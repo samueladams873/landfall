@@ -1,0 +1,15 @@
+[project]
+name = "landfall"
+version = "0.0.1"
+description = "A safe, open-source Windows to Linux migration assistant"
+readme = "README.md"
+license = "GPL-3.0-or-later"
+requires-python = ">=3.12"
+dependencies = ["PySide6>=6.10"]
+
+[project.scripts]
+landfall = "landfall.app:main"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
