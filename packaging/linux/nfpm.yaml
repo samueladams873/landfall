@@ -17,12 +17,16 @@ overrides:
       - libxcb-cursor0
       - libegl1
       - libxkbcommon-x11-0
+      - libfontconfig1
+      - libfreetype6
     recommends:
       - flatpak
   rpm:
     depends:
       - xcb-util-cursor
       - libxkbcommon-x11
+      - fontconfig
+      - freetype
     recommends:
       - flatpak
 contents:

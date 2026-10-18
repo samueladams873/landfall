@@ -1,230 +1,194 @@
 """Landfall on Linux: unpack the bundle made on Windows and set up the new PC."""
 from __future__ import annotations
 
-import subprocess
-import sys
-import time
+import shutil
 from datetime import datetime
 from pathlib import Path
 
 from PySide6.QtCore import Qt, QUrl
-from PySide6.QtGui import QDesktopServices, QIcon
-from PySide6.QtWidgets import (QApplication, QCheckBox, QFileDialog, QFrame, QGridLayout,
-                               QHBoxLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem,
-                               QMessageBox, QProgressBar, QPushButton, QScrollArea,
-                               QStackedWidget, QVBoxLayout, QWidget)
+from PySide6.QtGui import QDesktopServices
+from PySide6.QtWidgets import (QCheckBox, QFileDialog, QGridLayout, QHBoxLayout, QLabel,
+                               QLineEdit, QListWidget, QListWidgetItem, QMessageBox,
+                               QProgressBar, QPushButton, QScrollArea, QVBoxLayout, QWidget)
 
-from landfall import __version__
-from landfall.app import (ICON, HeaderPage, SidePage, label, logo, set_role, start_task)
 from landfall.linux import apps as apps_mod
 from landfall.linux.dirs import user_dirs
 from landfall.linux.restore import (RestoreCancelled, WrongPassword, find_bundles,
                                     read_manifest, restore)
 from landfall.scan.folders import human_size
-from landfall.theme import STYLE
+from landfall.ui import (ICONS, ChoiceRow, HeroPage, Page, Shell, card, folder_icon, label,
+                         make_app, picture, set_role, start_task)
+
+STEPS = ["Welcome", "Find your bundle", "Unlock it", "Choose what to bring", "Install apps",
+         "Setting up", "All done"]
 
 
-class Importer(QWidget):
+class Importer(Shell):
     WELCOME, FIND, PASSWORD, WHAT, APPS, WORKING, DONE = range(7)
 
     def __init__(self):
-        super().__init__()
-        self.setObjectName("Root")
+        super().__init__(STEPS, "Welcome to Linux")
         self.setWindowTitle("Landfall Moving Wizard")
-        self.resize(860, 620)
-        self.bundles = []
-        self.bundle = None
-        self.manifest = None
-        self.password = ""
+        self.bundles, self.bundle, self.manifest, self.password = [], None, None, ""
         self.dests = user_dirs()
-        self.folder_checks: dict[str, QCheckBox] = {}
-        self.app_checks: list[tuple[QCheckBox, apps_mod.AppChoice]] = []
+        self.folder_rows: dict[str, ChoiceRow] = {}
+        self.app_rows: list[tuple[ChoiceRow, apps_mod.AppChoice]] = []
         self.link_apps: list[apps_mod.AppChoice] = []
         self._cancel = False
+        self._checking = False
         self.restore_result = None
         self.app_results: list[tuple[str, bool, str]] = []
-
-        root = QVBoxLayout(self)
-        root.setContentsMargins(0, 0, 0, 0)
-        root.setSpacing(0)
-        root.addWidget(self._banner())
-        self.stack = QStackedWidget()
-        root.addWidget(self.stack, 1)
-        root.addWidget(self._footer())
+        self.back_btn.clicked.connect(self.on_back)
+        self.next_btn.clicked.connect(self.on_next)
         for build in (self._page_welcome, self._page_find, self._page_password,
                       self._page_what, self._page_apps, self._page_working, self._page_done):
             self.stack.addWidget(build())
         self.go(self.WELCOME)
 
-    # chrome -------------------------------------------------------------
-    def _banner(self):
-        banner = QFrame()
-        banner.setObjectName("Banner")
-        row = QHBoxLayout(banner)
-        row.setContentsMargins(14, 8, 18, 8)
-        row.addWidget(logo(46))
-        row.addSpacing(6)
-        col = QVBoxLayout()
-        col.setSpacing(0)
-        col.addWidget(label("Landfall Moving Wizard", "BannerTitle"))
-        col.addWidget(label("Welcome to Linux. Let's bring your things over.", "BannerSub"))
-        row.addLayout(col, 1)
-        return banner
-
-    def _footer(self):
-        footer = QFrame()
-        footer.setObjectName("Footer")
-        f = QHBoxLayout(footer)
-        f.setContentsMargins(16, 10, 16, 10)
-        f.addStretch(1)
-        self.back_btn = QPushButton("< Back")
-        self.next_btn = QPushButton("Next >")
-        self.next_btn.setObjectName("Primary")
-        self.cancel_btn = QPushButton("Cancel")
-        self.back_btn.clicked.connect(self.on_back)
-        self.next_btn.clicked.connect(self.on_next)
-        self.cancel_btn.clicked.connect(self.close)
-        for b in (self.back_btn, self.next_btn):
-            f.addWidget(b)
-        f.addSpacing(10)
-        f.addWidget(self.cancel_btn)
-        return footer
-
-    # pages --------------------------------------------------------------
+    # --- pages ------------------------------------------------------------
     def _page_welcome(self):
-        page = SidePage("Welcome")
-        b = page.body
-        b.addWidget(label("Welcome to your new Linux PC", "BigTitle"))
-        b.addSpacing(10)
-        b.addWidget(label("Landfall will take the bundle you made on Windows and:"))
-        for line in ("1.  Put your documents, pictures and other files in the right folders",
-                     "2.  Install the Linux versions of your apps",
-                     "3.  Give you a short list of anything left to do"):
-            b.addWidget(label(line))
-        b.addSpacing(10)
-        b.addWidget(label("Plug in the USB drive with your bundle now, if you haven't yet.",
-                          "Good"))
-        b.addStretch(1)
-        b.addWidget(label("Click Next to continue.", "Muted"))
+        page = HeroPage("Welcome to your new PC", "Let's bring your things over from Windows.")
+        frame, box = card()
+        box.addWidget(label("Landfall will", "Section"))
+        for icon, title, text in (
+                ("Documents", "Unpack your files", "Documents, pictures and more go into the "
+                                                   "matching folders."),
+                ("Apps", "Install your apps", "The Linux versions of the apps you used."),
+                ("Soon", "Show what's left", "A short to-do list at the end.")):
+            row = QHBoxLayout()
+            row.addWidget(picture(ICONS / f"{icon}.svg", 30))
+            row.addSpacing(10)
+            col = QVBoxLayout()
+            col.setSpacing(0)
+            col.addWidget(label(f"<b>{title}</b>"))
+            col.addWidget(label(text, "Muted"))
+            row.addLayout(col, 1)
+            box.addLayout(row)
+        page.body.addWidget(frame)
+        page.body.addSpacing(6)
+        page.body.addWidget(label("Plug in the USB drive with your Landfall Move folder now, "
+                                  "if you haven't yet.", "Good"))
+        page.body.addStretch(1)
         return page
 
     def _page_find(self):
-        page = HeaderPage("Find your bundle", "Pick the bundle you made on your Windows PC.")
-        b = page.body
-        self.find_status = label("")
-        b.addWidget(self.find_status)
+        page = Page("Find your bundle", "Pick the one you made on your Windows PC.")
+        self.find_status = label("", "Section")
+        page.body.addWidget(self.find_status)
         self.bundle_list = QListWidget()
         self.bundle_list.currentRowChanged.connect(lambda _: self.update_buttons())
-        b.addWidget(self.bundle_list, 1)
+        page.body.addWidget(self.bundle_list, 1)
         row = QHBoxLayout()
         again = QPushButton("Look again")
-        again.clicked.connect(self.refresh_bundles)
+        again.clicked.connect(lambda: self.refresh_bundles())
         browse = QPushButton("Look somewhere else...")
         browse.clicked.connect(self.browse_bundle)
         row.addWidget(again)
         row.addWidget(browse)
         row.addStretch(1)
-        b.addLayout(row)
+        page.body.addLayout(row)
         return page
 
     def _page_password(self):
-        page = HeaderPage("Unlock your bundle", "Type the password you chose on Windows.")
-        b = page.body
+        page = Page("Unlock your bundle", "Type the password you chose on your Windows PC.")
+        frame, box = card()
         grid = QGridLayout()
+        grid.setHorizontalSpacing(12)
         self.pw = QLineEdit()
         self.pw.setEchoMode(QLineEdit.EchoMode.Password)
+        self.pw.setPlaceholderText("Your bundle password")
         self.pw.textChanged.connect(lambda _: self.update_buttons())
         self.pw.returnPressed.connect(self.on_next)
-        grid.addWidget(QLabel("Password:"), 0, 0)
+        grid.addWidget(QLabel("Password"), 0, 0)
         grid.addWidget(self.pw, 0, 1)
         show = QCheckBox("Show password")
         show.toggled.connect(lambda on: self.pw.setEchoMode(
             QLineEdit.EchoMode.Normal if on else QLineEdit.EchoMode.Password))
         grid.addWidget(show, 1, 1)
-        b.addLayout(grid)
+        box.addLayout(grid)
         self.pw_status = label("")
-        b.addWidget(self.pw_status)
-        b.addStretch(1)
+        box.addWidget(self.pw_status)
+        page.body.addWidget(frame)
+        page.body.addStretch(1)
         return page
 
+    def _scroll_box(self, page):
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        holder = QWidget()
+        holder.setObjectName("Content")
+        box = QVBoxLayout(holder)
+        box.setContentsMargins(0, 0, 6, 0)
+        box.setSpacing(8)
+        box.setAlignment(Qt.AlignmentFlag.AlignTop)
+        scroll.setWidget(holder)
+        page.body.addWidget(scroll, 1)
+        return box
+
     def _page_what(self):
-        page = HeaderPage("Choose what to bring in",
-                          "Tick the folders to unpack. Nothing already here gets replaced.")
-        b = page.body
-        self.what_grid = QGridLayout()
-        self.what_grid.setColumnStretch(2, 1)
-        b.addLayout(self.what_grid)
-        b.addSpacing(10)
-        self.what_info = label("", "Muted")
-        b.addWidget(self.what_info)
-        b.addStretch(1)
-        self.what_total = label("")
-        b.addWidget(self.what_total)
+        page = Page("Choose what to bring in",
+                    "Tick the folders to unpack. Nothing already on this PC gets replaced.")
+        self.what_box = self._scroll_box(page)
+        self.what_total = label("", "Section")
+        page.body.addWidget(self.what_total)
         return page
 
     def _page_apps(self):
-        page = HeaderPage("Install your apps",
-                          "These are the Linux versions of the apps you used on Windows.")
-        b = page.body
+        page = Page("Install your apps",
+                    "The Linux versions of the apps you used on Windows.")
         self.apps_note = label("", "Muted")
-        b.addWidget(self.apps_note)
-        scroll = QScrollArea()
-        scroll.setWidgetResizable(True)
-        scroll.setFrameShape(QFrame.Shape.NoFrame)
-        holder = QWidget()
-        holder.setStyleSheet("background: transparent;")
-        self.apps_box = QVBoxLayout(holder)
-        self.apps_box.setAlignment(Qt.AlignmentFlag.AlignTop)
-        scroll.setWidget(holder)
-        b.addWidget(scroll, 1)
+        page.body.addWidget(self.apps_note)
+        self.apps_box = self._scroll_box(page)
         return page
 
     def _page_working(self):
-        page = HeaderPage("Setting up your PC", "This can take a while. Keep the drive plugged in.")
-        b = page.body
-        b.addStretch(1)
-        self.work_status = label("Starting...")
-        b.addWidget(self.work_status)
+        page = Page("Setting up your PC", "Keep the drive plugged in. This can take a while.")
+        frame, box = card()
+        self.work_status = label("Starting...", "Section")
+        box.addWidget(self.work_status)
         self.work_bar = QProgressBar()
         self.work_bar.setRange(0, 1000)
-        b.addWidget(self.work_bar)
+        box.addWidget(self.work_bar)
         self.work_detail = label("", "Muted")
-        b.addWidget(self.work_detail)
+        box.addWidget(self.work_detail)
         row = QHBoxLayout()
         row.addStretch(1)
         self.stop_btn = QPushButton("Stop")
         self.stop_btn.clicked.connect(self.stop_work)
         row.addWidget(self.stop_btn)
-        b.addLayout(row)
-        b.addStretch(2)
+        box.addLayout(row)
+        page.body.addWidget(frame)
+        page.body.addStretch(1)
         return page
 
     def _page_done(self):
-        page = SidePage("You've landed!")
-        b = page.body
-        b.addWidget(label("Your new PC is ready", "BigTitle"))
-        b.addSpacing(8)
+        page = HeroPage("You've landed!", "Your new PC is ready.")
+        frame, box = card()
         self.done_summary = label("")
         self.done_summary.setTextFormat(Qt.TextFormat.RichText)
-        b.addWidget(self.done_summary)
-        b.addSpacing(8)
-        b.addWidget(label("<b>What's left to do</b>"))
+        box.addWidget(self.done_summary)
+        page.body.addWidget(frame)
+        frame2, box2 = card()
+        box2.addWidget(label("What's left to do", "Section"))
         self.todo = label("")
         self.todo.setTextFormat(Qt.TextFormat.RichText)
         self.todo.setOpenExternalLinks(True)
-        b.addWidget(self.todo)
-        b.addStretch(1)
+        box2.addWidget(self.todo)
+        page.body.addWidget(frame2)
         row = QHBoxLayout()
-        docs = QPushButton("Open my files")
-        docs.clicked.connect(lambda: QDesktopServices.openUrl(QUrl.fromLocalFile(str(Path.home()))))
-        row.addWidget(docs)
+        files = QPushButton("Open my files")
+        files.clicked.connect(lambda: QDesktopServices.openUrl(
+            QUrl.fromLocalFile(str(Path.home()))))
+        row.addWidget(files)
         row.addStretch(1)
-        b.addLayout(row)
+        page.body.addLayout(row)
+        page.body.addStretch(1)
         return page
 
-    # navigation ---------------------------------------------------------
+    # --- navigation -------------------------------------------------------
     def go(self, index):
         self.stack.setCurrentIndex(index)
+        self.set_step(index)
         if index == self.FIND:
             self.refresh_bundles()
         if index == self.PASSWORD:
@@ -233,20 +197,17 @@ class Importer(QWidget):
 
     def update_buttons(self):
         i = self.stack.currentIndex()
-        self.back_btn.setEnabled(i not in (self.WELCOME, self.WORKING, self.DONE))
-        self.cancel_btn.setEnabled(i != self.DONE)
-        self.next_btn.setText({self.APPS: "Start", self.DONE: "Finish",
-                               self.PASSWORD: "Unlock"}.get(i, "Next >"))
-        ok = {
+        self.back_btn.setVisible(i not in (self.WELCOME, self.DONE))
+        self.back_btn.setEnabled(i != self.WORKING)
+        self.cancel_btn.setVisible(i != self.DONE)
+        self.next_btn.setText({self.WELCOME: "Get started", self.PASSWORD: "Unlock",
+                               self.APPS: "Start", self.DONE: "Finish"}.get(i, "Next"))
+        self.next_btn.setEnabled({
             self.WELCOME: True,
             self.FIND: 0 <= self.bundle_list.currentRow() < len(self.bundles),
-            self.PASSWORD: bool(self.pw.text()) and not getattr(self, "_checking", False),
-            self.WHAT: self._space_ok(),
-            self.APPS: True,
-            self.WORKING: False,
-            self.DONE: True,
-        }[i]
-        self.next_btn.setEnabled(ok)
+            self.PASSWORD: bool(self.pw.text()) and not self._checking,
+            self.WHAT: self._space_ok(), self.APPS: True, self.WORKING: False,
+            self.DONE: True}[i])
 
     def on_back(self):
         self.go(max(self.stack.currentIndex() - 1, 0))
@@ -277,18 +238,20 @@ class Importer(QWidget):
             self._cancel = True
         event.accept()
 
-    # step: find --------------------------------------------------------
+    # --- step: find -------------------------------------------------------
     def refresh_bundles(self, roots=None):
         self.bundles = find_bundles(roots) if roots else find_bundles()
         self.bundle_list.clear()
         for bundle in self.bundles:
             when = datetime.fromtimestamp(bundle.folder.stat().st_mtime)
             self.bundle_list.addItem(QListWidgetItem(
-                f"{bundle.move_folder}     {human_size(bundle.size)}, made {when:%B %d, %Y}"))
+                f"{bundle.move_folder}\n{human_size(bundle.size)}  \u00b7  made "
+                f"{when:%B %d, %Y}"))
         if self.bundles:
             self.bundle_list.setCurrentRow(0)
             set_role(self.find_status, "Good")
-            self.find_status.setText(f"Found {len(self.bundles)} bundle(s).")
+            self.find_status.setText(f"\u2714  Found {len(self.bundles)} bundle"
+                                     f"{'s' if len(self.bundles) > 1 else ''}.")
         else:
             set_role(self.find_status, "Warn")
             self.find_status.setText("No bundle found yet. Plug in your USB drive, wait a few "
@@ -296,11 +259,12 @@ class Importer(QWidget):
         self.update_buttons()
 
     def browse_bundle(self):
-        folder = QFileDialog.getExistingDirectory(self, "Where is your bundle?", str(Path.home()))
+        folder = QFileDialog.getExistingDirectory(self, "Where is your Landfall Move folder?",
+                                                  str(Path.home()))
         if folder:
             self.refresh_bundles([Path(folder)])
 
-    # step: password ----------------------------------------------------
+    # --- step: password ---------------------------------------------------
     def check_password(self):
         self._checking = True
         self.update_buttons()
@@ -321,47 +285,44 @@ class Importer(QWidget):
     def password_bad(self, err):
         self._checking = False
         set_role(self.pw_status, "Warn")
-        if isinstance(err, WrongPassword):
-            self.pw_status.setText("That password didn't unlock the bundle. Check Caps Lock "
-                                   "and try again.")
-        else:
-            self.pw_status.setText(f"The bundle couldn't be opened: {err}")
+        self.pw_status.setText("That password didn't unlock the bundle. Check Caps Lock and "
+                               "try again." if isinstance(err, WrongPassword)
+                               else f"The bundle couldn't be opened: {err}")
         self.update_buttons()
 
-    # step: what --------------------------------------------------------
+    # --- step: what -------------------------------------------------------
+    @staticmethod
+    def _clear(box):
+        while box.count():
+            item = box.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
+
     def fill_what(self):
-        while self.what_grid.count():
-            w = self.what_grid.takeAt(0).widget()
-            if w:
-                w.deleteLater()
-        self.folder_checks.clear()
+        self._clear(self.what_box)
+        self.folder_rows.clear()
         stats: dict[str, list[int]] = {}
         for f in self.manifest.get("files", []):
-            top = f["path"].split("/", 1)[0]
-            s = stats.setdefault(top, [0, 0])
+            s = stats.setdefault(f["path"].split("/", 1)[0], [0, 0])
             s[0] += 1
             s[1] += f["size"]
-        for row, name in enumerate(self.manifest.get("folders", [])):
+        for name in self.manifest.get("folders", []):
             files, size = stats.get(name, [0, 0])
-            box = QCheckBox(name)
-            box.setChecked(files > 0)
-            box.setEnabled(files > 0)
-            box.toggled.connect(lambda _: self.update_what())
-            self.folder_checks[name] = box
-            self.what_grid.addWidget(box, row, 0)
-            self.what_grid.addWidget(label(f"{files:,} files, {human_size(size)}", "Muted",
-                                           wrap=False), row, 1)
             dest = self.dests.get(name, Path.home() / name)
-            self.what_grid.addWidget(label(f"\u2192  {dest}", "Muted", wrap=False), row, 2)
+            detail = (f"{files:,} files  \u00b7  {human_size(size)}  \u2192  {dest}" if files
+                      else "Empty")
+            row = ChoiceRow(folder_icon(name), name, detail, files > 0, files > 0)
+            row.box.toggled.connect(lambda _: self.update_what())
+            self.folder_rows[name] = row
+            self.what_box.addWidget(row)
         made = self.manifest.get("created", "")[:10]
-        self.what_info.setText(f"Bundle made on {made} by Landfall "
-                               f"{self.manifest.get('landfall_version', '?')}. If a file with "
-                               "the same name is already here, the new one is saved as "
-                               "\u201cname (from Windows)\u201d.")
+        self.what_box.addWidget(label(
+            f"Bundle made {made}. If a file with the same name is already here, the one from "
+            "Windows is saved as \u201cname (from Windows)\u201d.", "Muted"))
         self.update_what()
 
     def chosen_folders(self):
-        return [n for n, b in self.folder_checks.items() if b.isChecked()]
+        return [n for n, r in self.folder_rows.items() if r.box.isChecked()]
 
     def chosen_bytes(self):
         chosen = set(self.chosen_folders())
@@ -371,17 +332,14 @@ class Importer(QWidget):
     def _space_ok(self):
         if not self.manifest:
             return False
-        import shutil as _sh
-        return _sh.disk_usage(Path.home()).free > self.chosen_bytes() * 2 + 200 * 1024 * 1024
+        return shutil.disk_usage(Path.home()).free > self.chosen_bytes() * 2 + 200 * 1024 ** 2
 
     def update_what(self):
-        need = self.chosen_bytes()
-        import shutil as _sh
-        free = _sh.disk_usage(Path.home()).free
+        need, free = self.chosen_bytes(), shutil.disk_usage(Path.home()).free
         if self._space_ok():
-            set_role(self.what_total, "Good")
-            self.what_total.setText(f"Bringing in {human_size(need)}. "
-                                    f"{human_size(free)} free on this PC.")
+            set_role(self.what_total, "Section")
+            self.what_total.setText(f"Bringing in {human_size(need)}  \u00b7  "
+                                    f"{human_size(free)} free on this PC")
         else:
             set_role(self.what_total, "Warn")
             self.what_total.setText(f"Not enough room: unpacking needs about "
@@ -389,49 +347,47 @@ class Importer(QWidget):
                                     f"{human_size(free)} is free.")
         self.update_buttons()
 
-    # step: apps --------------------------------------------------------
+    # --- step: apps -------------------------------------------------------
     def fill_apps(self):
-        while self.apps_box.count():
-            w = self.apps_box.takeAt(0).widget()
-            if w:
-                w.deleteLater()
-        self.app_checks.clear()
-        self.link_apps = []
+        self._clear(self.apps_box)
+        self.app_rows.clear()
         choices = apps_mod.choices_from_manifest(self.manifest)
         installed = apps_mod.installed_flatpaks()
         installable = [c for c in choices if c.flatpak]
         self.link_apps = [c for c in choices if not c.flatpak]
-        if not apps_mod.flatpak_available():
-            self.apps_note.setText("First, Landfall will set up Flatpak, the app store most "
-                                   "Linux PCs use. You'll be asked for your computer "
-                                   "password once.")
-        else:
-            self.apps_note.setText("Apps are installed just for you, from Flathub.")
-        if not installable and not self.link_apps:
+        self.apps_note.setText(
+            "Apps are installed just for you, from Flathub." if apps_mod.flatpak_available()
+            else "First, Landfall will set up Flatpak, the app store most Linux PCs use. "
+                 "You'll be asked for your computer password once.")
+        if not choices:
             self.apps_box.addWidget(label("No matching apps were found in your bundle.",
                                           "Muted"))
         for c in installable:
             already = c.flatpak in installed
-            text = f"{c.linux_name}     (for your {c.windows_name})"
-            box = QCheckBox(text + ("   - already installed" if already else ""))
-            box.setChecked(not already)
-            box.setEnabled(not already)
-            self.app_checks.append((box, c))
-            self.apps_box.addWidget(box)
+            row = ChoiceRow(ICONS / "Apps.svg", c.linux_name,
+                            f"For your {c.windows_name}" + ("  \u00b7  already installed"
+                                                            if already else ""),
+                            not already, not already)
+            self.app_rows.append((row, c))
+            self.apps_box.addWidget(row)
         if self.link_apps:
-            self.apps_box.addSpacing(10)
-            self.apps_box.addWidget(label("<b>Get these from their websites</b> "
-                                          "(links will be on the last page)"))
+            self.apps_box.addSpacing(6)
+            self.apps_box.addWidget(label("From their websites (links on the last page)",
+                                          "Section"))
             for c in self.link_apps:
-                tag = "  [new, Oct 2026]" if c.new else ""
-                self.apps_box.addWidget(label(f"\u2022  {c.linux_name}{tag}     "
-                                              f"(for your {c.windows_name})", "Muted"))
+                row = ChoiceRow(ICONS / "Soon.svg", c.linux_name, f"For your {c.windows_name}",
+                                False, False)
+                row.box.hide()
+                if c.new:
+                    row.side.addWidget(label("New", "PillNew", wrap=False))
+                self.apps_box.addWidget(row)
 
-    # step: working -----------------------------------------------------
+    # --- step: working ----------------------------------------------------
     def start_work(self):
         self._cancel = False
+        self.stop_btn.setEnabled(True)
         folders = self.chosen_folders()
-        apps = [c for box, c in self.app_checks if box.isChecked() and box.isEnabled()]
+        apps = [c for row, c in self.app_rows if row.box.isChecked() and row.box.isEnabled()]
         bundle, password, manifest, dests = self.bundle, self.password, self.manifest, self.dests
 
         def work(report):
@@ -441,7 +397,7 @@ class Importer(QWidget):
             app_results = []
             if apps and not self._cancel:
                 if not apps_mod.flatpak_available():
-                    report(("note", "Setting up Flatpak (watch for the password pop-up)..."))
+                    report(("note", "Setting up Flatpak. Watch for the password pop-up..."))
                     ok, msg = apps_mod.install_flatpak_tool()
                     if not ok:
                         return result, [(a.linux_name, False, msg) for a in apps]
@@ -461,13 +417,14 @@ class Importer(QWidget):
         kind = info[0]
         if kind == "files":
             _, done, total, name = info
-            self.work_status.setText(f"Unpacking your files: {human_size(done)} of "
-                                     f"{human_size(total)}")
+            self.work_bar.setRange(0, 1000)
             self.work_bar.setValue(int(1000 * done / total) if total else 1000)
+            pct = int(100 * done / total) if total else 100
+            self.work_status.setText(f"Unpacking your files  \u00b7  {pct}%")
             self.work_detail.setText(name)
         elif kind == "note":
             self.work_status.setText(info[1])
-            self.work_bar.setRange(0, 0)  # busy animation
+            self.work_bar.setRange(0, 0)
             self.work_detail.setText("")
         elif kind == "app":
             _, n, total, name = info
@@ -484,7 +441,7 @@ class Importer(QWidget):
     def work_done(self, result):
         self.restore_result, self.app_results = result
         r = self.restore_result
-        lines = [f"<b>{r.restored:,}</b> file(s) unpacked into your folders."]
+        lines = [f"<b>{r.restored:,} files</b> unpacked into your folders."]
         if r.already_there:
             lines.append(f"{r.already_there:,} were already here, so they were left alone.")
         if r.renamed:
@@ -492,14 +449,11 @@ class Importer(QWidget):
                          "because a different file had the same name.")
         good = [n for n, ok, _ in self.app_results if ok]
         if good:
-            lines.append(f"<b>{len(good)}</b> app(s) installed: {', '.join(good)}. "
-                         "Find them in your app menu.")
+            lines.append(f"<b>{len(good)} app{'s' if len(good) > 1 else ''}</b> installed: "
+                         f"{', '.join(good)}. Find them in your app menu.")
         self.done_summary.setText("<br>".join(lines))
-        todo = []
-        for name, ok, msg in self.app_results:
-            if not ok:
-                todo.append(f"\u2022 {name} didn't install. You can get it from your "
-                            "Software app.")
+        todo = [f"\u2022 {n} didn't install. You can get it from your Software app."
+                for n, ok, _ in self.app_results if not ok]
         for c in self.link_apps:
             if c.url:
                 tag = " (brand new, still young)" if c.new else ""
@@ -518,21 +472,15 @@ class Importer(QWidget):
     def work_failed(self, err):
         self.stop_btn.setEnabled(True)
         self.work_bar.setRange(0, 1000)
-        if isinstance(err, RestoreCancelled):
-            self.go(self.APPS)
-            return
-        QMessageBox.warning(self, "Something went wrong",
-                            f"Landfall stopped before finishing. Nothing already on this PC "
-                            f"was replaced.\n\nDetails: {err}")
+        if not isinstance(err, RestoreCancelled):
+            QMessageBox.warning(self, "Something went wrong",
+                                "Landfall stopped before finishing. Nothing already on this PC "
+                                f"was replaced.\n\nDetails: {err}")
         self.go(self.APPS)
 
 
 def main() -> int:
-    app = QApplication(sys.argv)
-    app.setStyle("Fusion")
-    app.setStyleSheet(STYLE)
-    app.setWindowIcon(QIcon(str(ICON)))
-    app.setDesktopFileName("landfall")
+    app = make_app()
     window = Importer()
     window.show()
     return app.exec()

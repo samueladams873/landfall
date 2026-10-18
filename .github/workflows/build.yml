@@ -31,6 +31,10 @@ jobs:
           pyinstaller --noconfirm --onedir --windowed --name landfall
           --paths "$PWD/src" --add-data "$PWD/src/landfall/data:landfall/data"
           --distpath build/linux --workpath build/work --specpath build run_landfall.py
+      - name: Use the computer's own font libraries
+        # Bundled copies from this older build machine can't read newer distros' font
+        # settings, which shows every letter as an empty box. Every desktop Linux has these.
+        run: rm -f build/linux/landfall/_internal/libfontconfig.so* build/linux/landfall/_internal/libfreetype.so* build/linux/landfall/_internal/libexpat.so*
       - name: Package .deb and .rpm
         run: |
           curl -sSL -o nfpm.tgz "https://github.com/goreleaser/nfpm/releases/download/v${NFPM_VERSION}/nfpm_${NFPM_VERSION}_Linux_x86_64.tar.gz"

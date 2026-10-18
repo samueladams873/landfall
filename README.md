@@ -10,11 +10,11 @@ PC, double-click Landfall, and everything lands where it belongs, with your apps
 It works with any Linux distro, and it only ever *reads* your Windows drive. It never changes
 or repartitions anything.
 
-> **Status: early development (v0.2).** Landfall can already check a Windows PC, pack your
+> **Status: early development (v0.3).** Landfall can already check a Windows PC, pack your
 > personal folders into a locked bundle, and unpack them on Linux with your apps installed.
 > The rest of the list below is being built now, one piece at a time.
 
-![Landfall on Windows](docs/screenshots/v0.2-welcome.png)
+![Landfall on Windows](docs/screenshots/v0.3-choose.png)
 
 ## What Landfall will move
 
