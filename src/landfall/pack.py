@@ -21,6 +21,7 @@ PART_SIZE = 3900 * 1024 * 1024
 BUNDLE_NAME = "Landfall-bundle.7z"
 INFO_NAME = "Landfall-info.7z"  # small locked file: list of contents, for a fast password check
 MOVE_FOLDER = "Landfall Move"
+DATA_FOLDER = ".landfall-data"  # hidden: users never need to open it; Landfall reads it
 FILTERS = [{"id": py7zr.FILTER_COPY}, {"id": py7zr.FILTER_CRYPTO_AES256_SHA256}]
 OVERHEAD = 1.01  # archive headers and padding
 EXTRA = 50 * 1024 * 1024
@@ -38,12 +39,11 @@ ON YOUR NEW LINUX PC
   2. Click Install and type your computer password.
   3. Open Landfall from your app menu and type your bundle password.
 
-WHAT'S IN THIS FOLDER
-  Landfall-bundle.7z.0001 (and any .0002, .0003 ... parts) hold your files, locked with the
-  password you chose. Keep all the parts together. Landfall-info.7z is a small locked list
-  of what's inside.
+  You don't need to open or unzip anything yourself. Landfall finds your locked files on
+  this drive and unpacks them for you.
 
-  You can also open the bundle anywhere with free 7-Zip (https://www.7-zip.org).
+PLEASE KEEP THIS WHOLE FOLDER TOGETHER
+  Your files are stored, locked with your password, in a hidden folder inside it.
 
 Learn more: https://github.com/samueladams873/landfall
 """
@@ -103,8 +103,10 @@ def pack(folders, password: str, drive_root: Path, extra_data: dict | None = Non
     """folders: measured FolderInfo objects. Never writes anywhere except drive_root."""
     if not password:
         raise ValueError("A password is required.")
-    out_dir = choose_output_folder(Path(drive_root))
+    move_dir = choose_output_folder(Path(drive_root))
+    out_dir = move_dir / DATA_FOLDER
     out_dir.mkdir(parents=True)
+    _hide(out_dir)
     bundle = out_dir / BUNDLE_NAME
     total = sum(f.bytes for f in folders)
     done = files = 0
@@ -139,18 +141,20 @@ def pack(folders, password: str, drive_root: Path, extra_data: dict | None = Non
                 z.writestr(json.dumps(manifest, indent=1), "landfall/manifest.json")
         progress(total, total, "")
     except BaseException:
-        for part in out_dir.glob("Landfall-*.7z*"):
-            part.unlink(missing_ok=True)
-        try:
-            out_dir.rmdir()
-        except OSError:
-            pass
+        shutil.rmtree(move_dir, ignore_errors=True)
         raise
     with py7zr.SevenZipFile(out_dir / INFO_NAME, "w", filters=FILTERS, password=password) as z:
         z.set_encrypted_header(True)
         z.writestr(json.dumps(manifest, indent=1), "landfall/manifest.json")
     for installer in linux_installers():
-        shutil.copyfile(installer, out_dir / INSTALLER_NAMES[installer.suffix])
-    (out_dir / "START HERE.txt").write_text(README.format(version=__version__), encoding="utf-8")
+        shutil.copyfile(installer, move_dir / INSTALLER_NAMES[installer.suffix])
+    (move_dir / "START HERE.txt").write_text(README.format(version=__version__), encoding="utf-8")
     parts = sorted(out_dir.glob(BUNDLE_NAME + ".*"))
-    return PackResult(out_dir, parts, files, done, skipped)
+    return PackResult(move_dir, parts, files, done, skipped)
+
+
+def _hide(path: Path) -> None:
+    """Hide the data folder in Windows Explorer too (Linux already hides dot-folders)."""
+    if sys.platform == "win32":
+        import ctypes
+        ctypes.windll.kernel32.SetFileAttributesW(str(path), 0x02)  # FILE_ATTRIBUTE_HIDDEN

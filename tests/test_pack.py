@@ -5,7 +5,7 @@ import py7zr
 import pytest
 
 from landfall import pack as pack_mod
-from landfall.pack import BUNDLE_NAME, PackCancelled, choose_output_folder, pack, space_needed
+from landfall.pack import BUNDLE_NAME, DATA_FOLDER, PackCancelled, choose_output_folder, pack, space_needed
 from landfall.scan.folders import FolderInfo, human_size, measure
 
 
@@ -23,7 +23,7 @@ def home(tmp_path):
 
 
 def open_bundle(result, password):
-    vol = multivolumefile.open(str(result.folder / BUNDLE_NAME), mode="rb")
+    vol = multivolumefile.open(str(result.folder / DATA_FOLDER / BUNDLE_NAME), mode="rb")
     return py7zr.SevenZipFile(vol, "r", password=password)
 
 
@@ -106,3 +106,14 @@ def test_copies_linux_installers(home, monkeypatch, tmp_path):
     assert (result.folder / "Landfall for Ubuntu and Mint.deb").read_bytes() == b"deb"
     assert (result.folder / "Landfall for Fedora.rpm").read_bytes() == b"rpm"
     assert space_needed(0) >= 6
+
+
+def test_user_only_sees_installers_and_start_here(home, monkeypatch, tmp_path):
+    fake = tmp_path / "linux2"
+    fake.mkdir()
+    (fake / "x.deb").write_bytes(b"d")
+    monkeypatch.setattr(pack_mod, "LINUX_DIR", fake)
+    result = pack(measured(home), "pw1234", home)
+    visible = sorted(p.name for p in result.folder.iterdir() if not p.name.startswith("."))
+    assert visible == ["Landfall for Ubuntu and Mint.deb", "START HERE.txt"]
+    assert (result.folder / DATA_FOLDER / "Landfall-info.7z").is_file()

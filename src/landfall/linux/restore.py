@@ -16,7 +16,7 @@ from py7zr.callbacks import ExtractCallback
 
 import tempfile
 
-from landfall.pack import BUNDLE_NAME, INFO_NAME
+from landfall.pack import BUNDLE_NAME, DATA_FOLDER, INFO_NAME
 
 MANIFEST = "landfall/manifest.json"
 
@@ -35,7 +35,14 @@ class Bundle:
 
     @property
     def folder(self) -> Path:
+        """Where the bundle's files live (the hidden data folder)."""
         return self.base.parent
+
+    @property
+    def move_folder(self) -> Path:
+        """The folder the user sees ("Landfall Move")."""
+        f = self.folder
+        return f.parent if f.name == DATA_FOLDER else f
 
     @property
     def size(self) -> int:
@@ -72,10 +79,14 @@ def find_bundles(roots: list[Path] | None = None, depth: int = 3) -> list[Bundle
         stack = [(root, 0)]
         while stack:
             folder, level = stack.pop()
-            first = folder / (BUNDLE_NAME + ".0001")
-            if first.is_file():
-                key = first.resolve()
-                found.setdefault(key, Bundle(folder / BUNDLE_NAME))
+            hit = None
+            for data in (folder / DATA_FOLDER, folder):  # new layout, then older bundles
+                if (data / (BUNDLE_NAME + ".0001")).is_file():
+                    hit = data
+                    break
+            if hit:
+                key = (hit / (BUNDLE_NAME + ".0001")).resolve()
+                found.setdefault(key, Bundle(hit / BUNDLE_NAME))
                 continue
             if level >= depth:
                 continue

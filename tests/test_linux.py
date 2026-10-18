@@ -32,7 +32,7 @@ def made(tmp_path):
 def test_finds_bundle_on_usb(made):
     tmp, _, _ = made
     found = find_bundles([tmp / "media"])
-    assert len(found) == 1 and found[0].folder.name == "Landfall Move"
+    assert len(found) == 1 and found[0].move_folder.name == "Landfall Move"
 
 
 def test_wrong_password(made):

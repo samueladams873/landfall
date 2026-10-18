@@ -361,7 +361,7 @@ class Wizard(QWidget):
         b.addWidget(label("The \u201cSTART HERE\u201d file in that folder has the same steps.",
                           "Muted"))
         b.addSpacing(10)
-        open_btn = QPushButton("Open the bundle folder")
+        open_btn = QPushButton("Open the Landfall Move folder")
         open_btn.clicked.connect(self.open_result_folder)
         row = QHBoxLayout()
         row.addWidget(open_btn)
@@ -625,8 +625,8 @@ class Wizard(QWidget):
 
     def pack_done(self, result):
         self.result = result
-        text = (f"Packed <b>{result.files:,} files</b> ({human_size(result.bytes)}) into "
-                f"<b>{len(result.parts)}</b> part(s) in:<br>{result.folder}")
+        text = (f"Packed <b>{result.files:,} files</b> ({human_size(result.bytes)}), locked "
+                f"with your password, into:<br><b>{result.folder}</b>")
         if result.skipped:
             text += (f"<br><br>{len(result.skipped):,} file(s) couldn't be read (for "
                      "example, open in another program) and were left out.")

@@ -284,7 +284,7 @@ class Importer(QWidget):
         for bundle in self.bundles:
             when = datetime.fromtimestamp(bundle.folder.stat().st_mtime)
             self.bundle_list.addItem(QListWidgetItem(
-                f"{bundle.folder}     {human_size(bundle.size)}, made {when:%B %d, %Y}"))
+                f"{bundle.move_folder}     {human_size(bundle.size)}, made {when:%B %d, %Y}"))
         if self.bundles:
             self.bundle_list.setCurrentRow(0)
             set_role(self.find_status, "Good")
