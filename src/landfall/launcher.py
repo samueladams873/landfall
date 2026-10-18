@@ -22,7 +22,25 @@ def _snapshot_hook():
     QTimer.singleShot(2500, take)
 
 
+def _selftest(out_path: str) -> int:
+    """Testing aid: LANDFALL_SELFTEST=/path.txt proves the packaged app can run system
+    programs (flatpak, xdg-open) with clean library settings, then exits."""
+    from landfall.sysenv import run
+    lines = []
+    for cmd in (["flatpak", "--version"], ["flatpak", "remotes", "--user"], ["xdg-open", "--version"]):
+        try:
+            p = run(cmd, capture_output=True, text=True, timeout=60)
+            lines.append(f"{' '.join(cmd)} -> exit {p.returncode}: {(p.stdout or p.stderr).strip()[:200]}")
+        except Exception as err:  # noqa: BLE001 - this is a diagnostic
+            lines.append(f"{' '.join(cmd)} -> FAILED {err}")
+    with open(out_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines) + "\n")
+    return 0
+
+
 def main() -> int:
+    if os.environ.get("LANDFALL_SELFTEST"):
+        return _selftest(os.environ["LANDFALL_SELFTEST"])
     mode = os.environ.get("LANDFALL_MODE") or ("pack" if sys.platform == "win32" else "unpack")
     if mode == "pack":
         from landfall.app import main as run

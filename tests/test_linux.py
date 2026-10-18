@@ -87,14 +87,36 @@ def test_cancel_leaves_nothing_behind(made):
     assert not list(home.glob(".landfall-unpack-*"))
 
 
-def test_app_choices(made):
+def test_old_bundles_get_the_recommended_pick(made):
     tmp, _, _ = made
     manifest = read_manifest(find_bundles([tmp / "media"])[0], "hunter22")
-    choices = choices_from_manifest(manifest)
-    by_name = {c.linux_name: c for c in choices}
-    assert by_name["Google Chrome"].flatpak == "com.google.Chrome"
-    assert by_name["GIMP"].flatpak == "org.gimp.GIMP"
-    assert by_name["PhotoCraft"].new and by_name["PhotoCraft"].url
+    names = {c.linux_name: c for c in choices_from_manifest(manifest)}
+    assert names["Google Chrome"].flatpak == "com.google.Chrome"
+    assert names["GIMP"].flatpak == "org.gimp.GIMP"   # first option for Photoshop
+    assert "PhotoCraft" not in names                   # extras are only installed if picked
+
+
+def test_user_picks_are_used_exactly():
+    manifest = {"install": [
+        {"windows": "Microsoft Edge", "name": "Firefox", "flatpak": "org.mozilla.firefox",
+         "commands": ["firefox"], "snap": "firefox"},
+        {"windows": "Adobe Photoshop", "name": "PhotoCraft",
+         "url": "https://github.com/storytold/photocraft", "new": True},
+    ], "apps": [{"name": "Microsoft Edge", "linux": [{"name": "Microsoft Edge"}]}]}
+    picks = choices_from_manifest(manifest)
+    assert [c.linux_name for c in picks] == ["Firefox", "PhotoCraft"]
+    assert picks[1].flatpak is None and picks[1].new
+
+
+def test_already_present_detects_snap_flatpak_and_command():
+    from landfall.linux.apps import AppChoice, already_present
+    ff = AppChoice("Microsoft Edge", "Firefox", "org.mozilla.firefox", None,
+                   commands=["definitely-not-a-real-command"], snap="firefox")
+    assert already_present(ff, set(), {"firefox"})
+    assert already_present(ff, {"org.mozilla.firefox"}, set())
+    assert not already_present(ff, set(), set())
+    sh = AppChoice("x", "Shell", "org.example.Sh", None, commands=["sh"])
+    assert already_present(sh, set(), set())
 
 
 def test_user_dirs_reads_translated_names(tmp_path, monkeypatch):

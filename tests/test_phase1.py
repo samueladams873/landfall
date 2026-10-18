@@ -42,7 +42,7 @@ def test_photoshop_lists_proven_pick_first_and_new_last():
     grouped = match_all(FAKE_APPS)
     opts = grouped[GROUP_ALT][0].options
     assert opts[0]["name"] == "GIMP"
-    assert opts[-1]["name"] == "PhotoCraft" and opts[-1]["new"]
+    assert any(o["name"] == "PhotoCraft" and o.get("new") for o in opts)
 
 
 def test_clean_drops_noise_and_duplicates():

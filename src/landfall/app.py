@@ -7,7 +7,7 @@ import time
 import webbrowser
 from pathlib import Path
 
-from PySide6.QtWidgets import (QCheckBox, QFileDialog, QGridLayout, QHBoxLayout, QLabel,
+from PySide6.QtWidgets import (QCheckBox, QComboBox, QFrame, QFileDialog, QGridLayout, QHBoxLayout, QLabel,
                                QLineEdit, QListWidget, QListWidgetItem, QMessageBox,
                                QProgressBar, QPushButton, QScrollArea, QTabWidget,
                                QTreeWidget, QTreeWidgetItem, QVBoxLayout, QWidget)
@@ -33,12 +33,13 @@ COMING_SOON = [
     "Game saves",
     "Product keys and licenses list",
 ]
-STEPS = ["Welcome", "Check this PC", "Choose what to move", "Choose where to save",
-         "Packing", "All done"]
+STEPS = ["Welcome", "Check this PC", "Pick your Linux apps", "Choose what to move",
+         "Choose where to save", "Packing", "All done"]
+SKIP = "Don't install"
 
 
 class Wizard(Shell):
-    WELCOME, CHECK, WHAT, WHERE, PACKING, DONE = range(6)
+    WELCOME, CHECK, PICK, WHAT, WHERE, PACKING, DONE = range(7)
 
     def __init__(self):
         super().__init__(STEPS, "Moving Wizard")
@@ -50,9 +51,10 @@ class Wizard(Shell):
         self.result = None
         self._cancel_pack = False
         self.folder_rows: dict[str, ChoiceRow] = {}
+        self.pick_rows: list[tuple[dict, QComboBox, QLabel]] = []
         self.back_btn.clicked.connect(self.on_back)
         self.next_btn.clicked.connect(self.on_next)
-        for build in (self._page_welcome, self._page_check, self._page_what,
+        for build in (self._page_welcome, self._page_check, self._page_pick, self._page_what,
                       self._page_where, self._page_packing, self._page_done):
             self.stack.addWidget(build())
         self.go(self.WELCOME)
@@ -64,7 +66,8 @@ class Wizard(Shell):
         frame, box = card()
         box.addWidget(label("Here's what happens next", "Section"))
         for icon, title, text in (
-                ("Apps", "Check this PC", "See which of your apps and devices work on Linux."),
+                ("Apps", "Check this PC and pick your apps",
+                 "See what works on Linux and choose the Linux apps you want."),
                 ("Documents", "Choose what to move", "Documents, pictures, music and more."),
                 ("Downloads", "Pack it up", "Everything goes onto a USB drive, locked with "
                                             "a password you choose.")):
@@ -110,6 +113,94 @@ class Wizard(Shell):
         row.addWidget(self.save_report_btn)
         page.body.addLayout(row)
         return page
+
+    def _page_pick(self):
+        page = Page("Pick your Linux apps",
+                    "We matched your Windows apps. Choose what you'd like on Linux; your new "
+                    "PC installs them for you.")
+        self.pick_box = QVBoxLayout()
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        holder = QWidget()
+        holder.setObjectName("Content")
+        holder.setLayout(self.pick_box)
+        self.pick_box.setContentsMargins(0, 0, 6, 0)
+        self.pick_box.setSpacing(8)
+        scroll.setWidget(holder)
+        page.body.addWidget(scroll, 1)
+        self.pick_total = label("", "Section")
+        page.body.addWidget(self.pick_total)
+        return page
+
+    def fill_pick(self):
+        while self.pick_box.count():
+            item = self.pick_box.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
+        self.pick_rows.clear()
+        matched = [r for g in GROUPS for r in self.grouped.get(g, []) if r.options]
+        unknown = [r for r in self.grouped.get(GROUPS[-1], []) if not r.options]
+        if not matched:
+            self.pick_box.addWidget(label("None of your apps have a Linux match we know of "
+                                          "yet. That's fine: your files still move.", "Muted"))
+        for r in matched:
+            row = QFrame()
+            row.setObjectName("Row")
+            line = QHBoxLayout(row)
+            line.setContentsMargins(14, 10, 14, 10)
+            line.setSpacing(12)
+            line.addWidget(picture(ICONS / "Apps.svg", 28))
+            words = QVBoxLayout()
+            words.setSpacing(1)
+            words.addWidget(label(f"<b>{r.app['name']}</b>", wrap=False))
+            about = label("", "Muted")
+            words.addWidget(about)
+            line.addLayout(words, 1)
+            combo = QComboBox()
+            combo.setMinimumWidth(230)
+            combo.setMinimumHeight(combo.fontMetrics().height() + 18)
+            for opt in r.options:
+                combo.addItem(opt["name"] + ("  (new)" if opt.get("new") else ""), opt)
+            combo.addItem(SKIP, None)
+            combo.currentIndexChanged.connect(lambda _=0, c=combo, a=about: self._pick_changed(c, a))
+            line.addWidget(combo)
+            self._pick_changed(combo, about)
+            self.pick_rows.append((r.app, combo, about))
+            self.pick_box.addWidget(row)
+        if unknown:
+            self.pick_box.addSpacing(6)
+            self.pick_box.addWidget(label(f"No Linux version known yet ({len(unknown)})",
+                                          "Section"))
+            self.pick_box.addWidget(label(", ".join(r.app["name"] for r in unknown), "Muted"))
+        self.pick_box.addStretch(1)
+        self.update_pick_total()
+
+    def _pick_changed(self, combo, about):
+        opt = combo.currentData()
+        if opt is None:
+            about.setText("Won't be installed.")
+        elif opt.get("flatpak"):
+            about.setText(opt.get("about", ""))
+        else:
+            about.setText(opt.get("about", "") + "  You'll get a link to it on your new PC.")
+        self.update_pick_total()
+
+    def update_pick_total(self):
+        picks = [c.currentData() for _, c, _ in self.pick_rows]
+        auto = len({p["flatpak"] for p in picks if p and p.get("flatpak")})
+        links = len({p["name"] for p in picks if p and not p.get("flatpak")})
+        text = f"{plural(auto, 'app')} will install automatically on your Linux PC"
+        if links:
+            text += f"  \u00b7  {plural(links, 'link')} for you to open"
+        self.pick_total.setText(text)
+
+    def chosen_apps(self) -> list[dict]:
+        out = []
+        for app, combo, _ in self.pick_rows:
+            opt = combo.currentData()
+            if opt:
+                out.append({"windows": app["name"], **opt})
+        return out
 
     def _page_what(self):
         page = Page("Choose what to move", "Tick what you want to bring to your Linux PC.")
@@ -221,6 +312,8 @@ class Wizard(Shell):
         self.set_step(index)
         if index == self.CHECK and self.grouped is None:
             self.start_check()
+        if index == self.PICK and not self.pick_rows and self.grouped is not None:
+            self.fill_pick()
         if index == self.WHAT and not self.folders:
             self.start_measure()
         if index == self.WHERE:
@@ -235,7 +328,8 @@ class Wizard(Shell):
         self.next_btn.setText({self.WELCOME: "Get started", self.WHERE: "Start packing",
                                self.DONE: "Finish"}.get(i, "Next"))
         self.next_btn.setEnabled({
-            self.WELCOME: True, self.CHECK: self.grouped is not None, self.WHAT: self.measured,
+            self.WELCOME: True, self.CHECK: self.grouped is not None, self.PICK: True,
+            self.WHAT: self.measured,
             self.WHERE: self._where_ready(), self.PACKING: False, self.DONE: True}[i])
 
     def on_back(self):
@@ -347,7 +441,7 @@ class Wizard(Shell):
         start_task(self, work, self.measure_done, self.task_failed, self.show_measured)
 
     def show_measured(self, folder):
-        text = f"{folder.files:,} files  \u00b7  {human_size(folder.bytes)}"
+        text = f"{plural(folder.files, 'file')}  \u00b7  {human_size(folder.bytes)}"
         if folder.cloud_only:
             text += f"  \u00b7  {folder.cloud_only:,} online-only OneDrive files stay in the cloud"
         self.folder_rows[folder.name].detail.setText(text)
@@ -429,7 +523,8 @@ class Wizard(Shell):
         self._cancel_pack = False
         self.stop_btn.setEnabled(True)
         folders, drive, password = self.selected_folders(), self.current_drive(), self.pw1.text()
-        extra = {"apps": self._app_records(), "hardware": self.hw or {}}
+        extra = {"apps": self._app_records(), "install": self.chosen_apps(),
+                 "hardware": self.hw or {}}
         self.pack_status.setText(f"Packing to {drive.title}...")
 
         def work(report):

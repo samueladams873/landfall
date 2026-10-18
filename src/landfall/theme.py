@@ -31,6 +31,13 @@ QFrame#Card QLabel, QFrame#Card QCheckBox {{ background: transparent; }}
 QFrame#Row {{ background: white; border: 1px solid #E3E9F3; border-radius: 10px; }}
 QFrame#Row:hover {{ border: 1px solid #A9C8FB; }}
 QFrame#Row QLabel, QFrame#Row QCheckBox {{ background: transparent; border: none; }}
+QFrame#Row QLabel#Pill {{ color: #1450B8; background: #E3EEFF; border-radius: 9px;
+    padding: 3px 10px; font-size: 9pt; font-weight: 600; }}
+QFrame#Row QLabel#PillNew {{ color: #8A4B00; background: #FFF0CC; border-radius: 9px;
+    padding: 3px 10px; font-size: 9pt; font-weight: 600; }}
+QFrame#Row QLabel#Good {{ color: #1E7E3A; background: #E2F6E8; border-radius: 9px;
+    padding: 3px 10px; font-size: 9pt; font-weight: 600; }}
+QFrame#Row QLabel#Muted {{ color: #5B6B82; }}
 
 QLabel#Hero {{ font-size: 22pt; font-weight: 700; }}
 QLabel#Section {{ font-size: 11.5pt; font-weight: 600; }}
@@ -71,6 +78,13 @@ QHeaderView::section {{ background: white; border: none; border-bottom: 1px soli
 QLineEdit {{ background: white; border: 1px solid #C9D3E3; border-radius: 8px;
     padding: 0 10px; }}
 QLineEdit:focus {{ border: 2px solid {BLUE}; padding: 0 9px; }}
+QComboBox {{ background: white; border: 1px solid #C9D3E3; border-radius: 8px; padding: 0 10px;
+    font-weight: 600; }}
+QComboBox:hover {{ border-color: {BLUE}; }}
+QComboBox::drop-down {{ border: none; width: 26px; }}
+QComboBox::down-arrow {{ image: url({_ICONS}/chevron.svg); width: 12px; height: 12px; }}
+QComboBox QAbstractItemView {{ background: white; border: 1px solid #C9D3E3; border-radius: 8px;
+    padding: 4px; selection-background-color: #DCEAFF; selection-color: {TEXT}; outline: none; }}
 QTabWidget::pane {{ border: none; top: 0; }}
 QTabBar::tab {{ background: transparent; border: none; padding: 8px 16px; margin-right: 4px;
     color: {MUTED}; font-weight: 600; border-bottom: 3px solid transparent; }}

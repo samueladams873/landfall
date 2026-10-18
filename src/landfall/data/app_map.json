@@ -1,88 +1,963 @@
 {
-  "version": 1,
-  "notes": "status: same = the same app exists on Linux; alternative = a different app does the same job; wine = only runs through Wine/Proton. Each pattern is a case-insensitive regex matched against the Windows display name.",
-  "apps": [
-    {"windows": "Google Chrome", "patterns": ["^google chrome"], "status": "same",
-     "linux": [{"name": "Google Chrome", "flatpak": "com.google.Chrome"}]},
-    {"windows": "Mozilla Firefox", "patterns": ["^mozilla firefox"], "status": "same",
-     "linux": [{"name": "Firefox", "flatpak": "org.mozilla.firefox"}]},
-    {"windows": "Microsoft Edge", "patterns": ["^microsoft edge$"], "status": "same",
-     "linux": [{"name": "Microsoft Edge", "flatpak": "com.microsoft.Edge"}]},
-    {"windows": "Brave", "patterns": ["^brave"], "status": "same",
-     "linux": [{"name": "Brave", "flatpak": "com.brave.Browser"}]},
-    {"windows": "Mozilla Thunderbird", "patterns": ["thunderbird"], "status": "same",
-     "linux": [{"name": "Thunderbird", "flatpak": "org.mozilla.Thunderbird"}]},
-    {"windows": "Spotify", "patterns": ["^spotify"], "status": "same",
-     "linux": [{"name": "Spotify", "flatpak": "com.spotify.Client"}]},
-    {"windows": "Discord", "patterns": ["^discord$"], "status": "same",
-     "linux": [{"name": "Discord", "flatpak": "com.discordapp.Discord"}]},
-    {"windows": "Steam", "patterns": ["^steam$"], "status": "same",
-     "linux": [{"name": "Steam (most Windows games run through Proton)", "flatpak": "com.valvesoftware.Steam"}]},
-    {"windows": "VLC media player", "patterns": ["^vlc media player"], "status": "same",
-     "linux": [{"name": "VLC", "flatpak": "org.videolan.VLC"}]},
-    {"windows": "Zoom", "patterns": ["^zoom"], "status": "same",
-     "linux": [{"name": "Zoom", "flatpak": "us.zoom.Zoom"}]},
-    {"windows": "Slack", "patterns": ["^slack"], "status": "same",
-     "linux": [{"name": "Slack", "flatpak": "com.slack.Slack"}]},
-    {"windows": "Signal", "patterns": ["^signal"], "status": "same",
-     "linux": [{"name": "Signal", "flatpak": "org.signal.Signal"}]},
-    {"windows": "Telegram Desktop", "patterns": ["^telegram"], "status": "same",
-     "linux": [{"name": "Telegram", "flatpak": "org.telegram.desktop"}]},
-    {"windows": "OBS Studio", "patterns": ["^obs studio"], "status": "same",
-     "linux": [{"name": "OBS Studio", "flatpak": "com.obsproject.Studio"}]},
-    {"windows": "Audacity", "patterns": ["^audacity"], "status": "same",
-     "linux": [{"name": "Audacity", "flatpak": "org.audacityteam.Audacity"}]},
-    {"windows": "Blender", "patterns": ["^blender"], "status": "same",
-     "linux": [{"name": "Blender", "flatpak": "org.blender.Blender"}]},
-    {"windows": "GIMP", "patterns": ["^gimp"], "status": "same",
-     "linux": [{"name": "GIMP", "flatpak": "org.gimp.GIMP"}]},
-    {"windows": "Visual Studio Code", "patterns": ["^microsoft visual studio code"], "status": "same",
-     "linux": [{"name": "Visual Studio Code", "flatpak": "com.visualstudio.code"}]},
-    {"windows": "Microsoft Office", "patterns": ["^microsoft office", "^microsoft 365"], "status": "alternative",
-     "linux": [{"name": "LibreOffice", "flatpak": "org.libreoffice.LibreOffice"},
-               {"name": "Office on the web (office.com in your browser)"}]},
-    {"windows": "Microsoft OneDrive", "patterns": ["^microsoft onedrive"], "status": "alternative",
-     "linux": [{"name": "OneDrive in your browser (onedrive.live.com)"}]},
-    {"windows": "Microsoft Teams", "patterns": ["^microsoft teams"], "status": "alternative",
-     "linux": [{"name": "Teams in your browser (teams.microsoft.com)"}]},
-    {"windows": "Adobe Photoshop", "patterns": ["^adobe photoshop"], "status": "alternative",
-     "linux": [{"name": "GIMP", "flatpak": "org.gimp.GIMP"},
-               {"name": "Krita", "flatpak": "org.kde.krita"},
-               {"name": "PhotoCraft", "url": "https://github.com/storytold/photocraft", "new": true}]},
-    {"windows": "Adobe Illustrator", "patterns": ["^adobe illustrator"], "status": "alternative",
-     "linux": [{"name": "Inkscape", "flatpak": "org.inkscape.Inkscape"},
-               {"name": "VectorCraft", "url": "https://github.com/storytold/vectorcraft", "new": true}]},
-    {"windows": "Adobe Premiere Pro", "patterns": ["^adobe premiere"], "status": "alternative",
-     "linux": [{"name": "Kdenlive", "flatpak": "org.kde.kdenlive"},
-               {"name": "DaVinci Resolve", "url": "https://www.blackmagicdesign.com/products/davinciresolve"},
-               {"name": "FilmCraft", "url": "https://github.com/storytold/filmcraft", "new": true}]},
-    {"windows": "Adobe Lightroom", "patterns": ["^adobe lightroom"], "status": "alternative",
-     "linux": [{"name": "darktable", "flatpak": "org.darktable.Darktable"},
-               {"name": "LightCraft", "url": "https://github.com/storytold/lightcraft", "new": true}]},
-    {"windows": "Adobe After Effects", "patterns": ["^adobe after effects"], "status": "alternative",
-     "linux": [{"name": "Natron", "flatpak": "fr.natron.Natron"},
-               {"name": "EffectCraft", "url": "https://github.com/storytold/effectcraft", "new": true}]},
-    {"windows": "Adobe InDesign", "patterns": ["^adobe indesign"], "status": "alternative",
-     "linux": [{"name": "Scribus", "flatpak": "net.scribus.Scribus"},
-               {"name": "DesignCraft", "url": "https://github.com/storytold/designcraft", "new": true}]},
-    {"windows": "Adobe Acrobat", "patterns": ["^adobe acrobat"], "status": "alternative",
-     "linux": [{"name": "Okular", "flatpak": "org.kde.okular"},
-               {"name": "PdfCraft", "url": "https://github.com/storytold/pdfcraft", "new": true}]},
-    {"windows": "Notepad++", "patterns": ["^notepad\\+\\+"], "status": "alternative",
-     "linux": [{"name": "Kate", "flatpak": "org.kde.kate"}]},
-    {"windows": "iTunes", "patterns": ["^itunes$"], "status": "alternative",
-     "linux": [{"name": "Rhythmbox", "flatpak": "org.gnome.Rhythmbox3"}]},
-    {"windows": "7-Zip", "patterns": ["^7-zip"], "status": "alternative",
-     "linux": [{"name": "PeaZip", "flatpak": "io.github.peazip.PeaZip"}]},
-    {"windows": "WinRAR", "patterns": ["^winrar"], "status": "alternative",
-     "linux": [{"name": "PeaZip", "flatpak": "io.github.peazip.PeaZip"}]},
-    {"windows": "KeePass", "patterns": ["^keepass"], "status": "alternative",
-     "linux": [{"name": "KeePassXC (opens your KeePass files)", "flatpak": "org.keepassxc.KeePassXC"}]},
-    {"windows": "Paint.NET", "patterns": ["^paint\\.net"], "status": "alternative",
-     "linux": [{"name": "Pinta", "flatpak": "com.github.PintaProject.Pinta"}]},
-    {"windows": "Epic Games Launcher", "patterns": ["^epic games launcher"], "status": "alternative",
-     "linux": [{"name": "Heroic Games Launcher", "flatpak": "com.heroicgameslauncher.hgl"}]},
-    {"windows": "Battle.net", "patterns": ["^battle\\.net"], "status": "wine",
-     "linux": [{"name": "Lutris (runs it through Wine)", "flatpak": "net.lutris.Lutris"}]}
-  ]
+ "version": 2,
+ "notes": "status: same = the same app exists on Linux; alternative = a different app does the same job; wine = only runs through Wine. The first option is the recommended pick.",
+ "apps": [
+  {
+   "windows": "Google Chrome",
+   "patterns": [
+    "^google chrome"
+   ],
+   "status": "same",
+   "linux": [
+    {
+     "name": "Google Chrome",
+     "about": "The same Chrome you know. Sign in to get your bookmarks back.",
+     "flatpak": "com.google.Chrome",
+     "commands": [
+      "google-chrome",
+      "google-chrome-stable"
+     ]
+    },
+    {
+     "name": "Chromium",
+     "about": "The open-source browser Chrome is built on. Looks and works like Chrome.",
+     "flatpak": "org.chromium.Chromium",
+     "commands": [
+      "chromium",
+      "chromium-browser"
+     ],
+     "snap": "chromium"
+    },
+    {
+     "name": "Brave",
+     "about": "Chrome-like browser that blocks ads and trackers.",
+     "flatpak": "com.brave.Browser",
+     "commands": [
+      "brave-browser"
+     ],
+     "snap": "brave"
+    },
+    {
+     "name": "Firefox",
+     "about": "Fast, private browser. Comes with most Linux PCs.",
+     "flatpak": "org.mozilla.firefox",
+     "commands": [
+      "firefox"
+     ],
+     "snap": "firefox"
+    }
+   ]
+  },
+  {
+   "windows": "Mozilla Firefox",
+   "patterns": [
+    "^mozilla firefox"
+   ],
+   "status": "same",
+   "linux": [
+    {
+     "name": "Firefox",
+     "about": "Fast, private browser. Comes with most Linux PCs.",
+     "flatpak": "org.mozilla.firefox",
+     "commands": [
+      "firefox"
+     ],
+     "snap": "firefox"
+    }
+   ]
+  },
+  {
+   "windows": "Microsoft Edge",
+   "patterns": [
+    "^microsoft edge$"
+   ],
+   "status": "alternative",
+   "linux": [
+    {
+     "name": "Firefox",
+     "about": "Fast, private browser. Comes with most Linux PCs.",
+     "flatpak": "org.mozilla.firefox",
+     "commands": [
+      "firefox"
+     ],
+     "snap": "firefox"
+    },
+    {
+     "name": "Chromium",
+     "about": "The open-source browser Chrome is built on. Looks and works like Chrome.",
+     "flatpak": "org.chromium.Chromium",
+     "commands": [
+      "chromium",
+      "chromium-browser"
+     ],
+     "snap": "chromium"
+    },
+    {
+     "name": "Brave",
+     "about": "Chrome-like browser that blocks ads and trackers.",
+     "flatpak": "com.brave.Browser",
+     "commands": [
+      "brave-browser"
+     ],
+     "snap": "brave"
+    },
+    {
+     "name": "Google Chrome",
+     "about": "The same Chrome you know. Sign in to get your bookmarks back.",
+     "flatpak": "com.google.Chrome",
+     "commands": [
+      "google-chrome",
+      "google-chrome-stable"
+     ]
+    },
+    {
+     "name": "Microsoft Edge",
+     "about": "The same Edge, if you really want to keep it.",
+     "flatpak": "com.microsoft.Edge",
+     "commands": [
+      "microsoft-edge",
+      "microsoft-edge-stable"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "Brave",
+   "patterns": [
+    "^brave"
+   ],
+   "status": "same",
+   "linux": [
+    {
+     "name": "Brave",
+     "about": "Chrome-like browser that blocks ads and trackers.",
+     "flatpak": "com.brave.Browser",
+     "commands": [
+      "brave-browser"
+     ],
+     "snap": "brave"
+    },
+    {
+     "name": "Firefox",
+     "about": "Fast, private browser. Comes with most Linux PCs.",
+     "flatpak": "org.mozilla.firefox",
+     "commands": [
+      "firefox"
+     ],
+     "snap": "firefox"
+    },
+    {
+     "name": "Chromium",
+     "about": "The open-source browser Chrome is built on. Looks and works like Chrome.",
+     "flatpak": "org.chromium.Chromium",
+     "commands": [
+      "chromium",
+      "chromium-browser"
+     ],
+     "snap": "chromium"
+    }
+   ]
+  },
+  {
+   "windows": "Opera",
+   "patterns": [
+    "^opera"
+   ],
+   "status": "same",
+   "linux": [
+    {
+     "name": "Opera",
+     "about": "The same Opera browser.",
+     "flatpak": "com.opera.Opera",
+     "commands": [
+      "opera"
+     ]
+    },
+    {
+     "name": "Firefox",
+     "about": "Fast, private browser. Comes with most Linux PCs.",
+     "flatpak": "org.mozilla.firefox",
+     "commands": [
+      "firefox"
+     ],
+     "snap": "firefox"
+    },
+    {
+     "name": "Chromium",
+     "about": "The open-source browser Chrome is built on. Looks and works like Chrome.",
+     "flatpak": "org.chromium.Chromium",
+     "commands": [
+      "chromium",
+      "chromium-browser"
+     ],
+     "snap": "chromium"
+    }
+   ]
+  },
+  {
+   "windows": "Vivaldi",
+   "patterns": [
+    "^vivaldi"
+   ],
+   "status": "same",
+   "linux": [
+    {
+     "name": "Vivaldi",
+     "about": "Customisable Chrome-based browser.",
+     "flatpak": "com.vivaldi.Vivaldi",
+     "commands": [
+      "vivaldi"
+     ]
+    },
+    {
+     "name": "Firefox",
+     "about": "Fast, private browser. Comes with most Linux PCs.",
+     "flatpak": "org.mozilla.firefox",
+     "commands": [
+      "firefox"
+     ],
+     "snap": "firefox"
+    },
+    {
+     "name": "Chromium",
+     "about": "The open-source browser Chrome is built on. Looks and works like Chrome.",
+     "flatpak": "org.chromium.Chromium",
+     "commands": [
+      "chromium",
+      "chromium-browser"
+     ],
+     "snap": "chromium"
+    }
+   ]
+  },
+  {
+   "windows": "Mozilla Thunderbird",
+   "patterns": [
+    "thunderbird"
+   ],
+   "status": "same",
+   "linux": [
+    {
+     "name": "Thunderbird",
+     "about": "The same email app.",
+     "flatpak": "org.mozilla.Thunderbird",
+     "commands": [
+      "thunderbird"
+     ],
+     "snap": "thunderbird"
+    }
+   ]
+  },
+  {
+   "windows": "Microsoft Outlook",
+   "patterns": [
+    "^microsoft outlook"
+   ],
+   "status": "alternative",
+   "linux": [
+    {
+     "name": "Thunderbird",
+     "about": "Free email and calendar app. Works with Outlook.com and Gmail.",
+     "flatpak": "org.mozilla.Thunderbird",
+     "commands": [
+      "thunderbird"
+     ],
+     "snap": "thunderbird"
+    },
+    {
+     "name": "Outlook in your browser",
+     "about": "Use Outlook on the web at outlook.live.com. Nothing to install.",
+     "url": "https://outlook.live.com"
+    }
+   ]
+  },
+  {
+   "windows": "Spotify",
+   "patterns": [
+    "^spotify"
+   ],
+   "status": "same",
+   "linux": [
+    {
+     "name": "Spotify",
+     "about": "The same Spotify.",
+     "flatpak": "com.spotify.Client",
+     "commands": [
+      "spotify"
+     ],
+     "snap": "spotify"
+    }
+   ]
+  },
+  {
+   "windows": "Discord",
+   "patterns": [
+    "^discord$"
+   ],
+   "status": "same",
+   "linux": [
+    {
+     "name": "Discord",
+     "about": "The same Discord.",
+     "flatpak": "com.discordapp.Discord",
+     "commands": [
+      "discord"
+     ],
+     "snap": "discord"
+    }
+   ]
+  },
+  {
+   "windows": "Steam",
+   "patterns": [
+    "^steam$"
+   ],
+   "status": "same",
+   "linux": [
+    {
+     "name": "Steam",
+     "about": "The same Steam. Most Windows games run through Proton.",
+     "flatpak": "com.valvesoftware.Steam",
+     "commands": [
+      "steam"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "VLC media player",
+   "patterns": [
+    "^vlc media player"
+   ],
+   "status": "same",
+   "linux": [
+    {
+     "name": "VLC",
+     "about": "The same VLC.",
+     "flatpak": "org.videolan.VLC",
+     "commands": [
+      "vlc"
+     ],
+     "snap": "vlc"
+    },
+    {
+     "name": "mpv",
+     "about": "Simple, fast video player.",
+     "flatpak": "io.mpv.Mpv",
+     "commands": [
+      "mpv"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "Zoom",
+   "patterns": [
+    "^zoom"
+   ],
+   "status": "same",
+   "linux": [
+    {
+     "name": "Zoom",
+     "about": "The same Zoom.",
+     "flatpak": "us.zoom.Zoom",
+     "commands": [
+      "zoom"
+     ],
+     "snap": "zoom-client"
+    }
+   ]
+  },
+  {
+   "windows": "Slack",
+   "patterns": [
+    "^slack"
+   ],
+   "status": "same",
+   "linux": [
+    {
+     "name": "Slack",
+     "about": "The same Slack.",
+     "flatpak": "com.slack.Slack",
+     "commands": [
+      "slack"
+     ],
+     "snap": "slack"
+    }
+   ]
+  },
+  {
+   "windows": "Signal",
+   "patterns": [
+    "^signal"
+   ],
+   "status": "same",
+   "linux": [
+    {
+     "name": "Signal",
+     "about": "The same Signal.",
+     "flatpak": "org.signal.Signal",
+     "commands": [
+      "signal-desktop"
+     ],
+     "snap": "signal-desktop"
+    }
+   ]
+  },
+  {
+   "windows": "Telegram Desktop",
+   "patterns": [
+    "^telegram"
+   ],
+   "status": "same",
+   "linux": [
+    {
+     "name": "Telegram",
+     "about": "The same Telegram.",
+     "flatpak": "org.telegram.desktop",
+     "commands": [
+      "telegram-desktop"
+     ],
+     "snap": "telegram-desktop"
+    }
+   ]
+  },
+  {
+   "windows": "OBS Studio",
+   "patterns": [
+    "^obs studio"
+   ],
+   "status": "same",
+   "linux": [
+    {
+     "name": "OBS Studio",
+     "about": "The same OBS.",
+     "flatpak": "com.obsproject.Studio",
+     "commands": [
+      "obs"
+     ],
+     "snap": "obs-studio"
+    }
+   ]
+  },
+  {
+   "windows": "Audacity",
+   "patterns": [
+    "^audacity"
+   ],
+   "status": "same",
+   "linux": [
+    {
+     "name": "Audacity",
+     "about": "The same Audacity.",
+     "flatpak": "org.audacityteam.Audacity",
+     "commands": [
+      "audacity"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "Blender",
+   "patterns": [
+    "^blender"
+   ],
+   "status": "same",
+   "linux": [
+    {
+     "name": "Blender",
+     "about": "The same Blender.",
+     "flatpak": "org.blender.Blender",
+     "commands": [
+      "blender"
+     ],
+     "snap": "blender"
+    }
+   ]
+  },
+  {
+   "windows": "GIMP",
+   "patterns": [
+    "^gimp"
+   ],
+   "status": "same",
+   "linux": [
+    {
+     "name": "GIMP",
+     "about": "The same GIMP.",
+     "flatpak": "org.gimp.GIMP",
+     "commands": [
+      "gimp"
+     ],
+     "snap": "gimp"
+    }
+   ]
+  },
+  {
+   "windows": "Visual Studio Code",
+   "patterns": [
+    "^microsoft visual studio code"
+   ],
+   "status": "same",
+   "linux": [
+    {
+     "name": "Visual Studio Code",
+     "about": "The same VS Code.",
+     "flatpak": "com.visualstudio.code",
+     "commands": [
+      "code"
+     ],
+     "snap": "code"
+    }
+   ]
+  },
+  {
+   "windows": "Obsidian",
+   "patterns": [
+    "^obsidian"
+   ],
+   "status": "same",
+   "linux": [
+    {
+     "name": "Obsidian",
+     "about": "The same Obsidian.",
+     "flatpak": "md.obsidian.Obsidian",
+     "commands": [
+      "obsidian"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "Bitwarden",
+   "patterns": [
+    "^bitwarden"
+   ],
+   "status": "same",
+   "linux": [
+    {
+     "name": "Bitwarden",
+     "about": "The same Bitwarden.",
+     "flatpak": "com.bitwarden.desktop",
+     "commands": [
+      "bitwarden"
+     ],
+     "snap": "bitwarden"
+    }
+   ]
+  },
+  {
+   "windows": "Microsoft Office",
+   "patterns": [
+    "^microsoft office",
+    "^microsoft 365"
+   ],
+   "status": "alternative",
+   "linux": [
+    {
+     "name": "LibreOffice",
+     "about": "Free office suite. Opens and saves Word, Excel and PowerPoint files.",
+     "flatpak": "org.libreoffice.LibreOffice",
+     "commands": [
+      "libreoffice",
+      "soffice"
+     ]
+    },
+    {
+     "name": "ONLYOFFICE",
+     "about": "Office suite that looks a lot like Microsoft Office.",
+     "flatpak": "org.onlyoffice.desktopeditors",
+     "commands": [
+      "onlyoffice-desktopeditors"
+     ]
+    },
+    {
+     "name": "Office in your browser",
+     "about": "Use Office on the web at office.com. Nothing to install.",
+     "url": "https://office.com"
+    }
+   ]
+  },
+  {
+   "windows": "Microsoft Teams",
+   "patterns": [
+    "^microsoft teams"
+   ],
+   "status": "alternative",
+   "linux": [
+    {
+     "name": "Teams in your browser",
+     "about": "Use Teams on the web at teams.microsoft.com. Nothing to install.",
+     "url": "https://teams.microsoft.com"
+    }
+   ]
+  },
+  {
+   "windows": "Microsoft OneDrive",
+   "patterns": [
+    "^microsoft onedrive"
+   ],
+   "status": "alternative",
+   "linux": [
+    {
+     "name": "OneDrive in your browser",
+     "about": "Use OneDrive on the web at onedrive.live.com. Nothing to install.",
+     "url": "https://onedrive.live.com"
+    }
+   ]
+  },
+  {
+   "windows": "Adobe Photoshop",
+   "patterns": [
+    "^adobe photoshop"
+   ],
+   "status": "alternative",
+   "linux": [
+    {
+     "name": "GIMP",
+     "about": "Powerful photo editor, the classic Photoshop alternative.",
+     "flatpak": "org.gimp.GIMP",
+     "commands": [
+      "gimp"
+     ],
+     "snap": "gimp"
+    },
+    {
+     "name": "Krita",
+     "about": "Great for drawing and painting.",
+     "flatpak": "org.kde.krita",
+     "commands": [
+      "krita"
+     ],
+     "snap": "krita"
+    },
+    {
+     "name": "PhotoCraft",
+     "about": "Brand-new free Photoshop look-alike that opens PSD files. Still young.",
+     "url": "https://github.com/storytold/photocraft",
+     "new": true
+    }
+   ]
+  },
+  {
+   "windows": "Adobe Illustrator",
+   "patterns": [
+    "^adobe illustrator"
+   ],
+   "status": "alternative",
+   "linux": [
+    {
+     "name": "Inkscape",
+     "about": "Professional vector drawing.",
+     "flatpak": "org.inkscape.Inkscape",
+     "commands": [
+      "inkscape"
+     ],
+     "snap": "inkscape"
+    },
+    {
+     "name": "VectorCraft",
+     "about": "Brand-new free Illustrator look-alike. Still young.",
+     "url": "https://github.com/storytold/vectorcraft",
+     "new": true
+    }
+   ]
+  },
+  {
+   "windows": "Adobe Premiere Pro",
+   "patterns": [
+    "^adobe premiere"
+   ],
+   "status": "alternative",
+   "linux": [
+    {
+     "name": "Kdenlive",
+     "about": "Full video editor, easy to learn.",
+     "flatpak": "org.kde.kdenlive",
+     "commands": [
+      "kdenlive"
+     ],
+     "snap": "kdenlive"
+    },
+    {
+     "name": "Shotcut",
+     "about": "Simple, reliable video editor.",
+     "flatpak": "org.shotcut.Shotcut",
+     "commands": [
+      "shotcut"
+     ],
+     "snap": "shotcut"
+    },
+    {
+     "name": "DaVinci Resolve",
+     "about": "Hollywood-grade editor. Free download from Blackmagic.",
+     "url": "https://www.blackmagicdesign.com/products/davinciresolve"
+    },
+    {
+     "name": "FilmCraft",
+     "about": "Brand-new free Premiere look-alike. Still young.",
+     "url": "https://github.com/storytold/filmcraft",
+     "new": true
+    }
+   ]
+  },
+  {
+   "windows": "Adobe Lightroom",
+   "patterns": [
+    "^adobe lightroom"
+   ],
+   "status": "alternative",
+   "linux": [
+    {
+     "name": "darktable",
+     "about": "Photo library and RAW editor.",
+     "flatpak": "org.darktable.Darktable",
+     "commands": [
+      "darktable"
+     ],
+     "snap": "darktable"
+    },
+    {
+     "name": "LightCraft",
+     "about": "Brand-new free Lightroom look-alike. Still young.",
+     "url": "https://github.com/storytold/lightcraft",
+     "new": true
+    }
+   ]
+  },
+  {
+   "windows": "Adobe After Effects",
+   "patterns": [
+    "^adobe after effects"
+   ],
+   "status": "alternative",
+   "linux": [
+    {
+     "name": "Natron",
+     "about": "Visual effects and compositing.",
+     "flatpak": "fr.natron.Natron",
+     "commands": [
+      "natron"
+     ]
+    },
+    {
+     "name": "EffectCraft",
+     "about": "Brand-new free After Effects look-alike. Still young.",
+     "url": "https://github.com/storytold/effectcraft",
+     "new": true
+    }
+   ]
+  },
+  {
+   "windows": "Adobe InDesign",
+   "patterns": [
+    "^adobe indesign"
+   ],
+   "status": "alternative",
+   "linux": [
+    {
+     "name": "Scribus",
+     "about": "Page layout for flyers, magazines and books.",
+     "flatpak": "net.scribus.Scribus",
+     "commands": [
+      "scribus"
+     ],
+     "snap": "scribus"
+    },
+    {
+     "name": "DesignCraft",
+     "about": "Brand-new free InDesign look-alike. Still young.",
+     "url": "https://github.com/storytold/designcraft",
+     "new": true
+    }
+   ]
+  },
+  {
+   "windows": "Adobe Acrobat",
+   "patterns": [
+    "^adobe acrobat"
+   ],
+   "status": "alternative",
+   "linux": [
+    {
+     "name": "Okular",
+     "about": "Read, fill in and sign PDFs.",
+     "flatpak": "org.kde.okular",
+     "commands": [
+      "okular"
+     ],
+     "snap": "okular"
+    },
+    {
+     "name": "PDF Arranger",
+     "about": "Merge, split and reorder PDF pages.",
+     "flatpak": "com.github.jeromerobert.pdfarranger",
+     "commands": [
+      "pdfarranger"
+     ]
+    },
+    {
+     "name": "PdfCraft",
+     "about": "Brand-new free Acrobat look-alike. Still young.",
+     "url": "https://github.com/storytold/pdfcraft",
+     "new": true
+    }
+   ]
+  },
+  {
+   "windows": "Notepad++",
+   "patterns": [
+    "^notepad\\+\\+"
+   ],
+   "status": "alternative",
+   "linux": [
+    {
+     "name": "Kate",
+     "about": "Powerful text editor with tabs, like Notepad++.",
+     "flatpak": "org.kde.kate",
+     "commands": [
+      "kate"
+     ],
+     "snap": "kate"
+    },
+    {
+     "name": "Notepadqq",
+     "about": "Made to look like Notepad++.",
+     "flatpak": "com.notepadqq.Notepadqq",
+     "commands": [
+      "notepadqq"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "iTunes",
+   "patterns": [
+    "^itunes$"
+   ],
+   "status": "alternative",
+   "linux": [
+    {
+     "name": "Strawberry",
+     "about": "Music library player, great for big collections.",
+     "flatpak": "org.strawberrymusicplayer.strawberry",
+     "commands": [
+      "strawberry"
+     ]
+    },
+    {
+     "name": "Rhythmbox",
+     "about": "Simple music player.",
+     "flatpak": "org.gnome.Rhythmbox3",
+     "commands": [
+      "rhythmbox"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "7-Zip",
+   "patterns": [
+    "^7-zip"
+   ],
+   "status": "alternative",
+   "linux": [
+    {
+     "name": "PeaZip",
+     "about": "Opens zip, 7z, rar and more.",
+     "flatpak": "io.github.peazip.PeaZip",
+     "commands": [
+      "peazip"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "WinRAR",
+   "patterns": [
+    "^winrar"
+   ],
+   "status": "alternative",
+   "linux": [
+    {
+     "name": "PeaZip",
+     "about": "Opens zip, 7z, rar and more.",
+     "flatpak": "io.github.peazip.PeaZip",
+     "commands": [
+      "peazip"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "KeePass",
+   "patterns": [
+    "^keepass"
+   ],
+   "status": "alternative",
+   "linux": [
+    {
+     "name": "KeePassXC",
+     "about": "Opens your KeePass password files.",
+     "flatpak": "org.keepassxc.KeePassXC",
+     "commands": [
+      "keepassxc"
+     ],
+     "snap": "keepassxc"
+    }
+   ]
+  },
+  {
+   "windows": "Paint.NET",
+   "patterns": [
+    "^paint\\.net"
+   ],
+   "status": "alternative",
+   "linux": [
+    {
+     "name": "Pinta",
+     "about": "Simple image editor that looks like Paint.NET.",
+     "flatpak": "com.github.PintaProject.Pinta",
+     "commands": [
+      "pinta"
+     ],
+     "snap": "pinta"
+    }
+   ]
+  },
+  {
+   "windows": "Epic Games Launcher",
+   "patterns": [
+    "^epic games launcher"
+   ],
+   "status": "alternative",
+   "linux": [
+    {
+     "name": "Heroic Games Launcher",
+     "about": "Plays your Epic and GOG games on Linux.",
+     "flatpak": "com.heroicgameslauncher.hgl",
+     "commands": [
+      "heroic"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "Battle.net",
+   "patterns": [
+    "^battle\\.net"
+   ],
+   "status": "wine",
+   "linux": [
+    {
+     "name": "Lutris",
+     "about": "Runs Battle.net through Wine.",
+     "flatpak": "net.lutris.Lutris",
+     "commands": [
+      "lutris"
+     ]
+    }
+   ]
+  }
+ ]
 }

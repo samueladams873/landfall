@@ -5,8 +5,7 @@ import shutil
 from datetime import datetime
 from pathlib import Path
 
-from PySide6.QtCore import Qt, QUrl
-from PySide6.QtGui import QDesktopServices
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (QCheckBox, QFileDialog, QGridLayout, QHBoxLayout, QLabel,
                                QLineEdit, QListWidget, QListWidgetItem, QMessageBox,
                                QProgressBar, QPushButton, QScrollArea, QVBoxLayout, QWidget)
@@ -16,16 +15,16 @@ from landfall.linux.dirs import user_dirs
 from landfall.linux.restore import (RestoreCancelled, WrongPassword, find_bundles,
                                     read_manifest, restore)
 from landfall.scan.folders import human_size
+from landfall.sysenv import open_path
 from landfall.ui import (ICONS, ChoiceRow, HeroPage, Page, Shell, card, folder_icon, label,
                          make_app, picture, run_window, set_role, start_task,
                          text_field, plural)
 
-STEPS = ["Welcome", "Find your bundle", "Unlock it", "Choose what to bring", "Install apps",
-         "Setting up", "All done"]
+STEPS = ["Welcome", "Find your bundle", "Unlock it", "Review", "Setting up", "All done"]
 
 
 class Importer(Shell):
-    WELCOME, FIND, PASSWORD, WHAT, APPS, WORKING, DONE = range(7)
+    WELCOME, FIND, PASSWORD, WHAT, WORKING, DONE = range(6)
 
     def __init__(self):
         super().__init__(STEPS, "Welcome to Linux")
@@ -33,8 +32,9 @@ class Importer(Shell):
         self.bundles, self.bundle, self.manifest, self.password = [], None, None, ""
         self.dests = user_dirs()
         self.folder_rows: dict[str, ChoiceRow] = {}
-        self.app_rows: list[tuple[ChoiceRow, apps_mod.AppChoice]] = []
+        self.to_install: list[apps_mod.AppChoice] = []
         self.link_apps: list[apps_mod.AppChoice] = []
+        self.present_apps: list[apps_mod.AppChoice] = []
         self._cancel = False
         self._checking = False
         self.restore_result = None
@@ -42,7 +42,7 @@ class Importer(Shell):
         self.back_btn.clicked.connect(self.on_back)
         self.next_btn.clicked.connect(self.on_next)
         for build in (self._page_welcome, self._page_find, self._page_password,
-                      self._page_what, self._page_apps, self._page_working, self._page_done):
+                      self._page_what, self._page_working, self._page_done):
             self.stack.addWidget(build())
         self.go(self.WELCOME)
 
@@ -54,7 +54,8 @@ class Importer(Shell):
         for icon, title, text in (
                 ("Documents", "Unpack your files", "Documents, pictures and more go into the "
                                                    "matching folders."),
-                ("Apps", "Install your apps", "The Linux versions of the apps you used."),
+                ("Apps", "Install your apps", "The Linux apps you picked on Windows, "
+                                              "installed for you."),
                 ("Soon", "Show what's left", "A short to-do list at the end.")):
             row = QHBoxLayout()
             row.addWidget(picture(ICONS / f"{icon}.svg", 30))
@@ -126,19 +127,11 @@ class Importer(Shell):
         return box
 
     def _page_what(self):
-        page = Page("Choose what to bring in",
-                    "Tick the folders to unpack. Nothing already on this PC gets replaced.")
+        page = Page("Review and start",
+                    "Here's everything Landfall will set up. Click Start and it does the rest.")
         self.what_box = self._scroll_box(page)
         self.what_total = label("", "Section")
         page.body.addWidget(self.what_total)
-        return page
-
-    def _page_apps(self):
-        page = Page("Install your apps",
-                    "The Linux versions of the apps you used on Windows.")
-        self.apps_note = label("", "Muted")
-        page.body.addWidget(self.apps_note)
-        self.apps_box = self._scroll_box(page)
         return page
 
     def _page_working(self):
@@ -167,18 +160,25 @@ class Importer(Shell):
         self.done_summary = label("")
         self.done_summary.setTextFormat(Qt.TextFormat.RichText)
         box.addWidget(self.done_summary)
+        retry_row = QHBoxLayout()
+        self.retry_btn = QPushButton("Try again")
+        self.retry_btn.setObjectName("Primary")
+        self.retry_btn.clicked.connect(self.retry_failed)
+        self.retry_btn.hide()
+        retry_row.addWidget(self.retry_btn)
+        retry_row.addStretch(1)
+        box.addLayout(retry_row)
         page.body.addWidget(frame)
         frame2, box2 = card()
         box2.addWidget(label("What's left to do", "Section"))
         self.todo = label("")
         self.todo.setTextFormat(Qt.TextFormat.RichText)
-        self.todo.setOpenExternalLinks(True)
+        self.todo.linkActivated.connect(open_path)
         box2.addWidget(self.todo)
         page.body.addWidget(frame2)
         row = QHBoxLayout()
         files = QPushButton("Open my files")
-        files.clicked.connect(lambda: QDesktopServices.openUrl(
-            QUrl.fromLocalFile(str(Path.home()))))
+        files.clicked.connect(lambda: open_path(str(Path.home())))
         row.addWidget(files)
         row.addStretch(1)
         page.body.addLayout(row)
@@ -201,12 +201,12 @@ class Importer(Shell):
         self.back_btn.setEnabled(i != self.WORKING)
         self.cancel_btn.setVisible(i != self.DONE)
         self.next_btn.setText({self.WELCOME: "Get started", self.PASSWORD: "Unlock",
-                               self.APPS: "Start", self.DONE: "Finish"}.get(i, "Next"))
+                               self.WHAT: "Start", self.DONE: "Finish"}.get(i, "Next"))
         self.next_btn.setEnabled({
             self.WELCOME: True,
             self.FIND: 0 <= self.bundle_list.currentRow() < len(self.bundles),
             self.PASSWORD: bool(self.pw.text()) and not self._checking,
-            self.WHAT: self._space_ok(), self.APPS: True, self.WORKING: False,
+            self.WHAT: self._space_ok(), self.WORKING: False,
             self.DONE: True}[i])
 
     def on_back(self):
@@ -221,7 +221,7 @@ class Importer(Shell):
             self.go(self.PASSWORD)
         elif i == self.PASSWORD:
             self.check_password()
-        elif i == self.APPS:
+        elif i == self.WHAT:
             self.go(self.WORKING)
             self.start_work()
         elif i == self.DONE:
@@ -279,7 +279,6 @@ class Importer(Shell):
         self.manifest, self.password = manifest, self.pw.text()
         self.pw_status.setText("")
         self.fill_what()
-        self.fill_apps()
         self.go(self.WHAT)
 
     def password_bad(self, err):
@@ -301,6 +300,7 @@ class Importer(Shell):
     def fill_what(self):
         self._clear(self.what_box)
         self.folder_rows.clear()
+        self.what_box.addWidget(label("Your files", "Section"))
         stats: dict[str, list[int]] = {}
         for f in self.manifest.get("files", []):
             s = stats.setdefault(f["path"].split("/", 1)[0], [0, 0])
@@ -309,16 +309,16 @@ class Importer(Shell):
         for name in self.manifest.get("folders", []):
             files, size = stats.get(name, [0, 0])
             dest = self.dests.get(name, Path.home() / name)
-            detail = (f"{files:,} files  \u00b7  {human_size(size)}  \u2192  {dest}" if files
+            detail = (f"{plural(files, 'file')}  \u00b7  {human_size(size)}  \u2192  {dest}" if files
                       else "Empty")
             row = ChoiceRow(folder_icon(name), name, detail, files > 0, files > 0)
             row.box.toggled.connect(lambda _: self.update_what())
             self.folder_rows[name] = row
             self.what_box.addWidget(row)
-        made = self.manifest.get("created", "")[:10]
         self.what_box.addWidget(label(
-            f"Bundle made {made}. If a file with the same name is already here, the one from "
-            "Windows is saved as \u201cname (from Windows)\u201d.", "Muted"))
+            "If a file with the same name is already here, the one from Windows is saved as "
+            "\u201cname (from Windows)\u201d. Nothing gets replaced.", "Muted"))
+        self.fill_apps()
         self.update_what()
 
     def chosen_folders(self):
@@ -349,45 +349,44 @@ class Importer(Shell):
 
     # --- step: apps -------------------------------------------------------
     def fill_apps(self):
-        self._clear(self.apps_box)
-        self.app_rows.clear()
         choices = apps_mod.choices_from_manifest(self.manifest)
-        installed = apps_mod.installed_flatpaks()
-        installable = [c for c in choices if c.flatpak]
-        self.link_apps = [c for c in choices if not c.flatpak]
-        self.apps_note.setText(
-            "Apps are installed just for you, from Flathub." if apps_mod.flatpak_available()
-            else "First, Landfall will set up Flatpak, the app store most Linux PCs use. "
-                 "You'll be asked for your computer password once.")
+        flatpaks, snaps = apps_mod.installed_flatpaks(), apps_mod.installed_snaps()
+        self.to_install, self.present_apps, self.link_apps = [], [], []
+        for c in choices:
+            if c.flatpak and apps_mod.already_present(c, flatpaks, snaps):
+                self.present_apps.append(c)
+            elif c.flatpak:
+                self.to_install.append(c)
+            else:
+                self.link_apps.append(c)
+        self.what_box.addSpacing(8)
+        self.what_box.addWidget(label("Your apps", "Section"))
         if not choices:
-            self.apps_box.addWidget(label("No matching apps were found in your bundle.",
-                                          "Muted"))
-        for c in installable:
-            already = c.flatpak in installed
-            row = ChoiceRow(ICONS / "Apps.svg", c.linux_name,
-                            f"For your {c.windows_name}" + ("  \u00b7  already installed"
-                                                            if already else ""),
-                            not already, not already)
-            self.app_rows.append((row, c))
-            self.apps_box.addWidget(row)
-        if self.link_apps:
-            self.apps_box.addSpacing(6)
-            self.apps_box.addWidget(label("From their websites (links on the last page)",
-                                          "Section"))
-            for c in self.link_apps:
-                row = ChoiceRow(ICONS / "Soon.svg", c.linux_name, f"For your {c.windows_name}",
-                                False, False)
-                row.box.hide()
-                if c.new:
-                    row.side.addWidget(label("New", "PillNew", wrap=False))
-                self.apps_box.addWidget(row)
+            self.what_box.addWidget(label("No apps were picked on Windows.", "Muted"))
+        rows = ([(c, "Will be installed for you", "Pill") for c in self.to_install]
+                + [(c, "Already on this PC", "Good") for c in self.present_apps]
+                + [(c, "Link at the end", "Muted") for c in self.link_apps])
+        for c, status, role in rows:
+            detail = f"For your {c.windows_name}" + (f"  \u00b7  {c.about}" if c.about else "")
+            row = ChoiceRow(ICONS / "Apps.svg", c.linux_name, detail, False, False)
+            row.box.hide()
+            row.title.setStyleSheet("")
+            row.detail.setWordWrap(True)
+            row.side.addWidget(label(status, role, wrap=False))
+            if c.new:
+                row.side.addWidget(label("New", "PillNew", wrap=False))
+            self.what_box.addWidget(row)
+        if self.to_install and not apps_mod.flatpak_available():
+            self.what_box.addWidget(label(
+                "Landfall will first set up Flatpak, the app store most Linux PCs use. "
+                "You'll be asked for your computer password once.", "Muted"))
 
     # --- step: working ----------------------------------------------------
     def start_work(self):
         self._cancel = False
         self.stop_btn.setEnabled(True)
         folders = self.chosen_folders()
-        apps = [c for row, c in self.app_rows if row.box.isChecked() and row.box.isEnabled()]
+        apps = list(self.to_install)
         bundle, password, manifest, dests = self.bundle, self.password, self.manifest, self.dests
 
         def work(report):
@@ -440,34 +439,64 @@ class Importer(Shell):
 
     def work_done(self, result):
         self.restore_result, self.app_results = result
+        self.show_done()
+        self.go(self.DONE)
+
+    def show_done(self):
         r = self.restore_result
         lines = [f"<b>{plural(r.restored, 'file')}</b> unpacked into your folders."]
         if r.already_there:
             lines.append(f"{plural(r.already_there, 'file')} already here, so left alone.")
         if r.renamed:
-            lines.append(f"{len(r.renamed):,} were saved as \u201c(from Windows)\u201d copies "
+            lines.append(f"{len(r.renamed):,} saved as \u201c(from Windows)\u201d copies "
                          "because a different file had the same name.")
         good = [n for n, ok, _ in self.app_results if ok]
+        bad = [(n, msg) for n, ok, msg in self.app_results if not ok]
         if good:
-            lines.append(f"<b>{plural(len(good), 'app')}</b> installed: "
-                         f"{', '.join(good)}. Find them in your app menu.")
+            lines.append(f"<b>{plural(len(good), 'app')}</b> installed: {', '.join(good)}. "
+                         "Find them in your app menu.")
+        if self.present_apps:
+            lines.append("Already on this PC: "
+                         + ", ".join(c.linux_name for c in self.present_apps) + ".")
+        for name, msg in bad:
+            lines.append(f"<span style='color:#B4410E'><b>{name}</b> didn't install: "
+                         f"{msg}</span>")
         self.done_summary.setText("<br>".join(lines))
-        todo = [f"\u2022 {n} didn't install. You can get it from your Software app."
-                for n, ok, _ in self.app_results if not ok]
+        self.retry_btn.setVisible(bool(bad))
+        todo = []
         for c in self.link_apps:
             if c.url:
                 tag = " (brand new, still young)" if c.new else ""
                 todo.append(f"\u2022 Get <a href='{c.url}'>{c.linux_name}</a>{tag} for your "
                             f"{c.windows_name}.")
-            else:
-                todo.append(f"\u2022 For your {c.windows_name}: use {c.linux_name}.")
         if r.failed:
             todo.append(f"\u2022 {len(r.failed)} file(s) couldn't be unpacked.")
         todo.append("\u2022 Sign in to your browser to bring back bookmarks and passwords "
                     "(automatic moving for these is coming soon).")
         todo.append("\u2022 Keep the USB drive until you've checked everything arrived.")
         self.todo.setText("<br>".join(todo))
-        self.go(self.DONE)
+
+    def retry_failed(self):
+        failed = {n for n, ok, _ in self.app_results if not ok}
+        apps = [c for c in self.to_install if c.linux_name in failed]
+        self.retry_btn.setEnabled(False)
+        self.retry_btn.setText("Installing...")
+
+        def work(report):
+            apps_mod.ensure_flathub()
+            return [(a.linux_name, *apps_mod.install_app(a.flatpak)) for a in apps]
+
+        def finished(results):
+            by_name = {n: (n, ok, msg) for n, ok, msg in results}
+            self.app_results = [by_name.get(n, (n, ok, msg)) for n, ok, msg in self.app_results]
+            self.retry_btn.setEnabled(True)
+            self.retry_btn.setText("Try again")
+            self.show_done()
+
+        start_task(self, work, finished, self.task_failed)
+
+    def task_failed(self, err):
+        QMessageBox.warning(self, "Something went wrong", f"Landfall hit a problem:\n{err}")
 
     def work_failed(self, err):
         self.stop_btn.setEnabled(True)
@@ -476,7 +505,7 @@ class Importer(Shell):
             QMessageBox.warning(self, "Something went wrong",
                                 "Landfall stopped before finishing. Nothing already on this PC "
                                 f"was replaced.\n\nDetails: {err}")
-        self.go(self.APPS)
+        self.go(self.WHAT)
 
 
 def main() -> int:
