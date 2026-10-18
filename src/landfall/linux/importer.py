@@ -17,7 +17,8 @@ from landfall.linux.restore import (RestoreCancelled, WrongPassword, find_bundle
                                     read_manifest, restore)
 from landfall.scan.folders import human_size
 from landfall.ui import (ICONS, ChoiceRow, HeroPage, Page, Shell, card, folder_icon, label,
-                         make_app, picture, run_window, set_role, start_task)
+                         make_app, picture, run_window, set_role, start_task,
+                         text_field, plural)
 
 STEPS = ["Welcome", "Find your bundle", "Unlock it", "Choose what to bring", "Install apps",
          "Setting up", "All done"]
@@ -94,9 +95,8 @@ class Importer(Shell):
         frame, box = card()
         grid = QGridLayout()
         grid.setHorizontalSpacing(12)
-        self.pw = QLineEdit()
-        self.pw.setEchoMode(QLineEdit.EchoMode.Password)
-        self.pw.setPlaceholderText("Your bundle password")
+        grid.setVerticalSpacing(10)
+        self.pw = text_field("Your bundle password", password=True)
         self.pw.textChanged.connect(lambda _: self.update_buttons())
         self.pw.returnPressed.connect(self.on_next)
         grid.addWidget(QLabel("Password"), 0, 0)
@@ -441,15 +441,15 @@ class Importer(Shell):
     def work_done(self, result):
         self.restore_result, self.app_results = result
         r = self.restore_result
-        lines = [f"<b>{r.restored:,} files</b> unpacked into your folders."]
+        lines = [f"<b>{plural(r.restored, 'file')}</b> unpacked into your folders."]
         if r.already_there:
-            lines.append(f"{r.already_there:,} were already here, so they were left alone.")
+            lines.append(f"{plural(r.already_there, 'file')} already here, so left alone.")
         if r.renamed:
             lines.append(f"{len(r.renamed):,} were saved as \u201c(from Windows)\u201d copies "
                          "because a different file had the same name.")
         good = [n for n, ok, _ in self.app_results if ok]
         if good:
-            lines.append(f"<b>{len(good)} app{'s' if len(good) > 1 else ''}</b> installed: "
+            lines.append(f"<b>{plural(len(good), 'app')}</b> installed: "
                          f"{', '.join(good)}. Find them in your app menu.")
         self.done_summary.setText("<br>".join(lines))
         todo = [f"\u2022 {n} didn't install. You can get it from your Software app."

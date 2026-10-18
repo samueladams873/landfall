@@ -21,7 +21,7 @@ from landfall.scan.folders import find_folders, human_size, measure
 from landfall.scan.hardware import hardware_notes, scan_hardware
 from landfall.ui import (ICON, ICONS, ChoiceRow, HeroPage, Page, Shell, card, folder_icon,
                          label, logo, make_app, picture, run_window, set_role,
-                         start_task)
+                         start_task, text_field, fit_list, plural)
 
 __all__ = ["ICON", "Wizard", "build_window", "main", "label", "logo", "set_role", "start_task"]
 
@@ -137,7 +137,6 @@ class Wizard(Shell):
         top.addWidget(refresh)
         box.addLayout(top)
         self.drive_list = QListWidget()
-        self.drive_list.setMaximumHeight(120)
         self.drive_list.currentRowChanged.connect(lambda _: self.update_where())
         box.addWidget(self.drive_list)
         self.space_label = label("")
@@ -150,12 +149,11 @@ class Wizard(Shell):
                              "lost, nobody can open your files, not even Landfall.", "Muted"))
         grid = QGridLayout()
         grid.setHorizontalSpacing(12)
-        self.pw1, self.pw2 = QLineEdit(), QLineEdit()
+        grid.setVerticalSpacing(10)
+        self.pw1 = text_field("At least 6 characters", password=True)
+        self.pw2 = text_field("Type it again", password=True)
         for field in (self.pw1, self.pw2):
-            field.setEchoMode(QLineEdit.EchoMode.Password)
             field.textChanged.connect(lambda _: self.update_where())
-        self.pw1.setPlaceholderText("At least 6 characters")
-        self.pw2.setPlaceholderText("Type it again")
         grid.addWidget(QLabel("Password"), 0, 0)
         grid.addWidget(self.pw1, 0, 1)
         grid.addWidget(QLabel("Confirm"), 1, 0)
@@ -380,6 +378,7 @@ class Wizard(Shell):
                 f"{d.title}   \u00b7   {human_size(d.free)} free of {human_size(d.total)}"))
         if self.drives:
             self.drive_list.setCurrentRow(0)
+        fit_list(self.drive_list, 1, 4)
         self.update_where()
 
     def current_drive(self):
@@ -465,7 +464,7 @@ class Wizard(Shell):
 
     def pack_done(self, result):
         self.result = result
-        text = (f"<b>{result.files:,} files</b> ({human_size(result.bytes)}) packed and locked "
+        text = (f"<b>{plural(result.files, 'file')}</b> ({human_size(result.bytes)}) packed and locked "
                 f"with your password in:<br><b>{result.folder}</b>")
         if result.skipped:
             text += (f"<br><br>{len(result.skipped):,} file(s) couldn't be read (for example, "

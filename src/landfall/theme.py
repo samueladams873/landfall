@@ -68,8 +68,9 @@ QTreeWidget::item, QListWidget::item {{ padding: 6px 4px; border-radius: 6px; }}
 QListWidget::item:selected {{ background: #DCEAFF; color: {TEXT}; }}
 QHeaderView::section {{ background: white; border: none; border-bottom: 1px solid #E3E9F3;
     padding: 6px; color: {MUTED}; font-weight: 600; }}
-QLineEdit {{ background: white; border: 1px solid #C9D3E3; border-radius: 8px; padding: 7px 10px; }}
-QLineEdit:focus {{ border: 2px solid {BLUE}; padding: 6px 9px; }}
+QLineEdit {{ background: white; border: 1px solid #C9D3E3; border-radius: 8px;
+    padding: 0 10px; }}
+QLineEdit:focus {{ border: 2px solid {BLUE}; padding: 0 9px; }}
 QTabWidget::pane {{ border: none; top: 0; }}
 QTabBar::tab {{ background: transparent; border: none; padding: 8px 16px; margin-right: 4px;
     color: {MUTED}; font-weight: 600; border-bottom: 3px solid transparent; }}

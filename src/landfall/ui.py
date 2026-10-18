@@ -6,8 +6,8 @@ import sys
 from PySide6.QtCore import QObject, Qt, QThread, Signal
 from PySide6.QtGui import QColor, QFont, QFontDatabase, QIcon, QPixmap
 from PySide6.QtWidgets import (QApplication, QCheckBox, QFrame, QGraphicsDropShadowEffect,
-                               QHBoxLayout, QLabel, QPushButton, QStackedWidget, QVBoxLayout,
-                               QWidget)
+                               QHBoxLayout, QLabel, QLayout, QPushButton, QStackedWidget,
+                               QVBoxLayout, QWidget)
 
 from landfall import __version__
 from landfall.theme import DATA, FONT, STYLE
@@ -104,6 +104,18 @@ def set_role(widget: QWidget, role: str):
     widget.setObjectName(role)
     widget.style().unpolish(widget)
     widget.style().polish(widget)
+
+
+def text_field(placeholder: str = "", password: bool = False):
+    """A text box sized from the real font height, so text never gets cut off at any
+    Windows or Linux display scaling."""
+    from PySide6.QtWidgets import QLineEdit
+    field = QLineEdit()
+    field.setPlaceholderText(placeholder)
+    if password:
+        field.setEchoMode(QLineEdit.EchoMode.Password)
+    field.setMinimumHeight(field.fontMetrics().height() + 20)
+    return field
 
 
 def picture(path, size: int) -> QLabel:
@@ -219,11 +231,11 @@ class Shell(QWidget):
         super().__init__()
         self.setObjectName("Root")
         self.setWindowTitle("Landfall")
-        self.resize(940, 640)
-        self.setMinimumSize(820, 560)
+        self.resize(940, 660)
         self.steps = steps
 
         root = QHBoxLayout(self)
+        root.setSizeConstraint(QLayout.SizeConstraint.SetMinimumSize)  # never squash pages
         root.setContentsMargins(0, 0, 0, 0)
         root.setSpacing(0)
 
@@ -286,3 +298,15 @@ class Shell(QWidget):
             state = "done" if i < index else "now" if i == index else "todo"
             dot.setPixmap(QIcon(str(ICONS / f"step-{state}.svg")).pixmap(20, 20))
             set_role(text, {"done": "StepDone", "now": "StepNow", "todo": "Step"}[state])
+
+
+def fit_list(widget, rows_min: int = 2, rows_max: int = 4):
+    """Size a list to its rows so it never steals room the rest of the page needs."""
+    rows = max(rows_min, min(rows_max, widget.count()))
+    row_h = widget.sizeHintForRow(0) if widget.count() else widget.fontMetrics().height() + 14
+    widget.setFixedHeight(rows * row_h + 2 * widget.frameWidth() + 10)
+
+
+def plural(n: int, word: str) -> str:
+    """'1 file', '2 files', '1,234 files'."""
+    return f"{n:,} {word}" + ("" if n == 1 else "s")
