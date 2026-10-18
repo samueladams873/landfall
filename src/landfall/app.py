@@ -20,7 +20,8 @@ from landfall.scan.apps import scan_apps
 from landfall.scan.folders import find_folders, human_size, measure
 from landfall.scan.hardware import hardware_notes, scan_hardware
 from landfall.ui import (ICON, ICONS, ChoiceRow, HeroPage, Page, Shell, card, folder_icon,
-                         label, logo, make_app, picture, set_role, start_task)
+                         label, logo, make_app, picture, run_window, set_role,
+                         start_task)
 
 __all__ = ["ICON", "Wizard", "build_window", "main", "label", "logo", "set_role", "start_task"]
 
@@ -494,6 +495,4 @@ def build_window() -> QWidget:
 
 def main() -> int:
     app = make_app()
-    window = build_window()
-    window.show()
-    return app.exec()
+    return run_window(app, build_window())

@@ -41,6 +41,19 @@ def make_app(argv=None) -> QApplication:
     return app
 
 
+def run_window(app: QApplication, window: QWidget) -> int:
+    """Show the window, run the app, then tear down in a safe order (window before app)."""
+    import shiboken6
+
+    window.show()
+    code = app.exec()
+    for thread, _task in getattr(window, "_tasks", []):
+        thread.quit()
+        thread.wait(3000)
+    shiboken6.delete(window)
+    return code
+
+
 # --- background work -------------------------------------------------------
 class Task(QObject):
     """Runs fn(report) on a background thread so the window never freezes."""

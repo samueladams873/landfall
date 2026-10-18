@@ -16,7 +16,8 @@ def _snapshot_hook():
         windows = [w for w in app.topLevelWidgets() if w.isVisible()]
         if windows:
             windows[0].grab().save(path)
-        app.quit()
+        for w in windows:
+            w.close()  # closing (not quitting) lets Qt shut down in the normal, safe order
 
     QTimer.singleShot(2500, take)
 

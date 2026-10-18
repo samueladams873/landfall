@@ -17,7 +17,7 @@ from landfall.linux.restore import (RestoreCancelled, WrongPassword, find_bundle
                                     read_manifest, restore)
 from landfall.scan.folders import human_size
 from landfall.ui import (ICONS, ChoiceRow, HeroPage, Page, Shell, card, folder_icon, label,
-                         make_app, picture, set_role, start_task)
+                         make_app, picture, run_window, set_role, start_task)
 
 STEPS = ["Welcome", "Find your bundle", "Unlock it", "Choose what to bring", "Install apps",
          "Setting up", "All done"]
@@ -481,6 +481,4 @@ class Importer(Shell):
 
 def main() -> int:
     app = make_app()
-    window = Importer()
-    window.show()
-    return app.exec()
+    return run_window(app, Importer())
