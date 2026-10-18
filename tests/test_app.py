@@ -11,4 +11,5 @@ from landfall.app import build_window
 def test_window_builds():
     app = QApplication.instance() or QApplication([])
     window = build_window()
-    assert window.windowTitle() == f"Landfall {__version__}"
+    assert window.windowTitle() == "Landfall Moving Wizard"
+    assert window.stack.count() == 6
