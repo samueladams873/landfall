@@ -1,0 +1,50 @@
+"""Match installed Windows apps against the Windows -> Linux app map."""
+from __future__ import annotations
+
+import json
+import re
+from dataclasses import dataclass, field
+from pathlib import Path
+
+DATA_FILE = Path(__file__).parent / "data" / "app_map.json"
+
+# Groups shown in the report, in display order.
+GROUP_SAME = "Works on Linux"
+GROUP_ALT = "Has a Linux alternative"
+GROUP_NONE = "Needs Wine or no match yet"
+GROUPS = (GROUP_SAME, GROUP_ALT, GROUP_NONE)
+
+_STATUS_TO_GROUP = {"same": GROUP_SAME, "alternative": GROUP_ALT, "wine": GROUP_NONE}
+
+
+@dataclass
+class MatchResult:
+    app: dict                      # the installed app (name, version, publisher)
+    group: str
+    entry: dict | None = None      # the app_map entry, or None if unknown
+    options: list = field(default_factory=list)
+
+
+def load_map(path: Path = DATA_FILE) -> list[dict]:
+    data = json.loads(path.read_text(encoding="utf-8"))
+    entries = data["apps"]
+    for entry in entries:
+        entry["_compiled"] = [re.compile(p, re.IGNORECASE) for p in entry["patterns"]]
+    return entries
+
+
+def match_app(app: dict, entries: list[dict]) -> MatchResult:
+    name = app.get("name", "").strip()
+    for entry in entries:
+        if any(rx.search(name) for rx in entry["_compiled"]):
+            return MatchResult(app, _STATUS_TO_GROUP[entry["status"]], entry, entry["linux"])
+    return MatchResult(app, GROUP_NONE)
+
+
+def match_all(apps: list[dict], entries: list[dict] | None = None) -> dict[str, list[MatchResult]]:
+    entries = entries if entries is not None else load_map()
+    grouped: dict[str, list[MatchResult]] = {g: [] for g in GROUPS}
+    for app in sorted(apps, key=lambda a: a.get("name", "").lower()):
+        result = match_app(app, entries)
+        grouped[result.group].append(result)
+    return grouped
