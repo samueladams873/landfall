@@ -1,15 +1,14 @@
-import os
-
-os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
-
-from PySide6.QtWidgets import QApplication
-
-from landfall import __version__
 from landfall.app import build_window
+from landfall.linux.importer import Importer
 
 
-def test_window_builds():
-    app = QApplication.instance() or QApplication([])
-    window = build_window()
+def test_windows_wizard_builds(window_factory):
+    window = window_factory(build_window)
     assert window.windowTitle() == "Landfall Moving Wizard"
     assert window.stack.count() == 6
+
+
+def test_linux_wizard_builds(window_factory):
+    window = window_factory(Importer)
+    assert window.stack.count() == 7
+    assert window.next_btn.text() == "Get started"
