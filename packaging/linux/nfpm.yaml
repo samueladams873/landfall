@@ -1,0 +1,38 @@
+name: landfall
+arch: amd64
+platform: linux
+version: ${LANDFALL_VERSION}
+section: utils
+priority: optional
+maintainer: Landfall project <samueladams873@users.noreply.github.com>
+description: |
+  Landfall Moving Wizard. Unpacks the bundle you made on Windows: puts your
+  files in the right folders and installs the Linux versions of your apps.
+vendor: Landfall
+homepage: https://github.com/samueladams873/landfall
+license: GPL-3.0-or-later
+overrides:
+  deb:
+    depends:
+      - libxcb-cursor0
+      - libegl1
+      - libxkbcommon-x11-0
+    recommends:
+      - flatpak
+  rpm:
+    depends:
+      - xcb-util-cursor
+      - libxkbcommon-x11
+    recommends:
+      - flatpak
+contents:
+  - src: ./build/linux/landfall/
+    dst: /opt/landfall/
+    type: tree
+  - src: /opt/landfall/landfall
+    dst: /usr/bin/landfall
+    type: symlink
+  - src: ./packaging/linux/landfall.desktop
+    dst: /usr/share/applications/landfall.desktop
+  - src: ./src/landfall/data/landfall.png
+    dst: /usr/share/icons/hicolor/512x512/apps/landfall.png

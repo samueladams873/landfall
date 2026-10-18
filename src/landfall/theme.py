@@ -1,4 +1,7 @@
 """A classic, early-2000s Windows-inspired look (original styling, no Microsoft assets)."""
+from pathlib import Path
+
+_DATA = (Path(__file__).parent / "data").as_posix()
 
 FONT_FAMILY = "Tahoma, Verdana, 'DejaVu Sans', sans-serif"
 
@@ -84,4 +87,12 @@ QProgressBar::chunk {{
 
 QCheckBox, QRadioButton {{ spacing: 8px; padding: 3px 0; }}
 QCheckBox:disabled, QRadioButton:disabled {{ color: #8A8A8A; }}
+QCheckBox::indicator {{
+    width: 13px; height: 13px; border: 1px solid #1C5180; border-radius: 1px;
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #DCDCD7, stop:1 #FFFFFF);
+}}
+QCheckBox::indicator:hover {{ border: 1px solid #F8B330; }}
+QCheckBox::indicator:checked {{ image: url({_DATA}/check.svg); }}
+QCheckBox::indicator:disabled {{ border-color: #CAC8BB; background: #F4F3EE; }}
+QCheckBox::indicator:checked:disabled {{ image: url({_DATA}/check-off.svg); }}
 """

@@ -48,7 +48,7 @@ def test_pack_roundtrip_with_password(home):
     result = pack(folders, "hunter22", usb, {"apps": [{"name": "Google Chrome"}]},
                   progress=lambda d, t, n: seen.append((d, t)))
     assert result.files == 3 and not result.skipped
-    assert (result.folder / "READ ME.txt").exists()
+    assert (result.folder / "START HERE.txt").exists()
     assert seen[-1][0] == seen[-1][1]
 
     out = home / "out"
@@ -94,3 +94,15 @@ def test_never_overwrites_an_earlier_bundle(home):
 def test_space_and_sizes():
     assert space_needed(1_000_000_000) > 1_000_000_000
     assert human_size(1536) == "1.5 KB"
+
+
+def test_copies_linux_installers(home, monkeypatch, tmp_path):
+    fake = tmp_path / "linux"
+    fake.mkdir()
+    (fake / "landfall_9.9_amd64.deb").write_bytes(b"deb")
+    (fake / "landfall-9.9.x86_64.rpm").write_bytes(b"rpm")
+    monkeypatch.setattr(pack_mod, "LINUX_DIR", fake)
+    result = pack(measured(home), "pw1234", home)
+    assert (result.folder / "Landfall for Ubuntu and Mint.deb").read_bytes() == b"deb"
+    assert (result.folder / "Landfall for Fedora.rpm").read_bytes() == b"rpm"
+    assert space_needed(0) >= 6

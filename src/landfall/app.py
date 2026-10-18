@@ -8,6 +8,7 @@ import webbrowser
 from pathlib import Path
 
 from PySide6.QtCore import QObject, Qt, QThread, Signal
+from PySide6.QtGui import QIcon, QPixmap
 from PySide6.QtWidgets import (QApplication, QCheckBox, QFileDialog, QFrame, QGridLayout,
                                QHBoxLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem,
                                QMessageBox, QProgressBar, QPushButton, QStackedWidget,
@@ -22,6 +23,18 @@ from landfall.scan.apps import scan_apps
 from landfall.scan.folders import find_folders, human_size, measure
 from landfall.scan.hardware import hardware_notes, scan_hardware
 from landfall.theme import STYLE
+
+DATA = Path(__file__).parent / "data"
+ICON = DATA / "landfall.png"
+
+
+def logo(size: int) -> QLabel:
+    lab = QLabel()
+    lab.setPixmap(QPixmap(str(ICON)).scaled(size, size, Qt.AspectRatioMode.KeepAspectRatio,
+                                            Qt.TransformationMode.SmoothTransformation))
+    lab.setStyleSheet("background: transparent;")
+    return lab
+
 
 COMING_SOON = [
     "Browser bookmarks, saved passwords and history",
@@ -119,6 +132,8 @@ class SidePage(QWidget):
         side.setFixedWidth(190)
         s = QVBoxLayout(side)
         s.setContentsMargins(18, 24, 18, 24)
+        s.addWidget(logo(120), 0, Qt.AlignmentFlag.AlignHCenter)
+        s.addSpacing(12)
         s.addWidget(label(side_text, "SideText"))
         s.addStretch(1)
         s.addWidget(label(f"Landfall {__version__}\nFree and open source", "SideSmall"))
@@ -163,10 +178,15 @@ class Wizard(QWidget):
     def _banner(self) -> QFrame:
         banner = QFrame()
         banner.setObjectName("Banner")
-        b = QVBoxLayout(banner)
-        b.setContentsMargins(18, 10, 18, 10)
+        row = QHBoxLayout(banner)
+        row.setContentsMargins(14, 8, 18, 8)
+        row.addWidget(logo(46))
+        row.addSpacing(6)
+        b = QVBoxLayout()
+        b.setSpacing(0)
         b.addWidget(label("Landfall Moving Wizard", "BannerTitle"))
         b.addWidget(label("Bring your files and settings from Windows to Linux", "BannerSub"))
+        row.addLayout(b, 1)
         return banner
 
     def _footer(self) -> QFrame:
@@ -332,12 +352,14 @@ class Wizard(QWidget):
         b.addWidget(self.done_summary)
         b.addSpacing(10)
         b.addWidget(label("<b>What's next</b>"))
-        for line in ("1.  Safely remove the USB drive.",
-                     "2.  Plug it into your Linux PC.",
-                     "3.  Double-click Landfall on the drive and type your password."):
+        for line in ("1.  Safely remove the USB drive and plug it into your Linux PC.",
+                     "2.  Open the \u201cLandfall Move\u201d folder on the drive.",
+                     "3.  Double-click the Landfall installer for your Linux and click "
+                     "Install.",
+                     "4.  Open Landfall from your app menu and type your password."):
             b.addWidget(label(line))
-        b.addWidget(label("The Linux side of Landfall is still being built. Your bundle can "
-                          "already be opened with free 7-Zip in the meantime.", "Muted"))
+        b.addWidget(label("The \u201cSTART HERE\u201d file in that folder has the same steps.",
+                          "Muted"))
         b.addSpacing(10)
         open_btn = QPushButton("Open the bundle folder")
         open_btn.clicked.connect(self.open_result_folder)
@@ -637,6 +659,7 @@ def main() -> int:
     app = QApplication(sys.argv)
     app.setStyle("Fusion")
     app.setStyleSheet(STYLE)
+    app.setWindowIcon(QIcon(str(ICON)))
     window = build_window()
     window.show()
     return app.exec()

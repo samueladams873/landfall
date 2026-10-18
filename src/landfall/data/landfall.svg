@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6EC6FF"/>
+      <stop offset="0.6" stop-color="#2B7BE8"/>
+      <stop offset="1" stop-color="#0B3FA8"/>
+    </linearGradient>
+    <linearGradient id="land" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7BE07B"/>
+      <stop offset="0.5" stop-color="#3AA83A"/>
+      <stop offset="1" stop-color="#1E6B1E"/>
+    </linearGradient>
+    <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1A5FD0"/>
+      <stop offset="1" stop-color="#0A2F86"/>
+    </linearGradient>
+    <radialGradient id="sun" cx="0.4" cy="0.4" r="0.6">
+      <stop offset="0" stop-color="#FFE9A0"/>
+      <stop offset="1" stop-color="#F8A020"/>
+    </radialGradient>
+    <linearGradient id="gloss" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <clipPath id="tile"><rect x="8" y="8" width="240" height="240" rx="52"/></clipPath>
+  </defs>
+  <g clip-path="url(#tile)">
+    <rect x="8" y="8" width="240" height="240" fill="url(#sky)"/>
+    <circle cx="186" cy="78" r="30" fill="url(#sun)"/>
+    <path d="M8 176 Q48 166 88 176 T168 176 T248 176 V248 H8 Z" fill="url(#sea)"/>
+    <path d="M24 204 Q44 196 64 204 M84 222 Q104 214 124 222" stroke="#6EC6FF" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.7"/>
+    <path d="M118 182 Q150 118 204 124 Q240 128 252 160 V190 Q190 196 118 182 Z" fill="url(#land)"/>
+    <path d="M30 150 Q74 70 150 112" stroke="#FFFFFF" stroke-width="18" fill="none" stroke-linecap="round"/>
+    <path d="M136 82 L176 126 L118 136 Z" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="6" stroke-linejoin="round"/>
+    <rect x="8" y="8" width="240" height="118" fill="url(#gloss)"/>
+  </g>
+  <rect x="9.5" y="9.5" width="237" height="237" rx="50.5" fill="none" stroke="#08307E" stroke-width="3"/>
+</svg>

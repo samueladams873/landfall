@@ -1,6 +1,6 @@
-"""Entry point used by PyInstaller to build the Windows .exe."""
+"""Entry point used by PyInstaller."""
 import sys
 
-from landfall.app import main
+from landfall.launcher import main
 
 sys.exit(main())

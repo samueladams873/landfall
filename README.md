@@ -10,29 +10,31 @@ PC, double-click Landfall, and everything lands where it belongs, with your apps
 It works with any Linux distro, and it only ever *reads* your Windows drive. It never changes
 or repartitions anything.
 
-> **Status: early development.** Today Landfall can scan a Windows PC and produce a Linux
-> readiness report. The full move described below is being built now, one piece at a time.
+> **Status: early development (v0.2).** Landfall can already check a Windows PC, pack your
+> personal folders into a locked bundle, and unpack them on Linux with your apps installed.
+> The rest of the list below is being built now, one piece at a time.
 
-![Landfall scanning apps](docs/screenshots/v0.1-apps.png)
+![Landfall on Windows](docs/screenshots/v0.2-welcome.png)
 
 ## What Landfall will move
 
 | | What | Status |
 |---|---|---|
 | 🔍 | **Readiness report:** which apps and hardware will work on Linux | ✅ Working |
-| 🎨 | **Friendly step-by-step wizard** with a classic Windows-style look | 🚧 In progress |
-| 📁 | **Your files:** Desktop, Documents, Pictures, Downloads, Music, Videos | 🚧 In progress |
+| 🎨 | **Friendly step-by-step wizard** with a classic Windows-style look | ✅ Working |
+| 📁 | **Your files:** Desktop, Documents, Pictures, Downloads, Music, Videos | ✅ Working |
 | 🌐 | **Browsers:** bookmarks, saved passwords, history (Chrome, Edge, Firefox) | Planned |
 | ✉️ | **Email and contacts:** Outlook and Thunderbird mail, Windows and Outlook contacts | Planned |
 | 📶 | **Wi-Fi networks and passwords** | Planned |
 | 🖼️ | **Personal touches:** wallpaper and fonts | Planned |
 | 🎮 | **Game saves** | Planned |
 | 🔑 | **Product keys and licenses list**, so you don't lose paid software | Planned |
-| 📦 | **Apps:** matched Linux apps installed with one click | Planned |
+| 📦 | **Apps:** matched Linux apps installed with one click | ✅ Working |
 
 ## On the Linux side
 
-- Double-click one Landfall icon on the USB drive. No terminal, no typed commands.
+- Double-click the Landfall installer on the USB drive (.deb for Ubuntu and Mint, .rpm for
+  Fedora), click **Install**, then open Landfall from your app menu. No terminal, ever.
 - Enter the bundle password you chose on Windows.
 - Landfall puts your files in the matching folders, installs your apps, loads your bookmarks
   and contacts, connects your Wi-Fi and sets your wallpaper.
@@ -51,8 +53,8 @@ or repartitions anything.
 
 - [x] Phase 0: Setup and build pipeline
 - [x] Phase 1: Readiness report
-- [ ] Phase 2: Wizard look, and packing everything into the encrypted bundle
-- [ ] Phase 3: Linux importer (unpack, install apps, restore settings)
+- [ ] Phase 2: Wizard look, and packing everything into the encrypted bundle (files done)
+- [ ] Phase 3: Linux importer (unpack, install apps, restore settings) (files and apps done)
 - [ ] Phase 4: Public launch (v1.0)
 
 ## Run from source

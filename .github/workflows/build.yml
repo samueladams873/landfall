@@ -1,0 +1,71 @@
+name: Build Landfall
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+env:
+  NFPM_VERSION: "2.48.0"
+
+jobs:
+  linux:
+    # Built on the oldest supported Ubuntu so the installers work on older distros too.
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+      - name: Install system libraries for Qt tests
+        run: sudo apt-get update && sudo apt-get install -y libegl1 libxkbcommon-x11-0 libxcb-cursor0
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+      - name: Run tests
+        run: pytest -q
+        env:
+          QT_QPA_PLATFORM: offscreen
+      - name: Build Linux app
+        run: >
+          pyinstaller --noconfirm --onedir --windowed --name landfall
+          --paths "$PWD/src" --add-data "$PWD/src/landfall/data:landfall/data"
+          --distpath build/linux --workpath build/work --specpath build run_landfall.py
+      - name: Package .deb and .rpm
+        run: |
+          curl -sSL -o nfpm.tgz "https://github.com/goreleaser/nfpm/releases/download/v${NFPM_VERSION}/nfpm_${NFPM_VERSION}_Linux_x86_64.tar.gz"
+          tar -xzf nfpm.tgz nfpm
+          export LANDFALL_VERSION=$(python -c "import sys; sys.path.insert(0,'src'); import landfall; print(landfall.__version__)")
+          ./nfpm pkg -f packaging/linux/nfpm.yaml -p deb -t linux-out/
+          ./nfpm pkg -f packaging/linux/nfpm.yaml -p rpm -t linux-out/
+          ls -la linux-out
+      - uses: actions/upload-artifact@v5
+        with:
+          name: Landfall-linux
+          path: linux-out/*
+
+  windows:
+    needs: linux
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+      - name: Run tests
+        run: pytest -q
+        env:
+          QT_QPA_PLATFORM: offscreen
+      - name: Get the Linux installers to carry inside the .exe
+        uses: actions/download-artifact@v5
+        with:
+          name: Landfall-linux
+          path: src/landfall/data/linux
+      - name: Build exe
+        run: pyinstaller --onefile --windowed --name Landfall --paths src --add-data "src/landfall/data:landfall/data" --icon src/landfall/data/landfall.ico run_landfall.py
+      - uses: actions/upload-artifact@v5
+        with:
+          name: Landfall-windows
+          path: dist/Landfall.exe

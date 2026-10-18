@@ -1,5 +1,5 @@
 import sys
 
-from landfall.app import main
+from landfall.launcher import main
 
 sys.exit(main())

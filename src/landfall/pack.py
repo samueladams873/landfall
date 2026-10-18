@@ -6,6 +6,7 @@ Anyone can open it with free 7-Zip, or with Landfall on Linux.
 from __future__ import annotations
 
 import json
+import shutil
 import sys
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -18,21 +19,40 @@ from landfall import __version__
 
 PART_SIZE = 3900 * 1024 * 1024
 BUNDLE_NAME = "Landfall-bundle.7z"
+INFO_NAME = "Landfall-info.7z"  # small locked file: list of contents, for a fast password check
 MOVE_FOLDER = "Landfall Move"
 FILTERS = [{"id": py7zr.FILTER_COPY}, {"id": py7zr.FILTER_CRYPTO_AES256_SHA256}]
 OVERHEAD = 1.01  # archive headers and padding
 EXTRA = 50 * 1024 * 1024
 
-README = """This folder was made by Landfall {version}, a free tool for moving from Windows to Linux.
+# Linux installers carried inside the Windows app, copied next to the bundle.
+LINUX_DIR = Path(__file__).parent / "data" / "linux"
+INSTALLER_NAMES = {".deb": "Landfall for Ubuntu and Mint.deb", ".rpm": "Landfall for Fedora.rpm"}
 
-Landfall-bundle.7z.0001 (and any .0002, .0003 ... parts) hold your files, locked with
-the password you chose. Keep all the parts together.
+README = """START HERE - made by Landfall {version}, a free tool for moving from Windows to Linux.
 
-To unpack on Linux: plug this drive in and double-click Landfall.
-To open it anywhere else: use free 7-Zip (https://www.7-zip.org) and open the .0001 file.
+ON YOUR NEW LINUX PC
+  1. Double-click the Landfall installer for your Linux:
+       Ubuntu, Linux Mint, Zorin OS, Pop!_OS, elementary:  "Landfall for Ubuntu and Mint.deb"
+       Fedora:                                              "Landfall for Fedora.rpm"
+  2. Click Install and type your computer password.
+  3. Open Landfall from your app menu and type your bundle password.
+
+WHAT'S IN THIS FOLDER
+  Landfall-bundle.7z.0001 (and any .0002, .0003 ... parts) hold your files, locked with the
+  password you chose. Keep all the parts together. Landfall-info.7z is a small locked list
+  of what's inside.
+
+  You can also open the bundle anywhere with free 7-Zip (https://www.7-zip.org).
 
 Learn more: https://github.com/samueladams873/landfall
 """
+
+
+def linux_installers() -> list[Path]:
+    if not LINUX_DIR.is_dir():
+        return []
+    return sorted(p for p in LINUX_DIR.iterdir() if p.suffix in INSTALLER_NAMES)
 
 
 class PackCancelled(Exception):
@@ -49,7 +69,8 @@ class PackResult:
 
 
 def space_needed(total_bytes: int) -> int:
-    return int(total_bytes * OVERHEAD) + EXTRA
+    installers = sum(p.stat().st_size for p in linux_installers())
+    return int(total_bytes * OVERHEAD) + EXTRA + installers
 
 
 def choose_output_folder(drive_root: Path) -> Path:
@@ -118,13 +139,18 @@ def pack(folders, password: str, drive_root: Path, extra_data: dict | None = Non
                 z.writestr(json.dumps(manifest, indent=1), "landfall/manifest.json")
         progress(total, total, "")
     except BaseException:
-        for part in out_dir.glob(BUNDLE_NAME + "*"):
+        for part in out_dir.glob("Landfall-*.7z*"):
             part.unlink(missing_ok=True)
         try:
             out_dir.rmdir()
         except OSError:
             pass
         raise
-    (out_dir / "READ ME.txt").write_text(README.format(version=__version__), encoding="utf-8")
+    with py7zr.SevenZipFile(out_dir / INFO_NAME, "w", filters=FILTERS, password=password) as z:
+        z.set_encrypted_header(True)
+        z.writestr(json.dumps(manifest, indent=1), "landfall/manifest.json")
+    for installer in linux_installers():
+        shutil.copyfile(installer, out_dir / INSTALLER_NAMES[installer.suffix])
+    (out_dir / "START HERE.txt").write_text(README.format(version=__version__), encoding="utf-8")
     parts = sorted(out_dir.glob(BUNDLE_NAME + ".*"))
     return PackResult(out_dir, parts, files, done, skipped)
