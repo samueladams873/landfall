@@ -41,6 +41,8 @@
     {"windows": "Microsoft Office", "patterns": ["^microsoft office", "^microsoft 365"], "status": "alternative",
      "linux": [{"name": "LibreOffice", "flatpak": "org.libreoffice.LibreOffice"},
                {"name": "Office on the web (office.com in your browser)"}]},
+    {"windows": "Microsoft OneDrive", "patterns": ["^microsoft onedrive"], "status": "alternative",
+     "linux": [{"name": "OneDrive in your browser (onedrive.live.com)"}]},
     {"windows": "Microsoft Teams", "patterns": ["^microsoft teams"], "status": "alternative",
      "linux": [{"name": "Teams in your browser (teams.microsoft.com)"}]},
     {"windows": "Adobe Photoshop", "patterns": ["^adobe photoshop"], "status": "alternative",

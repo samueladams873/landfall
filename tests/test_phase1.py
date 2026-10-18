@@ -53,6 +53,7 @@ def test_clean_drops_noise_and_duplicates():
         {"name": "Hidden thing", "system_component": True},
         {"name": ""},
         {"name": "Oracle VM VirtualBox Guest Additions 7.2.16"},
+        {"name": "Mozilla Maintenance Service"},
     ]
     assert [a["name"] for a in clean(raw)] == ["Google Chrome"]
 

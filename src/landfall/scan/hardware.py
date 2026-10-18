@@ -42,6 +42,8 @@ def firmware_type() -> str:
 def secure_boot() -> str:
     if sys.platform != "win32":
         return "Unknown"
+    if firmware_type() == "Legacy BIOS":
+        return "Not used (Legacy BIOS)"
     try:
         import winreg
         path = r"SYSTEM\CurrentControlSet\Control\SecureBoot\State"

@@ -18,7 +18,7 @@ NOISE = re.compile(
     r"windows sdk|update for|security update|hotfix|kb\d{6,}|driver|"
     r"microsoft edge (update|webview)|webview2|"
     r"microsoft update health|windows pc health|"
-    r"guest additions|vcredist|directx|runtime$)",
+    r"guest additions|vcredist|directx|runtime$|maintenance service)",
     re.IGNORECASE,
 )
 
