@@ -34,6 +34,14 @@ def load_map(path: Path = DATA_FILE) -> list[dict]:
     return entries
 
 
+def builtin_apps(entries: list[dict] | None = None) -> list[dict]:
+    """Programs that come with every copy of Windows (Notepad, Paint, Photos...). They never
+    show up as installed programs, so they're always added to what the scan found."""
+    entries = entries if entries is not None else load_map()
+    return [{"name": e["windows"], "icon": e.get("exe", ""), "source": "Built into Windows",
+             "builtin": True} for e in entries if e.get("builtin")]
+
+
 def match_app(app: dict, entries: list[dict]) -> MatchResult:
     name = app.get("name", "").strip()
     for entry in entries:
@@ -77,11 +85,16 @@ def by_category(grouped: dict[str, list[MatchResult]]) -> tuple[list[Category], 
             cat = cats.setdefault(r.entry.get("category", r.entry["windows"]),
                                   Category(r.entry.get("category", r.entry["windows"])))
             cat.windows_apps.append(r.app)
-            keys = {option_key(o) for o in cat.options}
-            for opt in r.options:
-                if option_key(opt) not in keys:
+            keys = {option_key(o): n for n, o in enumerate(cat.options)}
+            for i, opt in enumerate(r.options):
+                k = option_key(opt)
+                if k not in keys:
+                    keys[k] = len(cat.options)
                     cat.options.append(opt)
-                    keys.add(option_key(opt))
+                elif i == 0 and r.entry.get("status") == "same":
+                    # the same app the user already has: its own wording ("your data comes
+                    # over as it is") beats a generic description from another app
+                    cat.options[keys[k]] = opt
             cat.recommended.add(option_key(r.options[0]))
     for cat in cats.values():  # recommended picks first, then the rest in map order
         cat.options.sort(key=lambda o: option_key(o) not in cat.recommended)

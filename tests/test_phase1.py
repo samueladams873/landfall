@@ -90,3 +90,14 @@ def test_browsers_become_one_choice_without_repeats():
     names = [o["name"] for o in cats[0].options]
     assert len(names) == len(set(names))
     assert "Firefox" in names and "Microsoft Edge" not in names
+
+
+def test_builtin_windows_programs_always_get_alternatives():
+    from landfall.mapping import builtin_apps, by_category
+    built = builtin_apps()
+    names = {a["name"] for a in built}
+    assert {"Notepad", "Paint", "Photos", "Calculator", "Snipping Tool"} <= names
+    cats, _ = by_category(match_all(built))
+    by_name = {c.name: c for c in cats}
+    assert by_name["Drawing"].options[0]["name"] == "Pinta"          # Paint -> Pinta first
+    assert by_name["Text editor"].windows_apps[0]["name"] == "Notepad"

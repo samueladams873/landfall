@@ -1,54 +1,7 @@
 {
- "version": 3,
- "notes": "status: none = no Linux alternative we recommend; same = the same app exists on Linux; alternative = a different app does the same job; wine = only runs through Wine. The first option is the recommended pick.",
+ "version": 4,
+ "notes": "status: same = the same app exists on Linux; alternative = a different app does the same job; wine = only runs through Wine; none = nothing to install. The first option is the recommended pick.",
  "apps": [
-  {
-   "windows": "Google Chrome",
-   "patterns": [
-    "^google chrome"
-   ],
-   "status": "same",
-   "category": "Web browser",
-   "linux": [
-    {
-     "name": "Google Chrome",
-     "about": "The same Chrome you know. Sign in to get your bookmarks back.",
-     "flatpak": "com.google.Chrome",
-     "commands": [
-      "google-chrome",
-      "google-chrome-stable"
-     ]
-    },
-    {
-     "name": "Chromium",
-     "about": "The open-source browser Chrome is built on. Looks and works like Chrome.",
-     "flatpak": "org.chromium.Chromium",
-     "commands": [
-      "chromium",
-      "chromium-browser"
-     ],
-     "snap": "chromium"
-    },
-    {
-     "name": "Brave",
-     "about": "Chrome-like browser that blocks ads and trackers.",
-     "flatpak": "com.brave.Browser",
-     "commands": [
-      "brave-browser"
-     ],
-     "snap": "brave"
-    },
-    {
-     "name": "Firefox",
-     "about": "Fast, private browser. Comes with most Linux PCs.",
-     "flatpak": "org.mozilla.firefox",
-     "commands": [
-      "firefox"
-     ],
-     "snap": "firefox"
-    }
-   ]
-  },
   {
    "windows": "Mozilla Firefox",
    "patterns": [
@@ -59,12 +12,94 @@
    "linux": [
     {
      "name": "Firefox",
-     "about": "Fast, private browser. Comes with most Linux PCs.",
+     "about": "Your best match: Firefox bookmarks, history and passwords can come over as they are.",
      "flatpak": "org.mozilla.firefox",
      "commands": [
       "firefox"
      ],
      "snap": "firefox"
+    },
+    {
+     "name": "Zen Browser",
+     "about": "Sleek Firefox-based browser with vertical tabs.",
+     "flatpak": "app.zen_browser.zen",
+     "commands": [
+      "zen-browser"
+     ]
+    },
+    {
+     "name": "Chromium",
+     "about": "Chrome without Google. Same look; imports your bookmarks and passwords.",
+     "flatpak": "org.chromium.Chromium",
+     "commands": [
+      "chromium",
+      "chromium-browser"
+     ],
+     "snap": "chromium"
+    },
+    {
+     "name": "Brave",
+     "about": "Chrome-like, blocks ads and trackers. Imports bookmarks and passwords.",
+     "flatpak": "com.brave.Browser",
+     "commands": [
+      "brave-browser"
+     ],
+     "snap": "brave"
+    }
+   ]
+  },
+  {
+   "windows": "Google Chrome",
+   "patterns": [
+    "^google chrome"
+   ],
+   "status": "same",
+   "category": "Web browser",
+   "linux": [
+    {
+     "name": "Google Chrome",
+     "about": "Google's browser. Sign in and your bookmarks and passwords come back.",
+     "flatpak": "com.google.Chrome",
+     "commands": [
+      "google-chrome",
+      "google-chrome-stable"
+     ]
+    },
+    {
+     "name": "Chromium",
+     "about": "Chrome without Google. Same look; imports your bookmarks and passwords.",
+     "flatpak": "org.chromium.Chromium",
+     "commands": [
+      "chromium",
+      "chromium-browser"
+     ],
+     "snap": "chromium"
+    },
+    {
+     "name": "Brave",
+     "about": "Chrome-like, blocks ads and trackers. Imports bookmarks and passwords.",
+     "flatpak": "com.brave.Browser",
+     "commands": [
+      "brave-browser"
+     ],
+     "snap": "brave"
+    },
+    {
+     "name": "Firefox",
+     "about": "Fast, private browser. Imports your bookmarks and saved passwords.",
+     "flatpak": "org.mozilla.firefox",
+     "commands": [
+      "firefox"
+     ],
+     "snap": "firefox"
+    },
+    {
+     "name": "Vivaldi",
+     "about": "Chrome-based and very customisable. Imports bookmarks and passwords.",
+     "flatpak": "com.vivaldi.Vivaldi",
+     "commands": [
+      "vivaldi"
+     ]
     }
    ]
   },
@@ -78,7 +113,7 @@
    "linux": [
     {
      "name": "Firefox",
-     "about": "Fast, private browser. Comes with most Linux PCs.",
+     "about": "Fast, private browser. Imports your bookmarks and saved passwords.",
      "flatpak": "org.mozilla.firefox",
      "commands": [
       "firefox"
@@ -87,7 +122,7 @@
     },
     {
      "name": "Chromium",
-     "about": "The open-source browser Chrome is built on. Looks and works like Chrome.",
+     "about": "Chrome without Google. Same look; imports your bookmarks and passwords.",
      "flatpak": "org.chromium.Chromium",
      "commands": [
       "chromium",
@@ -97,7 +132,7 @@
     },
     {
      "name": "Brave",
-     "about": "Chrome-like browser that blocks ads and trackers.",
+     "about": "Chrome-like, blocks ads and trackers. Imports bookmarks and passwords.",
      "flatpak": "com.brave.Browser",
      "commands": [
       "brave-browser"
@@ -106,11 +141,19 @@
     },
     {
      "name": "Google Chrome",
-     "about": "The same Chrome you know. Sign in to get your bookmarks back.",
+     "about": "Google's browser. Sign in and your bookmarks and passwords come back.",
      "flatpak": "com.google.Chrome",
      "commands": [
       "google-chrome",
       "google-chrome-stable"
+     ]
+    },
+    {
+     "name": "Vivaldi",
+     "about": "Chrome-based and very customisable. Imports bookmarks and passwords.",
+     "flatpak": "com.vivaldi.Vivaldi",
+     "commands": [
+      "vivaldi"
      ]
     }
    ]
@@ -125,7 +168,7 @@
    "linux": [
     {
      "name": "Brave",
-     "about": "Chrome-like browser that blocks ads and trackers.",
+     "about": "Chrome-like, blocks ads and trackers. Imports bookmarks and passwords.",
      "flatpak": "com.brave.Browser",
      "commands": [
       "brave-browser"
@@ -134,7 +177,7 @@
     },
     {
      "name": "Firefox",
-     "about": "Fast, private browser. Comes with most Linux PCs.",
+     "about": "Fast, private browser. Imports your bookmarks and saved passwords.",
      "flatpak": "org.mozilla.firefox",
      "commands": [
       "firefox"
@@ -143,7 +186,7 @@
     },
     {
      "name": "Chromium",
-     "about": "The open-source browser Chrome is built on. Looks and works like Chrome.",
+     "about": "Chrome without Google. Same look; imports your bookmarks and passwords.",
      "flatpak": "org.chromium.Chromium",
      "commands": [
       "chromium",
@@ -158,20 +201,29 @@
    "patterns": [
     "^opera"
    ],
-   "status": "same",
+   "status": "alternative",
    "category": "Web browser",
    "linux": [
     {
-     "name": "Opera",
-     "about": "The same Opera browser.",
-     "flatpak": "com.opera.Opera",
+     "name": "Vivaldi",
+     "about": "Chrome-based and very customisable. Imports bookmarks and passwords.",
+     "flatpak": "com.vivaldi.Vivaldi",
      "commands": [
-      "opera"
+      "vivaldi"
      ]
     },
     {
+     "name": "Brave",
+     "about": "Chrome-like, blocks ads and trackers. Imports bookmarks and passwords.",
+     "flatpak": "com.brave.Browser",
+     "commands": [
+      "brave-browser"
+     ],
+     "snap": "brave"
+    },
+    {
      "name": "Firefox",
-     "about": "Fast, private browser. Comes with most Linux PCs.",
+     "about": "Fast, private browser. Imports your bookmarks and saved passwords.",
      "flatpak": "org.mozilla.firefox",
      "commands": [
       "firefox"
@@ -180,7 +232,7 @@
     },
     {
      "name": "Chromium",
-     "about": "The open-source browser Chrome is built on. Looks and works like Chrome.",
+     "about": "Chrome without Google. Same look; imports your bookmarks and passwords.",
      "flatpak": "org.chromium.Chromium",
      "commands": [
       "chromium",
@@ -200,7 +252,7 @@
    "linux": [
     {
      "name": "Vivaldi",
-     "about": "Customisable Chrome-based browser.",
+     "about": "Chrome-based and very customisable. Imports bookmarks and passwords.",
      "flatpak": "com.vivaldi.Vivaldi",
      "commands": [
       "vivaldi"
@@ -208,7 +260,7 @@
     },
     {
      "name": "Firefox",
-     "about": "Fast, private browser. Comes with most Linux PCs.",
+     "about": "Fast, private browser. Imports your bookmarks and saved passwords.",
      "flatpak": "org.mozilla.firefox",
      "commands": [
       "firefox"
@@ -217,7 +269,7 @@
     },
     {
      "name": "Chromium",
-     "about": "The open-source browser Chrome is built on. Looks and works like Chrome.",
+     "about": "Chrome without Google. Same look; imports your bookmarks and passwords.",
      "flatpak": "org.chromium.Chromium",
      "commands": [
       "chromium",
@@ -237,12 +289,20 @@
    "linux": [
     {
      "name": "Thunderbird",
-     "about": "The same email app.",
+     "about": "Email, calendar and contacts. Works with Gmail, Outlook.com and more.",
      "flatpak": "org.mozilla.Thunderbird",
      "commands": [
       "thunderbird"
      ],
      "snap": "thunderbird"
+    },
+    {
+     "name": "Betterbird",
+     "about": "Thunderbird with extra fixes and features.",
+     "flatpak": "eu.betterbird.Betterbird",
+     "commands": [
+      "betterbird"
+     ]
     }
    ]
   },
@@ -256,302 +316,106 @@
    "linux": [
     {
      "name": "Thunderbird",
-     "about": "Free email and calendar app. Works with Outlook.com and Gmail.",
+     "about": "Email, calendar and contacts. Works with Gmail, Outlook.com and more.",
      "flatpak": "org.mozilla.Thunderbird",
      "commands": [
       "thunderbird"
      ],
      "snap": "thunderbird"
-    }
-   ]
-  },
-  {
-   "windows": "Spotify",
-   "patterns": [
-    "^spotify"
-   ],
-   "status": "same",
-   "category": "Music streaming",
-   "linux": [
-    {
-     "name": "Spotify",
-     "about": "The same Spotify.",
-     "flatpak": "com.spotify.Client",
-     "commands": [
-      "spotify"
-     ],
-     "snap": "spotify"
-    }
-   ]
-  },
-  {
-   "windows": "Discord",
-   "patterns": [
-    "^discord$"
-   ],
-   "status": "same",
-   "category": "Chat",
-   "linux": [
-    {
-     "name": "Discord",
-     "about": "The same Discord.",
-     "flatpak": "com.discordapp.Discord",
-     "commands": [
-      "discord"
-     ],
-     "snap": "discord"
-    }
-   ]
-  },
-  {
-   "windows": "Steam",
-   "patterns": [
-    "^steam$"
-   ],
-   "status": "same",
-   "category": "Games",
-   "linux": [
-    {
-     "name": "Steam",
-     "about": "The same Steam. Most Windows games run through Proton.",
-     "flatpak": "com.valvesoftware.Steam",
-     "commands": [
-      "steam"
-     ]
-    }
-   ]
-  },
-  {
-   "windows": "VLC media player",
-   "patterns": [
-    "^vlc media player"
-   ],
-   "status": "same",
-   "category": "Video player",
-   "linux": [
-    {
-     "name": "VLC",
-     "about": "The same VLC.",
-     "flatpak": "org.videolan.VLC",
-     "commands": [
-      "vlc"
-     ],
-     "snap": "vlc"
     },
     {
-     "name": "mpv",
-     "about": "Simple, fast video player.",
-     "flatpak": "io.mpv.Mpv",
+     "name": "Evolution",
+     "about": "Email, calendar and contacts in one, Outlook-style.",
+     "flatpak": "org.gnome.Evolution",
      "commands": [
-      "mpv"
+      "evolution"
+     ]
+    },
+    {
+     "name": "Betterbird",
+     "about": "Thunderbird with extra fixes and features.",
+     "flatpak": "eu.betterbird.Betterbird",
+     "commands": [
+      "betterbird"
+     ]
+    },
+    {
+     "name": "Geary",
+     "about": "Simple, modern email app.",
+     "flatpak": "org.gnome.Geary",
+     "commands": [
+      "geary"
      ]
     }
    ]
   },
   {
-   "windows": "Zoom",
+   "windows": "Mailbird",
    "patterns": [
-    "^zoom"
+    "^mailbird"
    ],
-   "status": "same",
-   "category": "Video calls",
+   "status": "alternative",
+   "category": "Email",
    "linux": [
     {
-     "name": "Zoom",
-     "about": "The same Zoom.",
-     "flatpak": "us.zoom.Zoom",
+     "name": "Thunderbird",
+     "about": "Email, calendar and contacts. Works with Gmail, Outlook.com and more.",
+     "flatpak": "org.mozilla.Thunderbird",
      "commands": [
-      "zoom"
+      "thunderbird"
      ],
-     "snap": "zoom-client"
-    }
-   ]
-  },
-  {
-   "windows": "Slack",
-   "patterns": [
-    "^slack"
-   ],
-   "status": "same",
-   "category": "Chat",
-   "linux": [
+     "snap": "thunderbird"
+    },
     {
-     "name": "Slack",
-     "about": "The same Slack.",
-     "flatpak": "com.slack.Slack",
+     "name": "Geary",
+     "about": "Simple, modern email app.",
+     "flatpak": "org.gnome.Geary",
      "commands": [
-      "slack"
-     ],
-     "snap": "slack"
-    }
-   ]
-  },
-  {
-   "windows": "Signal",
-   "patterns": [
-    "^signal"
-   ],
-   "status": "same",
-   "category": "Chat",
-   "linux": [
+      "geary"
+     ]
+    },
     {
-     "name": "Signal",
-     "about": "The same Signal.",
-     "flatpak": "org.signal.Signal",
+     "name": "Evolution",
+     "about": "Email, calendar and contacts in one, Outlook-style.",
+     "flatpak": "org.gnome.Evolution",
      "commands": [
-      "signal-desktop"
-     ],
-     "snap": "signal-desktop"
-    }
-   ]
-  },
-  {
-   "windows": "Telegram Desktop",
-   "patterns": [
-    "^telegram"
-   ],
-   "status": "same",
-   "category": "Chat",
-   "linux": [
-    {
-     "name": "Telegram",
-     "about": "The same Telegram.",
-     "flatpak": "org.telegram.desktop",
-     "commands": [
-      "telegram-desktop"
-     ],
-     "snap": "telegram-desktop"
-    }
-   ]
-  },
-  {
-   "windows": "OBS Studio",
-   "patterns": [
-    "^obs studio"
-   ],
-   "status": "same",
-   "category": "Screen recording",
-   "linux": [
-    {
-     "name": "OBS Studio",
-     "about": "The same OBS.",
-     "flatpak": "com.obsproject.Studio",
-     "commands": [
-      "obs"
-     ],
-     "snap": "obs-studio"
-    }
-   ]
-  },
-  {
-   "windows": "Audacity",
-   "patterns": [
-    "^audacity"
-   ],
-   "status": "same",
-   "category": "Audio editing",
-   "linux": [
-    {
-     "name": "Audacity",
-     "about": "The same Audacity.",
-     "flatpak": "org.audacityteam.Audacity",
-     "commands": [
-      "audacity"
+      "evolution"
      ]
     }
    ]
   },
   {
-   "windows": "Blender",
+   "windows": "eM Client",
    "patterns": [
-    "^blender"
+    "^em client"
    ],
-   "status": "same",
-   "category": "3D",
+   "status": "alternative",
+   "category": "Email",
    "linux": [
     {
-     "name": "Blender",
-     "about": "The same Blender.",
-     "flatpak": "org.blender.Blender",
+     "name": "Thunderbird",
+     "about": "Email, calendar and contacts. Works with Gmail, Outlook.com and more.",
+     "flatpak": "org.mozilla.Thunderbird",
      "commands": [
-      "blender"
+      "thunderbird"
      ],
-     "snap": "blender"
-    }
-   ]
-  },
-  {
-   "windows": "GIMP",
-   "patterns": [
-    "^gimp"
-   ],
-   "status": "same",
-   "category": "Photo editing",
-   "linux": [
+     "snap": "thunderbird"
+    },
     {
-     "name": "GIMP",
-     "about": "The same GIMP.",
-     "flatpak": "org.gimp.GIMP",
+     "name": "Evolution",
+     "about": "Email, calendar and contacts in one, Outlook-style.",
+     "flatpak": "org.gnome.Evolution",
      "commands": [
-      "gimp"
-     ],
-     "snap": "gimp"
-    }
-   ]
-  },
-  {
-   "windows": "Visual Studio Code",
-   "patterns": [
-    "^microsoft visual studio code"
-   ],
-   "status": "same",
-   "category": "Coding",
-   "linux": [
-    {
-     "name": "Visual Studio Code",
-     "about": "The same VS Code.",
-     "flatpak": "com.visualstudio.code",
-     "commands": [
-      "code"
-     ],
-     "snap": "code"
-    }
-   ]
-  },
-  {
-   "windows": "Obsidian",
-   "patterns": [
-    "^obsidian"
-   ],
-   "status": "same",
-   "category": "Notes",
-   "linux": [
-    {
-     "name": "Obsidian",
-     "about": "The same Obsidian.",
-     "flatpak": "md.obsidian.Obsidian",
-     "commands": [
-      "obsidian"
+      "evolution"
      ]
-    }
-   ]
-  },
-  {
-   "windows": "Bitwarden",
-   "patterns": [
-    "^bitwarden"
-   ],
-   "status": "same",
-   "category": "Passwords",
-   "linux": [
+    },
     {
-     "name": "Bitwarden",
-     "about": "The same Bitwarden.",
-     "flatpak": "com.bitwarden.desktop",
+     "name": "Betterbird",
+     "about": "Thunderbird with extra fixes and features.",
+     "flatpak": "eu.betterbird.Betterbird",
      "commands": [
-      "bitwarden"
-     ],
-     "snap": "bitwarden"
+      "betterbird"
+     ]
     }
    ]
   },
@@ -584,27 +448,586 @@
    ]
   },
   {
-   "windows": "Microsoft Teams",
+   "windows": "WPS Office",
    "patterns": [
-    "^microsoft teams"
+    "^wps office"
    ],
-   "status": "none",
-   "category": "Video calls",
-   "linux": []
+   "status": "alternative",
+   "category": "Office",
+   "linux": [
+    {
+     "name": "LibreOffice",
+     "about": "Free office suite. Opens and saves Word, Excel and PowerPoint files.",
+     "flatpak": "org.libreoffice.LibreOffice",
+     "commands": [
+      "libreoffice",
+      "soffice"
+     ]
+    },
+    {
+     "name": "ONLYOFFICE",
+     "about": "Office suite with a familiar ribbon toolbar. Opens Word and Excel files.",
+     "flatpak": "org.onlyoffice.desktopeditors",
+     "commands": [
+      "onlyoffice-desktopeditors"
+     ]
+    }
+   ]
   },
   {
-   "windows": "Microsoft OneDrive",
+   "windows": "Microsoft Visio",
    "patterns": [
-    "^microsoft onedrive"
+    "^microsoft visio"
    ],
-   "status": "none",
-   "category": "Cloud storage",
-   "linux": []
+   "status": "alternative",
+   "category": "Diagrams",
+   "linux": [
+    {
+     "name": "draw.io",
+     "about": "Diagrams and flowcharts. Opens Visio files.",
+     "flatpak": "com.jgraph.drawio.desktop",
+     "commands": [
+      "drawio"
+     ]
+    },
+    {
+     "name": "LibreOffice",
+     "about": "Free office suite. Opens and saves Word, Excel and PowerPoint files.",
+     "flatpak": "org.libreoffice.LibreOffice",
+     "commands": [
+      "libreoffice",
+      "soffice"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "iTunes",
+   "patterns": [
+    "^itunes$"
+   ],
+   "status": "alternative",
+   "category": "Music player",
+   "linux": [
+    {
+     "name": "Strawberry",
+     "about": "Music library player, great for big collections.",
+     "flatpak": "org.strawberrymusicplayer.strawberry",
+     "commands": [
+      "strawberry"
+     ]
+    },
+    {
+     "name": "Rhythmbox",
+     "about": "Simple music player and library.",
+     "flatpak": "org.gnome.Rhythmbox3",
+     "commands": [
+      "rhythmbox"
+     ]
+    },
+    {
+     "name": "Elisa",
+     "about": "Clean, easy music player.",
+     "flatpak": "org.kde.elisa",
+     "commands": [
+      "elisa"
+     ]
+    },
+    {
+     "name": "Lollypop",
+     "about": "Good-looking music player for your albums.",
+     "flatpak": "org.gnome.Lollypop",
+     "commands": [
+      "lollypop"
+     ]
+    },
+    {
+     "name": "Amberol",
+     "about": "Tiny player: drop in songs and press play.",
+     "flatpak": "io.bassi.Amberol",
+     "commands": [
+      "amberol"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "MusicBee",
+   "patterns": [
+    "^musicbee"
+   ],
+   "status": "alternative",
+   "category": "Music player",
+   "linux": [
+    {
+     "name": "Strawberry",
+     "about": "Music library player, great for big collections.",
+     "flatpak": "org.strawberrymusicplayer.strawberry",
+     "commands": [
+      "strawberry"
+     ]
+    },
+    {
+     "name": "Elisa",
+     "about": "Clean, easy music player.",
+     "flatpak": "org.kde.elisa",
+     "commands": [
+      "elisa"
+     ]
+    },
+    {
+     "name": "Lollypop",
+     "about": "Good-looking music player for your albums.",
+     "flatpak": "org.gnome.Lollypop",
+     "commands": [
+      "lollypop"
+     ]
+    },
+    {
+     "name": "Rhythmbox",
+     "about": "Simple music player and library.",
+     "flatpak": "org.gnome.Rhythmbox3",
+     "commands": [
+      "rhythmbox"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "foobar2000",
+   "patterns": [
+    "^foobar2000"
+   ],
+   "status": "alternative",
+   "category": "Music player",
+   "linux": [
+    {
+     "name": "Strawberry",
+     "about": "Music library player, great for big collections.",
+     "flatpak": "org.strawberrymusicplayer.strawberry",
+     "commands": [
+      "strawberry"
+     ]
+    },
+    {
+     "name": "Elisa",
+     "about": "Clean, easy music player.",
+     "flatpak": "org.kde.elisa",
+     "commands": [
+      "elisa"
+     ]
+    },
+    {
+     "name": "Amberol",
+     "about": "Tiny player: drop in songs and press play.",
+     "flatpak": "io.bassi.Amberol",
+     "commands": [
+      "amberol"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "Winamp",
+   "patterns": [
+    "^winamp"
+   ],
+   "status": "alternative",
+   "category": "Music player",
+   "linux": [
+    {
+     "name": "Strawberry",
+     "about": "Music library player, great for big collections.",
+     "flatpak": "org.strawberrymusicplayer.strawberry",
+     "commands": [
+      "strawberry"
+     ]
+    },
+    {
+     "name": "Amberol",
+     "about": "Tiny player: drop in songs and press play.",
+     "flatpak": "io.bassi.Amberol",
+     "commands": [
+      "amberol"
+     ]
+    },
+    {
+     "name": "Elisa",
+     "about": "Clean, easy music player.",
+     "flatpak": "org.kde.elisa",
+     "commands": [
+      "elisa"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "AIMP",
+   "patterns": [
+    "^aimp"
+   ],
+   "status": "alternative",
+   "category": "Music player",
+   "linux": [
+    {
+     "name": "Strawberry",
+     "about": "Music library player, great for big collections.",
+     "flatpak": "org.strawberrymusicplayer.strawberry",
+     "commands": [
+      "strawberry"
+     ]
+    },
+    {
+     "name": "Elisa",
+     "about": "Clean, easy music player.",
+     "flatpak": "org.kde.elisa",
+     "commands": [
+      "elisa"
+     ]
+    },
+    {
+     "name": "Amberol",
+     "about": "Tiny player: drop in songs and press play.",
+     "flatpak": "io.bassi.Amberol",
+     "commands": [
+      "amberol"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "Spotify",
+   "patterns": [
+    "^spotify"
+   ],
+   "status": "same",
+   "category": "Music streaming",
+   "linux": [
+    {
+     "name": "Spotify",
+     "about": "The same Spotify.",
+     "flatpak": "com.spotify.Client",
+     "commands": [
+      "spotify"
+     ],
+     "snap": "spotify"
+    }
+   ]
+  },
+  {
+   "windows": "VLC media player",
+   "patterns": [
+    "^vlc media player"
+   ],
+   "status": "same",
+   "category": "Video player",
+   "linux": [
+    {
+     "name": "VLC",
+     "about": "Plays almost any video or music file.",
+     "flatpak": "org.videolan.VLC",
+     "commands": [
+      "vlc"
+     ],
+     "snap": "vlc"
+    },
+    {
+     "name": "mpv",
+     "about": "Simple, fast video player.",
+     "flatpak": "io.mpv.Mpv",
+     "commands": [
+      "mpv"
+     ]
+    },
+    {
+     "name": "Celluloid",
+     "about": "Easy video player with a clean look.",
+     "flatpak": "io.github.celluloid_player.Celluloid",
+     "commands": [
+      "celluloid"
+     ]
+    },
+    {
+     "name": "Haruna",
+     "about": "Video player with handy extras like YouTube links.",
+     "flatpak": "org.kde.haruna",
+     "commands": [
+      "haruna"
+     ]
+    },
+    {
+     "name": "Showtime",
+     "about": "Simple video player for everyday watching.",
+     "flatpak": "org.gnome.Showtime"
+    }
+   ]
+  },
+  {
+   "windows": "PotPlayer",
+   "patterns": [
+    "potplayer"
+   ],
+   "status": "alternative",
+   "category": "Video player",
+   "linux": [
+    {
+     "name": "VLC",
+     "about": "Plays almost any video or music file.",
+     "flatpak": "org.videolan.VLC",
+     "commands": [
+      "vlc"
+     ],
+     "snap": "vlc"
+    },
+    {
+     "name": "mpv",
+     "about": "Simple, fast video player.",
+     "flatpak": "io.mpv.Mpv",
+     "commands": [
+      "mpv"
+     ]
+    },
+    {
+     "name": "Celluloid",
+     "about": "Easy video player with a clean look.",
+     "flatpak": "io.github.celluloid_player.Celluloid",
+     "commands": [
+      "celluloid"
+     ]
+    },
+    {
+     "name": "Haruna",
+     "about": "Video player with handy extras like YouTube links.",
+     "flatpak": "org.kde.haruna",
+     "commands": [
+      "haruna"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "MPC-HC",
+   "patterns": [
+    "^mpc-hc",
+    "media player classic"
+   ],
+   "status": "alternative",
+   "category": "Video player",
+   "linux": [
+    {
+     "name": "mpv",
+     "about": "Simple, fast video player.",
+     "flatpak": "io.mpv.Mpv",
+     "commands": [
+      "mpv"
+     ]
+    },
+    {
+     "name": "VLC",
+     "about": "Plays almost any video or music file.",
+     "flatpak": "org.videolan.VLC",
+     "commands": [
+      "vlc"
+     ],
+     "snap": "vlc"
+    },
+    {
+     "name": "Celluloid",
+     "about": "Easy video player with a clean look.",
+     "flatpak": "io.github.celluloid_player.Celluloid",
+     "commands": [
+      "celluloid"
+     ]
+    },
+    {
+     "name": "Haruna",
+     "about": "Video player with handy extras like YouTube links.",
+     "flatpak": "org.kde.haruna",
+     "commands": [
+      "haruna"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "KMPlayer",
+   "patterns": [
+    "^kmplayer"
+   ],
+   "status": "alternative",
+   "category": "Video player",
+   "linux": [
+    {
+     "name": "VLC",
+     "about": "Plays almost any video or music file.",
+     "flatpak": "org.videolan.VLC",
+     "commands": [
+      "vlc"
+     ],
+     "snap": "vlc"
+    },
+    {
+     "name": "mpv",
+     "about": "Simple, fast video player.",
+     "flatpak": "io.mpv.Mpv",
+     "commands": [
+      "mpv"
+     ]
+    },
+    {
+     "name": "Celluloid",
+     "about": "Easy video player with a clean look.",
+     "flatpak": "io.github.celluloid_player.Celluloid",
+     "commands": [
+      "celluloid"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "Kodi",
+   "patterns": [
+    "^kodi"
+   ],
+   "status": "same",
+   "category": "Media centre",
+   "linux": [
+    {
+     "name": "Kodi",
+     "about": "Turns your PC into a home-theatre media centre.",
+     "flatpak": "tv.kodi.Kodi",
+     "commands": [
+      "kodi"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "Plex",
+   "patterns": [
+    "^plex"
+   ],
+   "status": "same",
+   "category": "Media centre",
+   "linux": [
+    {
+     "name": "Plex",
+     "about": "Watch your Plex library.",
+     "flatpak": "tv.plex.PlexDesktop"
+    },
+    {
+     "name": "Kodi",
+     "about": "Turns your PC into a home-theatre media centre.",
+     "flatpak": "tv.kodi.Kodi",
+     "commands": [
+      "kodi"
+     ]
+    }
+   ]
   },
   {
    "windows": "Adobe Photoshop",
    "patterns": [
     "^adobe photoshop"
+   ],
+   "status": "alternative",
+   "category": "Photo editing",
+   "linux": [
+    {
+     "name": "GIMP",
+     "about": "Powerful photo editor, the classic Photoshop alternative.",
+     "flatpak": "org.gimp.GIMP",
+     "commands": [
+      "gimp"
+     ],
+     "snap": "gimp"
+    },
+    {
+     "name": "Krita",
+     "about": "Great for drawing and painting.",
+     "flatpak": "org.kde.krita",
+     "commands": [
+      "krita"
+     ],
+     "snap": "krita"
+    },
+    {
+     "name": "PhotoCraft",
+     "about": "Brand-new free Photoshop look-alike that opens PSD files. Still young.",
+     "url": "https://github.com/storytold/photocraft",
+     "new": true
+    },
+    {
+     "name": "Pinta",
+     "about": "Simple image editor, like Paint.NET.",
+     "flatpak": "com.github.PintaProject.Pinta",
+     "commands": [
+      "pinta"
+     ],
+     "snap": "pinta"
+    }
+   ]
+  },
+  {
+   "windows": "GIMP",
+   "patterns": [
+    "^gimp"
+   ],
+   "status": "same",
+   "category": "Photo editing",
+   "linux": [
+    {
+     "name": "GIMP",
+     "about": "Powerful photo editor, the classic Photoshop alternative.",
+     "flatpak": "org.gimp.GIMP",
+     "commands": [
+      "gimp"
+     ],
+     "snap": "gimp"
+    }
+   ]
+  },
+  {
+   "windows": "Paint.NET",
+   "patterns": [
+    "^paint\\.net"
+   ],
+   "status": "alternative",
+   "category": "Photo editing",
+   "linux": [
+    {
+     "name": "Pinta",
+     "about": "Simple image editor, like Paint.NET.",
+     "flatpak": "com.github.PintaProject.Pinta",
+     "commands": [
+      "pinta"
+     ],
+     "snap": "pinta"
+    },
+    {
+     "name": "GIMP",
+     "about": "Powerful photo editor, the classic Photoshop alternative.",
+     "flatpak": "org.gimp.GIMP",
+     "commands": [
+      "gimp"
+     ],
+     "snap": "gimp"
+    },
+    {
+     "name": "Krita",
+     "about": "Great for drawing and painting.",
+     "flatpak": "org.kde.krita",
+     "commands": [
+      "krita"
+     ],
+     "snap": "krita"
+    }
+   ]
+  },
+  {
+   "windows": "Affinity Photo",
+   "patterns": [
+    "^affinity photo"
    ],
    "status": "alternative",
    "category": "Photo editing",
@@ -645,7 +1068,7 @@
    "linux": [
     {
      "name": "Inkscape",
-     "about": "Professional vector drawing.",
+     "about": "Professional vector drawing and logos.",
      "flatpak": "org.inkscape.Inkscape",
      "commands": [
       "inkscape"
@@ -656,6 +1079,106 @@
      "name": "VectorCraft",
      "about": "Brand-new free Illustrator look-alike. Still young.",
      "url": "https://github.com/storytold/vectorcraft",
+     "new": true
+    },
+    {
+     "name": "Krita",
+     "about": "Great for drawing and painting.",
+     "flatpak": "org.kde.krita",
+     "commands": [
+      "krita"
+     ],
+     "snap": "krita"
+    }
+   ]
+  },
+  {
+   "windows": "CorelDRAW",
+   "patterns": [
+    "^coreldraw"
+   ],
+   "status": "alternative",
+   "category": "Drawing and design",
+   "linux": [
+    {
+     "name": "Inkscape",
+     "about": "Professional vector drawing and logos.",
+     "flatpak": "org.inkscape.Inkscape",
+     "commands": [
+      "inkscape"
+     ],
+     "snap": "inkscape"
+    },
+    {
+     "name": "VectorCraft",
+     "about": "Brand-new free Illustrator look-alike. Still young.",
+     "url": "https://github.com/storytold/vectorcraft",
+     "new": true
+    }
+   ]
+  },
+  {
+   "windows": "Affinity Designer",
+   "patterns": [
+    "^affinity designer"
+   ],
+   "status": "alternative",
+   "category": "Drawing and design",
+   "linux": [
+    {
+     "name": "Inkscape",
+     "about": "Professional vector drawing and logos.",
+     "flatpak": "org.inkscape.Inkscape",
+     "commands": [
+      "inkscape"
+     ],
+     "snap": "inkscape"
+    },
+    {
+     "name": "VectorCraft",
+     "about": "Brand-new free Illustrator look-alike. Still young.",
+     "url": "https://github.com/storytold/vectorcraft",
+     "new": true
+    }
+   ]
+  },
+  {
+   "windows": "Adobe Lightroom",
+   "patterns": [
+    "^adobe lightroom"
+   ],
+   "status": "alternative",
+   "category": "Photo library",
+   "linux": [
+    {
+     "name": "darktable",
+     "about": "Photo library and RAW editor.",
+     "flatpak": "org.darktable.Darktable",
+     "commands": [
+      "darktable"
+     ],
+     "snap": "darktable"
+    },
+    {
+     "name": "RawTherapee",
+     "about": "Powerful RAW photo developer.",
+     "flatpak": "com.rawtherapee.RawTherapee",
+     "commands": [
+      "rawtherapee"
+     ]
+    },
+    {
+     "name": "digiKam",
+     "about": "Organises big photo collections.",
+     "flatpak": "org.kde.digikam",
+     "commands": [
+      "digikam"
+     ]
+    },
+    {
+     "name": "LightCraft",
+     "about": "Brand-new free Lightroom look-alike. Still young.",
+     "url": "https://github.com/storytold/lightcraft",
      "new": true
     }
    ]
@@ -692,6 +1215,14 @@
      "url": "https://www.blackmagicdesign.com/products/davinciresolve"
     },
     {
+     "name": "OpenShot",
+     "about": "Beginner-friendly video editor.",
+     "flatpak": "org.openshot.OpenShot",
+     "commands": [
+      "openshot-qt"
+     ]
+    },
+    {
      "name": "FilmCraft",
      "about": "Brand-new free Premiere look-alike. Still young.",
      "url": "https://github.com/storytold/filmcraft",
@@ -700,27 +1231,149 @@
    ]
   },
   {
-   "windows": "Adobe Lightroom",
+   "windows": "Filmora",
    "patterns": [
-    "^adobe lightroom"
+    "filmora"
    ],
    "status": "alternative",
-   "category": "Photo library",
+   "category": "Video editing",
    "linux": [
     {
-     "name": "darktable",
-     "about": "Photo library and RAW editor.",
-     "flatpak": "org.darktable.Darktable",
+     "name": "Kdenlive",
+     "about": "Full video editor, easy to learn.",
+     "flatpak": "org.kde.kdenlive",
      "commands": [
-      "darktable"
+      "kdenlive"
      ],
-     "snap": "darktable"
+     "snap": "kdenlive"
     },
     {
-     "name": "LightCraft",
-     "about": "Brand-new free Lightroom look-alike. Still young.",
-     "url": "https://github.com/storytold/lightcraft",
-     "new": true
+     "name": "Shotcut",
+     "about": "Simple, reliable video editor.",
+     "flatpak": "org.shotcut.Shotcut",
+     "commands": [
+      "shotcut"
+     ],
+     "snap": "shotcut"
+    },
+    {
+     "name": "OpenShot",
+     "about": "Beginner-friendly video editor.",
+     "flatpak": "org.openshot.OpenShot",
+     "commands": [
+      "openshot-qt"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "CapCut",
+   "patterns": [
+    "^capcut"
+   ],
+   "status": "alternative",
+   "category": "Video editing",
+   "linux": [
+    {
+     "name": "Kdenlive",
+     "about": "Full video editor, easy to learn.",
+     "flatpak": "org.kde.kdenlive",
+     "commands": [
+      "kdenlive"
+     ],
+     "snap": "kdenlive"
+    },
+    {
+     "name": "Shotcut",
+     "about": "Simple, reliable video editor.",
+     "flatpak": "org.shotcut.Shotcut",
+     "commands": [
+      "shotcut"
+     ],
+     "snap": "shotcut"
+    },
+    {
+     "name": "OpenShot",
+     "about": "Beginner-friendly video editor.",
+     "flatpak": "org.openshot.OpenShot",
+     "commands": [
+      "openshot-qt"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "VEGAS Pro",
+   "patterns": [
+    "^vegas pro"
+   ],
+   "status": "alternative",
+   "category": "Video editing",
+   "linux": [
+    {
+     "name": "Kdenlive",
+     "about": "Full video editor, easy to learn.",
+     "flatpak": "org.kde.kdenlive",
+     "commands": [
+      "kdenlive"
+     ],
+     "snap": "kdenlive"
+    },
+    {
+     "name": "Shotcut",
+     "about": "Simple, reliable video editor.",
+     "flatpak": "org.shotcut.Shotcut",
+     "commands": [
+      "shotcut"
+     ],
+     "snap": "shotcut"
+    },
+    {
+     "name": "DaVinci Resolve",
+     "about": "Hollywood-grade editor. Free download from Blackmagic.",
+     "url": "https://www.blackmagicdesign.com/products/davinciresolve"
+    }
+   ]
+  },
+  {
+   "windows": "DaVinci Resolve",
+   "patterns": [
+    "^davinci resolve"
+   ],
+   "status": "same",
+   "category": "Video editing",
+   "linux": [
+    {
+     "name": "DaVinci Resolve",
+     "about": "Hollywood-grade editor. Free download from Blackmagic.",
+     "url": "https://www.blackmagicdesign.com/products/davinciresolve"
+    },
+    {
+     "name": "Kdenlive",
+     "about": "Full video editor, easy to learn.",
+     "flatpak": "org.kde.kdenlive",
+     "commands": [
+      "kdenlive"
+     ],
+     "snap": "kdenlive"
+    }
+   ]
+  },
+  {
+   "windows": "HandBrake",
+   "patterns": [
+    "^handbrake"
+   ],
+   "status": "same",
+   "category": "Video converting",
+   "linux": [
+    {
+     "name": "HandBrake",
+     "about": "Converts and shrinks videos.",
+     "flatpak": "fr.handbrake.ghb",
+     "commands": [
+      "ghb"
+     ]
     }
    ]
   },
@@ -791,6 +1444,11 @@
      "snap": "okular"
     },
     {
+     "name": "Papers",
+     "about": "Simple, fast PDF reader.",
+     "flatpak": "org.gnome.Papers"
+    },
+    {
      "name": "PDF Arranger",
      "about": "Merge, split and reorder PDF pages.",
      "flatpak": "com.github.jeromerobert.pdfarranger",
@@ -799,10 +1457,222 @@
      ]
     },
     {
+     "name": "Xournal++",
+     "about": "Write and draw on PDFs, handwritten notes.",
+     "flatpak": "com.github.xournalpp.xournalpp",
+     "commands": [
+      "xournalpp"
+     ]
+    },
+    {
      "name": "PdfCraft",
      "about": "Brand-new free Acrobat look-alike. Still young.",
      "url": "https://github.com/storytold/pdfcraft",
      "new": true
+    }
+   ]
+  },
+  {
+   "windows": "Foxit PDF Reader",
+   "patterns": [
+    "^foxit"
+   ],
+   "status": "alternative",
+   "category": "PDF",
+   "linux": [
+    {
+     "name": "Okular",
+     "about": "Read, fill in and sign PDFs.",
+     "flatpak": "org.kde.okular",
+     "commands": [
+      "okular"
+     ],
+     "snap": "okular"
+    },
+    {
+     "name": "Papers",
+     "about": "Simple, fast PDF reader.",
+     "flatpak": "org.gnome.Papers"
+    },
+    {
+     "name": "Xournal++",
+     "about": "Write and draw on PDFs, handwritten notes.",
+     "flatpak": "com.github.xournalpp.xournalpp",
+     "commands": [
+      "xournalpp"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "SumatraPDF",
+   "patterns": [
+    "^sumatrapdf"
+   ],
+   "status": "alternative",
+   "category": "PDF",
+   "linux": [
+    {
+     "name": "Papers",
+     "about": "Simple, fast PDF reader.",
+     "flatpak": "org.gnome.Papers"
+    },
+    {
+     "name": "Okular",
+     "about": "Read, fill in and sign PDFs.",
+     "flatpak": "org.kde.okular",
+     "commands": [
+      "okular"
+     ],
+     "snap": "okular"
+    }
+   ]
+  },
+  {
+   "windows": "Blender",
+   "patterns": [
+    "^blender"
+   ],
+   "status": "same",
+   "category": "3D",
+   "linux": [
+    {
+     "name": "Blender",
+     "about": "Free, professional 3D modelling and animation.",
+     "flatpak": "org.blender.Blender",
+     "commands": [
+      "blender"
+     ],
+     "snap": "blender"
+    }
+   ]
+  },
+  {
+   "windows": "AutoCAD",
+   "patterns": [
+    "^autocad"
+   ],
+   "status": "alternative",
+   "category": "CAD",
+   "linux": [
+    {
+     "name": "FreeCAD",
+     "about": "3D design for real-world parts.",
+     "flatpak": "org.freecad.FreeCAD",
+     "commands": [
+      "freecad"
+     ]
+    },
+    {
+     "name": "LibreCAD",
+     "about": "2D drafting, opens DXF drawings.",
+     "flatpak": "org.librecad.librecad",
+     "commands": [
+      "librecad"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "SketchUp",
+   "patterns": [
+    "^sketchup"
+   ],
+   "status": "alternative",
+   "category": "CAD",
+   "linux": [
+    {
+     "name": "FreeCAD",
+     "about": "3D design for real-world parts.",
+     "flatpak": "org.freecad.FreeCAD",
+     "commands": [
+      "freecad"
+     ]
+    },
+    {
+     "name": "Blender",
+     "about": "Free, professional 3D modelling and animation.",
+     "flatpak": "org.blender.Blender",
+     "commands": [
+      "blender"
+     ],
+     "snap": "blender"
+    }
+   ]
+  },
+  {
+   "windows": "Audacity",
+   "patterns": [
+    "^audacity"
+   ],
+   "status": "same",
+   "category": "Audio editing",
+   "linux": [
+    {
+     "name": "Audacity",
+     "about": "Record and edit audio.",
+     "flatpak": "org.audacityteam.Audacity",
+     "commands": [
+      "audacity"
+     ]
+    },
+    {
+     "name": "Tenacity",
+     "about": "Audacity-based, no tracking.",
+     "flatpak": "org.tenacityaudio.Tenacity"
+    }
+   ]
+  },
+  {
+   "windows": "FL Studio",
+   "patterns": [
+    "^fl studio",
+    "^image-line fl studio"
+   ],
+   "status": "alternative",
+   "category": "Music making",
+   "linux": [
+    {
+     "name": "LMMS",
+     "about": "Free music-making studio, like FL Studio.",
+     "flatpak": "io.lmms.LMMS",
+     "commands": [
+      "lmms"
+     ]
+    },
+    {
+     "name": "Ardour",
+     "about": "Pro recording and mixing studio.",
+     "flatpak": "org.ardour.Ardour",
+     "commands": [
+      "ardour"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "Ableton Live",
+   "patterns": [
+    "^ableton live"
+   ],
+   "status": "alternative",
+   "category": "Music making",
+   "linux": [
+    {
+     "name": "Ardour",
+     "about": "Pro recording and mixing studio.",
+     "flatpak": "org.ardour.Ardour",
+     "commands": [
+      "ardour"
+     ]
+    },
+    {
+     "name": "LMMS",
+     "about": "Free music-making studio, like FL Studio.",
+     "flatpak": "io.lmms.LMMS",
+     "commands": [
+      "lmms"
+     ]
     }
    ]
   },
@@ -830,67 +1700,260 @@
      "commands": [
       "notepadqq"
      ]
-    }
-   ]
-  },
-  {
-   "windows": "iTunes",
-   "patterns": [
-    "^itunes$"
-   ],
-   "status": "alternative",
-   "category": "Music player",
-   "linux": [
+    },
     {
-     "name": "Strawberry",
-     "about": "Music library player, great for big collections.",
-     "flatpak": "org.strawberrymusicplayer.strawberry",
+     "name": "Text Editor",
+     "about": "Clean, simple text editor.",
+     "flatpak": "org.gnome.TextEditor",
      "commands": [
-      "strawberry"
+      "gnome-text-editor"
      ]
     },
     {
-     "name": "Rhythmbox",
-     "about": "Simple music player.",
-     "flatpak": "org.gnome.Rhythmbox3",
+     "name": "Sublime Text",
+     "about": "Fast, polished text and code editor.",
+     "flatpak": "com.sublimetext.three",
      "commands": [
-      "rhythmbox"
+      "subl"
      ]
     }
    ]
   },
   {
-   "windows": "7-Zip",
+   "windows": "Sublime Text",
    "patterns": [
-    "^7-zip"
+    "^sublime text"
    ],
-   "status": "alternative",
-   "category": "Zip files",
+   "status": "same",
+   "category": "Text editor",
    "linux": [
     {
-     "name": "PeaZip",
-     "about": "Opens zip, 7z, rar and more.",
-     "flatpak": "io.github.peazip.PeaZip",
+     "name": "Sublime Text",
+     "about": "Fast, polished text and code editor.",
+     "flatpak": "com.sublimetext.three",
      "commands": [
-      "peazip"
+      "subl"
+     ]
+    },
+    {
+     "name": "Kate",
+     "about": "Powerful text editor with tabs, like Notepad++.",
+     "flatpak": "org.kde.kate",
+     "commands": [
+      "kate"
+     ],
+     "snap": "kate"
+    }
+   ]
+  },
+  {
+   "windows": "Visual Studio Code",
+   "patterns": [
+    "^microsoft visual studio code"
+   ],
+   "status": "same",
+   "category": "Coding",
+   "linux": [
+    {
+     "name": "Visual Studio Code",
+     "about": "The popular code editor.",
+     "flatpak": "com.visualstudio.code",
+     "commands": [
+      "code"
+     ],
+     "snap": "code"
+    },
+    {
+     "name": "VSCodium",
+     "about": "VS Code without the tracking.",
+     "flatpak": "com.vscodium.codium",
+     "commands": [
+      "codium"
+     ],
+     "snap": "codium"
+    }
+   ]
+  },
+  {
+   "windows": "Microsoft OneNote",
+   "patterns": [
+    "^microsoft onenote"
+   ],
+   "status": "alternative",
+   "category": "Notes",
+   "linux": [
+    {
+     "name": "Joplin",
+     "about": "Free notes app. Imports OneNote and Evernote notes.",
+     "flatpak": "net.cozic.joplin_desktop",
+     "commands": [
+      "joplin"
+     ]
+    },
+    {
+     "name": "Xournal++",
+     "about": "Write and draw on PDFs, handwritten notes.",
+     "flatpak": "com.github.xournalpp.xournalpp",
+     "commands": [
+      "xournalpp"
+     ]
+    },
+    {
+     "name": "Obsidian",
+     "about": "Popular notes app; your notes stay as simple files.",
+     "flatpak": "md.obsidian.Obsidian",
+     "commands": [
+      "obsidian"
+     ]
+    },
+    {
+     "name": "Logseq",
+     "about": "Notes and outlines that link together.",
+     "flatpak": "com.logseq.Logseq",
+     "commands": [
+      "logseq"
      ]
     }
    ]
   },
   {
-   "windows": "WinRAR",
+   "windows": "Evernote",
    "patterns": [
-    "^winrar"
+    "^evernote"
    ],
    "status": "alternative",
-   "category": "Zip files",
+   "category": "Notes",
    "linux": [
     {
-     "name": "PeaZip",
-     "about": "Opens zip, 7z, rar and more.",
-     "flatpak": "io.github.peazip.PeaZip",
+     "name": "Joplin",
+     "about": "Free notes app. Imports OneNote and Evernote notes.",
+     "flatpak": "net.cozic.joplin_desktop",
      "commands": [
-      "peazip"
+      "joplin"
+     ]
+    },
+    {
+     "name": "Obsidian",
+     "about": "Popular notes app; your notes stay as simple files.",
+     "flatpak": "md.obsidian.Obsidian",
+     "commands": [
+      "obsidian"
+     ]
+    },
+    {
+     "name": "Logseq",
+     "about": "Notes and outlines that link together.",
+     "flatpak": "com.logseq.Logseq",
+     "commands": [
+      "logseq"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "Obsidian",
+   "patterns": [
+    "^obsidian"
+   ],
+   "status": "same",
+   "category": "Notes",
+   "linux": [
+    {
+     "name": "Obsidian",
+     "about": "Popular notes app; your notes stay as simple files.",
+     "flatpak": "md.obsidian.Obsidian",
+     "commands": [
+      "obsidian"
+     ]
+    },
+    {
+     "name": "Logseq",
+     "about": "Notes and outlines that link together.",
+     "flatpak": "com.logseq.Logseq",
+     "commands": [
+      "logseq"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "Notion",
+   "patterns": [
+    "^notion"
+   ],
+   "status": "alternative",
+   "category": "Notes",
+   "linux": [
+    {
+     "name": "AppFlowy",
+     "about": "Notion-style notes, tasks and databases.",
+     "flatpak": "io.appflowy.AppFlowy"
+    },
+    {
+     "name": "Obsidian",
+     "about": "Popular notes app; your notes stay as simple files.",
+     "flatpak": "md.obsidian.Obsidian",
+     "commands": [
+      "obsidian"
+     ]
+    },
+    {
+     "name": "Joplin",
+     "about": "Free notes app. Imports OneNote and Evernote notes.",
+     "flatpak": "net.cozic.joplin_desktop",
+     "commands": [
+      "joplin"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "Microsoft To Do",
+   "patterns": [
+    "^microsoft to do"
+   ],
+   "status": "alternative",
+   "category": "To-do lists",
+   "linux": [
+    {
+     "name": "Errands",
+     "about": "Simple to-do lists.",
+     "flatpak": "io.github.mrvladus.List"
+    }
+   ]
+  },
+  {
+   "windows": "Anki",
+   "patterns": [
+    "^anki"
+   ],
+   "status": "same",
+   "category": "Study",
+   "linux": [
+    {
+     "name": "Anki",
+     "about": "Flashcards that help you remember.",
+     "flatpak": "net.ankiweb.Anki",
+     "commands": [
+      "anki"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "Calibre",
+   "patterns": [
+    "^calibre"
+   ],
+   "status": "same",
+   "category": "E-books",
+   "linux": [
+    {
+     "name": "Calibre",
+     "about": "Organise and convert e-books.",
+     "flatpak": "com.calibre_ebook.calibre",
+     "commands": [
+      "calibre"
      ]
     }
    ]
@@ -915,21 +1978,268 @@
    ]
   },
   {
-   "windows": "Paint.NET",
+   "windows": "Bitwarden",
    "patterns": [
-    "^paint\\.net"
+    "^bitwarden"
    ],
-   "status": "alternative",
-   "category": "Photo editing",
+   "status": "same",
+   "category": "Passwords",
    "linux": [
     {
-     "name": "Pinta",
-     "about": "Simple image editor that looks like Paint.NET.",
-     "flatpak": "com.github.PintaProject.Pinta",
+     "name": "Bitwarden",
+     "about": "Free password manager that syncs everywhere.",
+     "flatpak": "com.bitwarden.desktop",
      "commands": [
-      "pinta"
+      "bitwarden"
      ],
-     "snap": "pinta"
+     "snap": "bitwarden"
+    },
+    {
+     "name": "KeePassXC",
+     "about": "Opens your KeePass password files.",
+     "flatpak": "org.keepassxc.KeePassXC",
+     "commands": [
+      "keepassxc"
+     ],
+     "snap": "keepassxc"
+    }
+   ]
+  },
+  {
+   "windows": "LastPass",
+   "patterns": [
+    "^lastpass"
+   ],
+   "status": "alternative",
+   "category": "Passwords",
+   "linux": [
+    {
+     "name": "Bitwarden",
+     "about": "Free password manager that syncs everywhere.",
+     "flatpak": "com.bitwarden.desktop",
+     "commands": [
+      "bitwarden"
+     ],
+     "snap": "bitwarden"
+    },
+    {
+     "name": "KeePassXC",
+     "about": "Opens your KeePass password files.",
+     "flatpak": "org.keepassxc.KeePassXC",
+     "commands": [
+      "keepassxc"
+     ],
+     "snap": "keepassxc"
+    }
+   ]
+  },
+  {
+   "windows": "1Password",
+   "patterns": [
+    "^1password"
+   ],
+   "status": "alternative",
+   "category": "Passwords",
+   "linux": [
+    {
+     "name": "Bitwarden",
+     "about": "Free password manager that syncs everywhere.",
+     "flatpak": "com.bitwarden.desktop",
+     "commands": [
+      "bitwarden"
+     ],
+     "snap": "bitwarden"
+    },
+    {
+     "name": "KeePassXC",
+     "about": "Opens your KeePass password files.",
+     "flatpak": "org.keepassxc.KeePassXC",
+     "commands": [
+      "keepassxc"
+     ],
+     "snap": "keepassxc"
+    }
+   ]
+  },
+  {
+   "windows": "Dashlane",
+   "patterns": [
+    "^dashlane"
+   ],
+   "status": "alternative",
+   "category": "Passwords",
+   "linux": [
+    {
+     "name": "Bitwarden",
+     "about": "Free password manager that syncs everywhere.",
+     "flatpak": "com.bitwarden.desktop",
+     "commands": [
+      "bitwarden"
+     ],
+     "snap": "bitwarden"
+    },
+    {
+     "name": "KeePassXC",
+     "about": "Opens your KeePass password files.",
+     "flatpak": "org.keepassxc.KeePassXC",
+     "commands": [
+      "keepassxc"
+     ],
+     "snap": "keepassxc"
+    }
+   ]
+  },
+  {
+   "windows": "Discord",
+   "patterns": [
+    "^discord$"
+   ],
+   "status": "same",
+   "category": "Chat",
+   "linux": [
+    {
+     "name": "Discord",
+     "about": "Chat, voice and communities.",
+     "flatpak": "com.discordapp.Discord",
+     "commands": [
+      "discord"
+     ],
+     "snap": "discord"
+    },
+    {
+     "name": "Vesktop",
+     "about": "Discord with better screen sharing on Linux.",
+     "flatpak": "dev.vencord.Vesktop"
+    }
+   ]
+  },
+  {
+   "windows": "Slack",
+   "patterns": [
+    "^slack"
+   ],
+   "status": "same",
+   "category": "Chat",
+   "linux": [
+    {
+     "name": "Slack",
+     "about": "The same Slack.",
+     "flatpak": "com.slack.Slack",
+     "commands": [
+      "slack"
+     ],
+     "snap": "slack"
+    }
+   ]
+  },
+  {
+   "windows": "Signal",
+   "patterns": [
+    "^signal"
+   ],
+   "status": "same",
+   "category": "Chat",
+   "linux": [
+    {
+     "name": "Signal",
+     "about": "The same Signal.",
+     "flatpak": "org.signal.Signal",
+     "commands": [
+      "signal-desktop"
+     ],
+     "snap": "signal-desktop"
+    }
+   ]
+  },
+  {
+   "windows": "Telegram Desktop",
+   "patterns": [
+    "^telegram"
+   ],
+   "status": "same",
+   "category": "Chat",
+   "linux": [
+    {
+     "name": "Telegram",
+     "about": "The same Telegram.",
+     "flatpak": "org.telegram.desktop",
+     "commands": [
+      "telegram-desktop"
+     ],
+     "snap": "telegram-desktop"
+    }
+   ]
+  },
+  {
+   "windows": "WhatsApp",
+   "patterns": [
+    "^whatsapp"
+   ],
+   "status": "alternative",
+   "category": "Chat",
+   "linux": [
+    {
+     "name": "ZapZap",
+     "about": "WhatsApp on your desktop.",
+     "flatpak": "com.rtosta.zapzap",
+     "commands": [
+      "zapzap"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "Zoom",
+   "patterns": [
+    "^zoom"
+   ],
+   "status": "same",
+   "category": "Video calls",
+   "linux": [
+    {
+     "name": "Zoom",
+     "about": "The same Zoom.",
+     "flatpak": "us.zoom.Zoom",
+     "commands": [
+      "zoom"
+     ],
+     "snap": "zoom-client"
+    }
+   ]
+  },
+  {
+   "windows": "Microsoft Teams",
+   "patterns": [
+    "^microsoft teams"
+   ],
+   "status": "none",
+   "category": "Video calls",
+   "linux": []
+  },
+  {
+   "windows": "Skype",
+   "patterns": [
+    "^skype"
+   ],
+   "status": "none",
+   "category": "Video calls",
+   "linux": []
+  },
+  {
+   "windows": "Steam",
+   "patterns": [
+    "^steam$"
+   ],
+   "status": "same",
+   "category": "Games",
+   "linux": [
+    {
+     "name": "Steam",
+     "about": "The same Steam. Most Windows games run through Proton.",
+     "flatpak": "com.valvesoftware.Steam",
+     "commands": [
+      "steam"
+     ]
     }
    ]
   },
@@ -943,13 +2253,559 @@
    "linux": [
     {
      "name": "Heroic Games Launcher",
-     "about": "Plays your Epic and GOG games on Linux.",
+     "about": "Plays your Epic, GOG and Amazon games on Linux.",
+     "flatpak": "com.heroicgameslauncher.hgl",
+     "commands": [
+      "heroic"
+     ]
+    },
+    {
+     "name": "Lutris",
+     "about": "Runs Battle.net, EA and Ubisoft games through Wine.",
+     "flatpak": "net.lutris.Lutris",
+     "commands": [
+      "lutris"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "GOG GALAXY",
+   "patterns": [
+    "^gog galaxy"
+   ],
+   "status": "alternative",
+   "category": "Games",
+   "linux": [
+    {
+     "name": "Heroic Games Launcher",
+     "about": "Plays your Epic, GOG and Amazon games on Linux.",
+     "flatpak": "com.heroicgameslauncher.hgl",
+     "commands": [
+      "heroic"
+     ]
+    },
+    {
+     "name": "Lutris",
+     "about": "Runs Battle.net, EA and Ubisoft games through Wine.",
+     "flatpak": "net.lutris.Lutris",
+     "commands": [
+      "lutris"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "EA app",
+   "patterns": [
+    "^ea app$",
+    "^ea desktop",
+    "^origin$"
+   ],
+   "status": "alternative",
+   "category": "Games",
+   "linux": [
+    {
+     "name": "Lutris",
+     "about": "Runs Battle.net, EA and Ubisoft games through Wine.",
+     "flatpak": "net.lutris.Lutris",
+     "commands": [
+      "lutris"
+     ]
+    },
+    {
+     "name": "Heroic Games Launcher",
+     "about": "Plays your Epic, GOG and Amazon games on Linux.",
+     "flatpak": "com.heroicgameslauncher.hgl",
+     "commands": [
+      "heroic"
+     ]
+    },
+    {
+     "name": "Bottles",
+     "about": "Runs many Windows programs on Linux.",
+     "flatpak": "com.usebottles.bottles",
+     "commands": [
+      "bottles"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "Ubisoft Connect",
+   "patterns": [
+    "^ubisoft connect",
+    "^uplay"
+   ],
+   "status": "alternative",
+   "category": "Games",
+   "linux": [
+    {
+     "name": "Lutris",
+     "about": "Runs Battle.net, EA and Ubisoft games through Wine.",
+     "flatpak": "net.lutris.Lutris",
+     "commands": [
+      "lutris"
+     ]
+    },
+    {
+     "name": "Heroic Games Launcher",
+     "about": "Plays your Epic, GOG and Amazon games on Linux.",
      "flatpak": "com.heroicgameslauncher.hgl",
      "commands": [
       "heroic"
      ]
     }
    ]
+  },
+  {
+   "windows": "Battle.net",
+   "patterns": [
+    "^battle\\.net"
+   ],
+   "status": "wine",
+   "category": "Games",
+   "linux": [
+    {
+     "name": "Lutris",
+     "about": "Runs Battle.net, EA and Ubisoft games through Wine.",
+     "flatpak": "net.lutris.Lutris",
+     "commands": [
+      "lutris"
+     ]
+    },
+    {
+     "name": "Bottles",
+     "about": "Runs many Windows programs on Linux.",
+     "flatpak": "com.usebottles.bottles",
+     "commands": [
+      "bottles"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "Minecraft Launcher",
+   "patterns": [
+    "^minecraft launcher",
+    "^minecraft$"
+   ],
+   "status": "alternative",
+   "category": "Games",
+   "linux": [
+    {
+     "name": "Prism Launcher",
+     "about": "Minecraft Java with easy mods.",
+     "flatpak": "org.prismlauncher.PrismLauncher",
+     "commands": [
+      "prismlauncher"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "Xbox",
+   "patterns": [
+    "^xbox"
+   ],
+   "status": "none",
+   "category": "Games",
+   "linux": []
+  },
+  {
+   "windows": "OBS Studio",
+   "patterns": [
+    "^obs studio"
+   ],
+   "status": "same",
+   "category": "Screen recording",
+   "linux": [
+    {
+     "name": "OBS Studio",
+     "about": "Record your screen and stream live.",
+     "flatpak": "com.obsproject.Studio",
+     "commands": [
+      "obs"
+     ],
+     "snap": "obs-studio"
+    }
+   ]
+  },
+  {
+   "windows": "ShareX",
+   "patterns": [
+    "^sharex"
+   ],
+   "status": "alternative",
+   "category": "Screenshots",
+   "linux": [
+    {
+     "name": "Flameshot",
+     "about": "Screenshots you can mark up, like Snipping Tool.",
+     "flatpak": "org.flameshot.Flameshot",
+     "commands": [
+      "flameshot"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "Greenshot",
+   "patterns": [
+    "^greenshot"
+   ],
+   "status": "alternative",
+   "category": "Screenshots",
+   "linux": [
+    {
+     "name": "Flameshot",
+     "about": "Screenshots you can mark up, like Snipping Tool.",
+     "flatpak": "org.flameshot.Flameshot",
+     "commands": [
+      "flameshot"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "Snagit",
+   "patterns": [
+    "^snagit"
+   ],
+   "status": "alternative",
+   "category": "Screenshots",
+   "linux": [
+    {
+     "name": "Flameshot",
+     "about": "Screenshots you can mark up, like Snipping Tool.",
+     "flatpak": "org.flameshot.Flameshot",
+     "commands": [
+      "flameshot"
+     ]
+    },
+    {
+     "name": "OBS Studio",
+     "about": "Record your screen and stream live.",
+     "flatpak": "com.obsproject.Studio",
+     "commands": [
+      "obs"
+     ],
+     "snap": "obs-studio"
+    }
+   ]
+  },
+  {
+   "windows": "7-Zip",
+   "patterns": [
+    "^7-zip"
+   ],
+   "status": "alternative",
+   "category": "Zip files",
+   "linux": [
+    {
+     "name": "PeaZip",
+     "about": "Opens zip, 7z, rar and more.",
+     "flatpak": "io.github.peazip.PeaZip",
+     "commands": [
+      "peazip"
+     ]
+    },
+    {
+     "name": "Ark",
+     "about": "Simple zip and archive manager.",
+     "flatpak": "org.kde.ark",
+     "commands": [
+      "ark"
+     ]
+    },
+    {
+     "name": "Archive Manager",
+     "about": "Opens and makes zip files.",
+     "flatpak": "org.gnome.FileRoller",
+     "commands": [
+      "file-roller"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "WinRAR",
+   "patterns": [
+    "^winrar"
+   ],
+   "status": "alternative",
+   "category": "Zip files",
+   "linux": [
+    {
+     "name": "PeaZip",
+     "about": "Opens zip, 7z, rar and more.",
+     "flatpak": "io.github.peazip.PeaZip",
+     "commands": [
+      "peazip"
+     ]
+    },
+    {
+     "name": "Ark",
+     "about": "Simple zip and archive manager.",
+     "flatpak": "org.kde.ark",
+     "commands": [
+      "ark"
+     ]
+    },
+    {
+     "name": "Archive Manager",
+     "about": "Opens and makes zip files.",
+     "flatpak": "org.gnome.FileRoller",
+     "commands": [
+      "file-roller"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "WinZip",
+   "patterns": [
+    "^winzip"
+   ],
+   "status": "alternative",
+   "category": "Zip files",
+   "linux": [
+    {
+     "name": "PeaZip",
+     "about": "Opens zip, 7z, rar and more.",
+     "flatpak": "io.github.peazip.PeaZip",
+     "commands": [
+      "peazip"
+     ]
+    },
+    {
+     "name": "Ark",
+     "about": "Simple zip and archive manager.",
+     "flatpak": "org.kde.ark",
+     "commands": [
+      "ark"
+     ]
+    },
+    {
+     "name": "Archive Manager",
+     "about": "Opens and makes zip files.",
+     "flatpak": "org.gnome.FileRoller",
+     "commands": [
+      "file-roller"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "qBittorrent",
+   "patterns": [
+    "^qbittorrent"
+   ],
+   "status": "same",
+   "category": "Downloads",
+   "linux": [
+    {
+     "name": "qBittorrent",
+     "about": "Clean, ad-free torrent app.",
+     "flatpak": "org.qbittorrent.qBittorrent",
+     "commands": [
+      "qbittorrent"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "uTorrent",
+   "patterns": [
+    "torrent$",
+    "^bittorrent"
+   ],
+   "status": "alternative",
+   "category": "Downloads",
+   "linux": [
+    {
+     "name": "qBittorrent",
+     "about": "Clean, ad-free torrent app.",
+     "flatpak": "org.qbittorrent.qBittorrent",
+     "commands": [
+      "qbittorrent"
+     ]
+    },
+    {
+     "name": "Transmission",
+     "about": "Simple, light torrent app.",
+     "flatpak": "com.transmissionbt.Transmission",
+     "commands": [
+      "transmission-gtk"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "FileZilla",
+   "patterns": [
+    "^filezilla"
+   ],
+   "status": "same",
+   "category": "File transfer",
+   "linux": [
+    {
+     "name": "FileZilla",
+     "about": "Reliable FTP and SFTP file transfer.",
+     "flatpak": "org.filezillaproject.Filezilla",
+     "commands": [
+      "filezilla"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "WinSCP",
+   "patterns": [
+    "^winscp"
+   ],
+   "status": "alternative",
+   "category": "File transfer",
+   "linux": [
+    {
+     "name": "FileZilla",
+     "about": "Reliable FTP and SFTP file transfer.",
+     "flatpak": "org.filezillaproject.Filezilla",
+     "commands": [
+      "filezilla"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "TeamViewer",
+   "patterns": [
+    "^teamviewer"
+   ],
+   "status": "alternative",
+   "category": "Remote desktop",
+   "linux": [
+    {
+     "name": "RustDesk",
+     "about": "Free remote-desktop app, like TeamViewer.",
+     "flatpak": "com.rustdesk.RustDesk",
+     "commands": [
+      "rustdesk"
+     ]
+    },
+    {
+     "name": "AnyDesk",
+     "about": "Popular remote-desktop app.",
+     "flatpak": "com.anydesk.Anydesk",
+     "commands": [
+      "anydesk"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "AnyDesk",
+   "patterns": [
+    "^anydesk"
+   ],
+   "status": "same",
+   "category": "Remote desktop",
+   "linux": [
+    {
+     "name": "AnyDesk",
+     "about": "Popular remote-desktop app.",
+     "flatpak": "com.anydesk.Anydesk",
+     "commands": [
+      "anydesk"
+     ]
+    },
+    {
+     "name": "RustDesk",
+     "about": "Free remote-desktop app, like TeamViewer.",
+     "flatpak": "com.rustdesk.RustDesk",
+     "commands": [
+      "rustdesk"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "Everything",
+   "patterns": [
+    "^everything"
+   ],
+   "status": "alternative",
+   "category": "File search",
+   "linux": [
+    {
+     "name": "FSearch",
+     "about": "Instant file search, like Everything.",
+     "flatpak": "io.github.cboxdoerfer.FSearch",
+     "commands": [
+      "fsearch"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "CCleaner",
+   "patterns": [
+    "^ccleaner"
+   ],
+   "status": "alternative",
+   "category": "Clean-up",
+   "linux": [
+    {
+     "name": "BleachBit",
+     "about": "Frees up space and clears junk, like CCleaner.",
+     "flatpak": "org.bleachbit.BleachBit",
+     "commands": [
+      "bleachbit"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "Postman",
+   "patterns": [
+    "^postman"
+   ],
+   "status": "same",
+   "category": "Coding",
+   "linux": [
+    {
+     "name": "Postman",
+     "about": "Test and build web APIs.",
+     "flatpak": "com.getpostman.Postman"
+    }
+   ]
+  },
+  {
+   "windows": "MATLAB",
+   "patterns": [
+    "^matlab"
+   ],
+   "status": "alternative",
+   "category": "Maths and science",
+   "linux": [
+    {
+     "name": "GNU Octave",
+     "about": "Runs most MATLAB code.",
+     "flatpak": "org.octave.Octave",
+     "commands": [
+      "octave"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "Microsoft OneDrive",
+   "patterns": [
+    "^microsoft onedrive"
+   ],
+   "status": "none",
+   "category": "Cloud storage",
+   "linux": []
   },
   {
    "windows": "Dropbox",
@@ -970,22 +2826,502 @@
    "linux": []
   },
   {
-   "windows": "Battle.net",
+   "windows": "iCloud",
    "patterns": [
-    "^battle\\.net"
+    "^icloud"
    ],
-   "status": "wine",
-   "category": "Games",
+   "status": "none",
+   "category": "Cloud storage",
+   "linux": []
+  },
+  {
+   "windows": "Norton",
+   "patterns": [
+    "^norton"
+   ],
+   "status": "none",
+   "category": "Antivirus",
+   "linux": []
+  },
+  {
+   "windows": "McAfee",
+   "patterns": [
+    "^mcafee"
+   ],
+   "status": "none",
+   "category": "Antivirus",
+   "linux": []
+  },
+  {
+   "windows": "Avast",
+   "patterns": [
+    "^avast"
+   ],
+   "status": "none",
+   "category": "Antivirus",
+   "linux": []
+  },
+  {
+   "windows": "AVG",
+   "patterns": [
+    "^avg "
+   ],
+   "status": "none",
+   "category": "Antivirus",
+   "linux": []
+  },
+  {
+   "windows": "Malwarebytes",
+   "patterns": [
+    "^malwarebytes"
+   ],
+   "status": "none",
+   "category": "Antivirus",
+   "linux": []
+  },
+  {
+   "windows": "Bitdefender",
+   "patterns": [
+    "^bitdefender"
+   ],
+   "status": "none",
+   "category": "Antivirus",
+   "linux": []
+  },
+  {
+   "windows": "Notepad",
+   "patterns": [
+    "^Notepad$"
+   ],
+   "status": "alternative",
+   "category": "Text editor",
+   "builtin": true,
+   "exe": "C:\\Windows\\System32\\notepad.exe",
    "linux": [
     {
-     "name": "Lutris",
-     "about": "Runs Battle.net through Wine.",
-     "flatpak": "net.lutris.Lutris",
+     "name": "Text Editor",
+     "about": "Clean, simple text editor.",
+     "flatpak": "org.gnome.TextEditor",
      "commands": [
-      "lutris"
+      "gnome-text-editor"
+     ]
+    },
+    {
+     "name": "Kate",
+     "about": "Powerful text editor with tabs, like Notepad++.",
+     "flatpak": "org.kde.kate",
+     "commands": [
+      "kate"
+     ],
+     "snap": "kate"
+    },
+    {
+     "name": "Notepadqq",
+     "about": "Made to look like Notepad++.",
+     "flatpak": "com.notepadqq.Notepadqq",
+     "commands": [
+      "notepadqq"
      ]
     }
    ]
+  },
+  {
+   "windows": "Paint",
+   "patterns": [
+    "^Paint$"
+   ],
+   "status": "alternative",
+   "category": "Drawing",
+   "builtin": true,
+   "exe": "C:\\Windows\\System32\\mspaint.exe",
+   "linux": [
+    {
+     "name": "Pinta",
+     "about": "Simple image editor, like Paint.NET.",
+     "flatpak": "com.github.PintaProject.Pinta",
+     "commands": [
+      "pinta"
+     ],
+     "snap": "pinta"
+    },
+    {
+     "name": "Drawing",
+     "about": "Basic drawing app, just like Paint.",
+     "flatpak": "com.github.maoschanz.drawing",
+     "commands": [
+      "drawing"
+     ]
+    },
+    {
+     "name": "Krita",
+     "about": "Great for drawing and painting.",
+     "flatpak": "org.kde.krita",
+     "commands": [
+      "krita"
+     ],
+     "snap": "krita"
+    }
+   ]
+  },
+  {
+   "windows": "Photos",
+   "patterns": [
+    "^Photos$"
+   ],
+   "status": "alternative",
+   "category": "Photo viewer",
+   "builtin": true,
+   "exe": "",
+   "linux": [
+    {
+     "name": "Image Viewer",
+     "about": "Fast, simple photo viewer.",
+     "flatpak": "org.gnome.Loupe",
+     "commands": [
+      "loupe"
+     ]
+    },
+    {
+     "name": "Gwenview",
+     "about": "Photo viewer with quick edits.",
+     "flatpak": "org.kde.gwenview",
+     "commands": [
+      "gwenview"
+     ]
+    },
+    {
+     "name": "Shotwell",
+     "about": "Photo albums and simple fixes.",
+     "flatpak": "org.gnome.Shotwell",
+     "commands": [
+      "shotwell"
+     ]
+    },
+    {
+     "name": "digiKam",
+     "about": "Organises big photo collections.",
+     "flatpak": "org.kde.digikam",
+     "commands": [
+      "digikam"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "Snipping Tool",
+   "patterns": [
+    "^Snipping Tool$"
+   ],
+   "status": "alternative",
+   "category": "Screenshots",
+   "builtin": true,
+   "exe": "C:\\Windows\\System32\\SnippingTool.exe",
+   "linux": [
+    {
+     "name": "Flameshot",
+     "about": "Screenshots you can mark up, like Snipping Tool.",
+     "flatpak": "org.flameshot.Flameshot",
+     "commands": [
+      "flameshot"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "Calculator",
+   "patterns": [
+    "^Calculator$"
+   ],
+   "status": "alternative",
+   "category": "Calculator",
+   "builtin": true,
+   "exe": "C:\\Windows\\System32\\calc.exe",
+   "linux": [
+    {
+     "name": "Calculator",
+     "about": "Everyday calculator.",
+     "flatpak": "org.gnome.Calculator",
+     "commands": [
+      "gnome-calculator"
+     ]
+    },
+    {
+     "name": "KCalc",
+     "about": "Scientific calculator.",
+     "flatpak": "org.kde.kcalc",
+     "commands": [
+      "kcalc"
+     ]
+    },
+    {
+     "name": "Qalculate!",
+     "about": "Powerful calculator with unit conversion.",
+     "flatpak": "io.github.Qalculate",
+     "commands": [
+      "qalculate-gtk"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "Windows Media Player",
+   "patterns": [
+    "^Windows Media Player$"
+   ],
+   "status": "alternative",
+   "category": "Video player",
+   "builtin": true,
+   "exe": "C:\\Program Files\\Windows Media Player\\wmplayer.exe",
+   "linux": [
+    {
+     "name": "VLC",
+     "about": "Plays almost any video or music file.",
+     "flatpak": "org.videolan.VLC",
+     "commands": [
+      "vlc"
+     ],
+     "snap": "vlc"
+    },
+    {
+     "name": "Celluloid",
+     "about": "Easy video player with a clean look.",
+     "flatpak": "io.github.celluloid_player.Celluloid",
+     "commands": [
+      "celluloid"
+     ]
+    },
+    {
+     "name": "Showtime",
+     "about": "Simple video player for everyday watching.",
+     "flatpak": "org.gnome.Showtime"
+    },
+    {
+     "name": "mpv",
+     "about": "Simple, fast video player.",
+     "flatpak": "io.mpv.Mpv",
+     "commands": [
+      "mpv"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "Mail and Calendar",
+   "patterns": [
+    "^Mail and Calendar$"
+   ],
+   "status": "alternative",
+   "category": "Email",
+   "builtin": true,
+   "exe": "",
+   "linux": [
+    {
+     "name": "Thunderbird",
+     "about": "Email, calendar and contacts. Works with Gmail, Outlook.com and more.",
+     "flatpak": "org.mozilla.Thunderbird",
+     "commands": [
+      "thunderbird"
+     ],
+     "snap": "thunderbird"
+    },
+    {
+     "name": "Evolution",
+     "about": "Email, calendar and contacts in one, Outlook-style.",
+     "flatpak": "org.gnome.Evolution",
+     "commands": [
+      "evolution"
+     ]
+    },
+    {
+     "name": "Geary",
+     "about": "Simple, modern email app.",
+     "flatpak": "org.gnome.Geary",
+     "commands": [
+      "geary"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "WordPad",
+   "patterns": [
+    "^WordPad$"
+   ],
+   "status": "alternative",
+   "category": "Office",
+   "builtin": true,
+   "exe": "C:\\Program Files\\Windows NT\\Accessories\\wordpad.exe",
+   "linux": [
+    {
+     "name": "LibreOffice",
+     "about": "Free office suite. Opens and saves Word, Excel and PowerPoint files.",
+     "flatpak": "org.libreoffice.LibreOffice",
+     "commands": [
+      "libreoffice",
+      "soffice"
+     ]
+    },
+    {
+     "name": "ONLYOFFICE",
+     "about": "Office suite with a familiar ribbon toolbar. Opens Word and Excel files.",
+     "flatpak": "org.onlyoffice.desktopeditors",
+     "commands": [
+      "onlyoffice-desktopeditors"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "Sticky Notes",
+   "patterns": [
+    "^Sticky Notes$"
+   ],
+   "status": "alternative",
+   "category": "Notes",
+   "builtin": true,
+   "exe": "",
+   "linux": [
+    {
+     "name": "Sticky Notes",
+     "about": "Little notes on your desktop.",
+     "flatpak": "com.vixalien.sticky"
+    },
+    {
+     "name": "Joplin",
+     "about": "Free notes app. Imports OneNote and Evernote notes.",
+     "flatpak": "net.cozic.joplin_desktop",
+     "commands": [
+      "joplin"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "Voice Recorder",
+   "patterns": [
+    "^Voice Recorder$"
+   ],
+   "status": "alternative",
+   "category": "Voice recording",
+   "builtin": true,
+   "exe": "C:\\Windows\\System32\\SoundRecorder.exe",
+   "linux": [
+    {
+     "name": "Sound Recorder",
+     "about": "Record voice memos.",
+     "flatpak": "org.gnome.SoundRecorder",
+     "commands": [
+      "gnome-sound-recorder"
+     ]
+    },
+    {
+     "name": "Audacity",
+     "about": "Record and edit audio.",
+     "flatpak": "org.audacityteam.Audacity",
+     "commands": [
+      "audacity"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "Camera",
+   "patterns": [
+    "^Camera$"
+   ],
+   "status": "alternative",
+   "category": "Camera",
+   "builtin": true,
+   "exe": "",
+   "linux": [
+    {
+     "name": "Camera",
+     "about": "Take photos and videos with your webcam.",
+     "flatpak": "org.gnome.Snapshot",
+     "commands": [
+      "snapshot"
+     ]
+    },
+    {
+     "name": "Cheese",
+     "about": "Webcam photos with fun effects.",
+     "flatpak": "org.gnome.Cheese",
+     "commands": [
+      "cheese"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "Alarms & Clock",
+   "patterns": [
+    "^Alarms & Clock$"
+   ],
+   "status": "alternative",
+   "category": "Clock",
+   "builtin": true,
+   "exe": "",
+   "linux": [
+    {
+     "name": "Clocks",
+     "about": "Alarms, timers and world clocks.",
+     "flatpak": "org.gnome.clocks",
+     "commands": [
+      "gnome-clocks"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "Weather",
+   "patterns": [
+    "^Weather$"
+   ],
+   "status": "alternative",
+   "category": "Weather",
+   "builtin": true,
+   "exe": "",
+   "linux": [
+    {
+     "name": "Weather",
+     "about": "Today's weather and the forecast.",
+     "flatpak": "org.gnome.Weather",
+     "commands": [
+      "gnome-weather"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "Maps",
+   "patterns": [
+    "^Maps$"
+   ],
+   "status": "alternative",
+   "category": "Maps",
+   "builtin": true,
+   "exe": "",
+   "linux": [
+    {
+     "name": "Maps",
+     "about": "Maps and directions.",
+     "flatpak": "org.gnome.Maps",
+     "commands": [
+      "gnome-maps"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "Windows Defender",
+   "patterns": [
+    "^Windows Defender$"
+   ],
+   "status": "none",
+   "category": "Antivirus",
+   "builtin": true,
+   "exe": "",
+   "linux": []
   }
  ]
 }

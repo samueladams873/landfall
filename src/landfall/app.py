@@ -14,7 +14,8 @@ from PySide6.QtWidgets import (QCheckBox, QFileDialog, QGridLayout, QHBoxLayout,
                                QTreeWidget, QTreeWidgetItem, QVBoxLayout, QWidget)
 
 from landfall.drives import list_drives
-from landfall.mapping import GROUP_ALT, GROUP_SAME, GROUPS, by_category, match_all
+from landfall.mapping import (GROUP_ALT, GROUP_SAME, GROUPS, builtin_apps, by_category,
+                              match_all)
 from landfall.pack import PackCancelled, pack, space_needed
 from landfall.report import build_html, option_text
 from landfall.scan.apps import scan_apps
@@ -232,7 +233,17 @@ class Wizard(Shell):
             self.pick_box.addWidget(label("None of your apps have a Linux alternative we know "
                                           "of yet. That's fine: your files still move.",
                                           "Muted"))
-        for cat in categories:
+        yours = [c for c in categories if any(not a.get("builtin") for a in c.windows_apps)]
+        builtin = [c for c in categories if c not in yours]
+        if yours:
+            self.pick_box.addWidget(label("Apps you installed", "Section"))
+        for cat in yours + builtin:
+            if cat is (builtin[0] if builtin else None):
+                self.pick_box.addSpacing(10)
+                self.pick_box.addWidget(label("Built into Windows", "Section"))
+                self.pick_box.addWidget(label(
+                    "Every Windows PC has these. Most Linux PCs come with their own versions, "
+                    "and Landfall only installs what's missing.", "Muted"))
             card_ = CategoryCard(cat)
             card_.changed.connect(self.update_pick_total)
             self.pick_cards.append(card_)
@@ -257,7 +268,8 @@ class Wizard(Shell):
         picks = self.chosen_apps()
         auto = len({p["flatpak"] for p in picks if p.get("flatpak")})
         links = len({p["name"] for p in picks if not p.get("flatpak")})
-        text = f"{plural(auto, 'app')} will install automatically on your Linux PC"
+        text = (f"Up to {plural(auto, 'app')} will install automatically "
+                "(any already on your Linux PC are skipped)")
         if links:
             text += f"  \u00b7  {plural(links, 'website link')} for you to open"
         self.pick_total.setText(text)
@@ -439,7 +451,9 @@ class Wizard(Shell):
             for app in sorted(apps, key=lambda a: a["name"].lower()):
                 report(("item", f"Found {app['name']}"))
                 time.sleep(pause)
-            grouped = match_all(apps)
+            report(("item", "Notepad, Paint, Photos and the other built-in programs"))
+            time.sleep(0.4)
+            grouped = match_all(apps + builtin_apps())
             report(("stage", 2))
             report(("item", "Processor, memory, graphics, Wi-Fi..."))
             hw = scan_hardware()
@@ -460,8 +474,9 @@ class Wizard(Shell):
     def show_check(self, result):
         self.grouped, self.hw = result
         self.stages.set_stage(4)
-        total = sum(len(v) for v in self.grouped.values())
-        ready = len(self.grouped[GROUP_SAME]) + len(self.grouped[GROUP_ALT])
+        mine = lambda group: [r for r in self.grouped[group] if not r.app.get("builtin")]
+        total = sum(len(mine(g)) for g in GROUPS)          # built-ins don't count: every
+        ready = len(mine(GROUP_SAME)) + len(mine(GROUP_ALT))  # Windows PC has them
         self.ring.set_score(ready, total)
         if total == 0:
             self.apps_headline.setText("No apps to worry about")

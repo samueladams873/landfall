@@ -451,8 +451,11 @@ class CategoryCard(QFrame):
         for app in category.windows_apps:
             row = QHBoxLayout()
             row.setSpacing(8)
-            row.addWidget(windows_icon(app, 28))
-            row.addWidget(label(app["name"], wrap=True), 1)
+            row.addWidget(windows_icon(app, 28), 0, Qt.AlignmentFlag.AlignTop)
+            text = app["name"]
+            if app.get("builtin"):
+                text += "<br><span style='color:#7A889C; font-size:8.5pt'>built into Windows</span>"
+            row.addWidget(label(text, wrap=True), 1)
             left.addLayout(row)
         left.addStretch(1)
         side = QWidget()
