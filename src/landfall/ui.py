@@ -242,6 +242,7 @@ class Shell(QWidget):
         side = QFrame()
         side.setObjectName("Sidebar")
         side.setFixedWidth(250)
+        self.sidebar = side
         s = QVBoxLayout(side)
         s.setContentsMargins(18, 22, 18, 18)
         s.setSpacing(4)
@@ -293,6 +294,25 @@ class Shell(QWidget):
         root.addLayout(right, 1)
         self.cancel_btn.clicked.connect(self.close)
 
+    def showEvent(self, event):
+        """Fit the window to the screen it opens on, so no button is ever off-screen."""
+        super().showEvent(event)
+        if getattr(self, "_fitted", False):
+            return
+        self._fitted = True
+        screen = self.screen() or QApplication.primaryScreen()
+        if screen is None:
+            return
+        area = screen.availableGeometry()
+        if area.width() < 1100:
+            self.sidebar.setFixedWidth(205)   # small screens: more room for the page
+        w = min(self.width(), int(area.width() * 0.95))
+        h = min(self.height(), int(area.height() * 0.92))
+        self.resize(w, h)
+        frame = self.frameGeometry()
+        frame.moveCenter(area.center())
+        self.move(frame.topLeft())
+
     def set_step(self, index: int):
         for i, (dot, text) in enumerate(self._step_rows):
             state = "done" if i < index else "now" if i == index else "todo"
@@ -340,6 +360,9 @@ def windows_icon(app: dict, size: int = 32) -> QLabel:
         icon = QIcon(str(ICONS / "Apps.svg"))
     lab.setPixmap(icon.pixmap(size, size))
     return lab
+
+
+LEFT_W = 160   # width of the "On Windows you use" column
 
 
 class OptionTile(QFrame):
@@ -404,8 +427,8 @@ class CategoryCard(QFrame):
         self.setObjectName("Card")
         self.category = category
         outer = QHBoxLayout(self)
-        outer.setContentsMargins(18, 16, 18, 16)
-        outer.setSpacing(12)
+        outer.setContentsMargins(14, 14, 14, 14)
+        outer.setSpacing(8)
 
         left = QVBoxLayout()
         left.setContentsMargins(0, 0, 0, 0)
@@ -420,7 +443,7 @@ class CategoryCard(QFrame):
             left.addLayout(row)
         left.addStretch(1)
         side = QWidget()
-        side.setFixedWidth(180)
+        side.setFixedWidth(LEFT_W)
         side.setLayout(left)
         side.setStyleSheet("background: transparent;")
         outer.addWidget(side, 0, Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
@@ -430,26 +453,40 @@ class CategoryCard(QFrame):
 
         right = QVBoxLayout()
         right.setSpacing(8)
-        right.addWidget(label("On Linux, click to pick (pick more than one if you like)",
-                              "Muted", wrap=False))
-        grid = QGridLayout()
-        grid.setSpacing(10)
-        grid.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
+        right.addWidget(label("On Linux, click to pick", "Muted", wrap=False))
+        self.grid = QGridLayout()
+        self.grid.setSpacing(10)
+        self.grid.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
         self.tiles = []
+        self._cols = 0
         from landfall.mapping import option_key
-        for n, opt in enumerate(category.options):
+        for opt in category.options:
             key = option_key(opt)
             tile = OptionTile(opt, key in category.recommended, key in category.recommended)
             tile.toggled.connect(lambda _on: self._changed())
             self.tiles.append(tile)
-            grid.addWidget(tile, n // 3, n % 3)
-        right.addLayout(grid)
+        self._place_tiles(3)
+        right.addLayout(self.grid)
         right.addStretch(1)
         self.note = label("", "Muted")
         right.addWidget(self.note)
         outer.addLayout(right)
         outer.addStretch(1)
         self._changed(emit=False)
+
+    def _place_tiles(self, cols: int):
+        if cols == self._cols:
+            return
+        self._cols = cols
+        for tile in self.tiles:
+            self.grid.removeWidget(tile)
+        for n, tile in enumerate(self.tiles):
+            self.grid.addWidget(tile, n // cols, n % cols)
+
+    def fit_width(self, width: int):
+        """Fewer tiles per row on small screens, so nothing is ever cut off."""
+        room = width - LEFT_W - 28 - 3 * 8 - 28
+        self._place_tiles(max(1, min(3, (room + 10) // (152 + 10))))
 
     def picks(self) -> list[dict]:
         return [t.opt for t in self.tiles if t.selected]
@@ -460,3 +497,18 @@ class CategoryCard(QFrame):
                           else f"{n} picked")
         if emit:
             self.changed.emit()
+
+
+class WidthWatcher(QObject):
+    """Calls back with a scroll area's visible width whenever it changes."""
+
+    def __init__(self, scroll, callback):
+        super().__init__(scroll)
+        self.callback = callback
+        scroll.viewport().installEventFilter(self)
+
+    def eventFilter(self, obj, event):
+        from PySide6.QtCore import QEvent
+        if event.type() == QEvent.Type.Resize:
+            self.callback(obj.width())
+        return False

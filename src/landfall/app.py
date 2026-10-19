@@ -20,7 +20,7 @@ from landfall.report import build_html, option_text
 from landfall.scan.apps import scan_apps
 from landfall.scan.folders import find_folders, human_size, measure
 from landfall.scan.hardware import hardware_notes, scan_hardware
-from landfall.ui import (ICON, ICONS, CategoryCard, ChoiceRow, HeroPage, Page, Shell, card, folder_icon,
+from landfall.ui import (ICON, ICONS, CategoryCard, ChoiceRow, WidthWatcher, HeroPage, Page, Shell, card, folder_icon,
                          label, logo, make_app, picture, run_window, set_role,
                          start_task, text_field, fit_list, plural)
 
@@ -34,8 +34,8 @@ COMING_SOON = [
     "Game saves",
     "Product keys and licenses list",
 ]
-STEPS = ["Welcome", "Check this PC", "Pick your Linux apps", "Choose what to move",
-         "Choose where to save", "Packing", "All done"]
+STEPS = ["Welcome", "Check this PC", "Pick your apps", "Pick your files", "Where to save",
+         "Packing", "All done"]
 
 
 class Wizard(Shell):
@@ -129,6 +129,8 @@ class Wizard(Shell):
         self.pick_box.setContentsMargins(0, 0, 6, 0)
         self.pick_box.setSpacing(8)
         scroll.setWidget(holder)
+        self.pick_scroll = scroll
+        self._pick_watch = WidthWatcher(scroll, self._fit_pick_cards)
         page.body.addWidget(scroll, 1)
         self.pick_total = label("", "Section")
         page.body.addWidget(self.pick_total)
@@ -159,7 +161,12 @@ class Wizard(Shell):
                 "with everything else.", "Muted"))
         self.pick_box.addStretch(1)
         self.pick_filled = True
+        self._fit_pick_cards(self.pick_scroll.viewport().width())
         self.update_pick_total()
+
+    def _fit_pick_cards(self, width: int):
+        for card_ in self.pick_cards:
+            card_.fit_width(width - 8)
 
     def update_pick_total(self):
         picks = self.chosen_apps()
