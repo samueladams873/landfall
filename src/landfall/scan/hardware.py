@@ -86,7 +86,7 @@ def hardware_notes(hw: dict) -> list[str]:
     gpus = " ".join(hw.get("gpu", [])).lower()
     if "nvidia" in gpus:
         notes.append("NVIDIA graphics: pick a Linux version that offers NVIDIA drivers during "
-                     "install (Ubuntu, Linux Mint and Pop!_OS all do).")
+                     "install (Ubuntu, Linux Mint and Pop!\u2060_OS all do).")
     wifi = " ".join(hw.get("wifi", [])).lower()
     if "broadcom" in wifi:
         notes.append("Broadcom Wi-Fi: may need an extra driver. Keep an Ethernet cable or "

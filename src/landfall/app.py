@@ -10,7 +10,7 @@ from pathlib import Path
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (QCheckBox, QFileDialog, QGridLayout, QHBoxLayout, QLabel,
                                QLineEdit, QListWidget, QListWidgetItem, QMessageBox,
-                               QProgressBar, QPushButton, QScrollArea, QTabWidget,
+                               QProgressBar, QPushButton, QScrollArea, QStackedWidget, QTabWidget,
                                QTreeWidget, QTreeWidgetItem, QVBoxLayout, QWidget)
 
 from landfall.drives import list_drives
@@ -20,7 +20,8 @@ from landfall.report import build_html, option_text
 from landfall.scan.apps import scan_apps
 from landfall.scan.folders import find_folders, human_size, measure
 from landfall.scan.hardware import hardware_notes, scan_hardware
-from landfall.ui import (ICON, ICONS, CategoryCard, ChoiceRow, WidthWatcher, HeroPage, Page, Shell, card, folder_icon,
+from landfall.ui import (ICON, ICONS, CategoryCard, ChoiceRow, ScoreRing, StageList,
+                         WidthWatcher, HeroPage, Page, Shell, card, folder_icon,
                          label, logo, make_app, picture, run_window, set_role,
                          start_task, text_field, fit_list, plural)
 
@@ -91,9 +92,94 @@ class Wizard(Shell):
         return page
 
     def _page_check(self):
-        page = Page("Checking this PC", "Here's how ready your apps and devices are for Linux.")
-        self.check_status = label("Getting ready...", "Section")
-        page.body.addWidget(self.check_status)
+        page = Page("Checking this PC", "Seeing how ready your apps and hardware are for Linux.")
+        self.check_views = QStackedWidget()
+        page.body.addWidget(self.check_views, 1)
+
+        # 1) the live scan
+        scan = QWidget()
+        scan.setObjectName("Content")
+        sv = QVBoxLayout(scan)
+        sv.setContentsMargins(0, 0, 0, 0)
+        frame, box = card()
+        head = QHBoxLayout()
+        head.addWidget(picture(ICONS / "hardware.svg", 44))
+        head.addSpacing(10)
+        words = QVBoxLayout()
+        words.setSpacing(2)
+        words.addWidget(label("Getting to know your PC", "Section"))
+        words.addWidget(label("About 30 seconds. Nothing on this PC gets changed.", "Muted"))
+        head.addLayout(words, 1)
+        box.addLayout(head)
+        box.addSpacing(8)
+        self.stages = StageList(["Looking at your apps", "Finding Linux matches",
+                                 "Checking your hardware", "Getting your results ready"])
+        box.addWidget(self.stages)
+        box.addSpacing(8)
+        self.scan_bar = QProgressBar()
+        self.scan_bar.setRange(0, 0)
+        box.addWidget(self.scan_bar)
+        self.scan_item = label("", "Muted", wrap=False)
+        box.addWidget(self.scan_item)
+        sv.addWidget(frame)
+        sv.addStretch(1)
+        self.check_views.addWidget(scan)
+
+        # 2) the friendly results
+        res = QWidget()
+        res.setObjectName("Content")
+        rv = QVBoxLayout(res)
+        rv.setContentsMargins(0, 0, 0, 0)
+        rv.setSpacing(12)
+        top = QHBoxLayout()
+        top.setSpacing(12)
+        apps_card, ab = card()
+        arow = QHBoxLayout()
+        self.ring = ScoreRing()
+        arow.addWidget(self.ring)
+        arow.addSpacing(14)
+        acol = QVBoxLayout()
+        acol.addStretch(1)
+        self.apps_headline = label("", "Section")
+        acol.addWidget(self.apps_headline)
+        self.apps_sub = label("", "Muted")
+        acol.addWidget(self.apps_sub)
+        acol.addStretch(1)
+        arow.addLayout(acol, 1)
+        ab.addLayout(arow)
+        top.addWidget(apps_card, 3)
+        hw_card, hb = card()
+        hrow = QHBoxLayout()
+        hrow.addWidget(picture(ICONS / "hardware.svg", 36))
+        hrow.addSpacing(8)
+        hrow.addWidget(label("Your hardware", "Section"), 1)
+        hb.addLayout(hrow)
+        self.hw_lines = label("", "Muted")
+        hb.addWidget(self.hw_lines)
+        self.hw_status = label("")
+        hb.addWidget(self.hw_status)
+        hb.addStretch(1)
+        top.addWidget(hw_card, 2)
+        rv.addLayout(top)
+        self.notes_card, self.notes_box = card()
+        rv.addWidget(self.notes_card)
+        rv.addStretch(1)
+        row = QHBoxLayout()
+        details = QPushButton("See the full list")
+        details.clicked.connect(lambda: self.check_views.setCurrentIndex(2))
+        row.addWidget(details)
+        self.save_report_btn = QPushButton("Save a report")
+        self.save_report_btn.clicked.connect(self.save_report)
+        row.addWidget(self.save_report_btn)
+        row.addStretch(1)
+        rv.addLayout(row)
+        self.check_views.addWidget(res)
+
+        # 3) the full details, for anyone who wants them
+        det = QWidget()
+        det.setObjectName("Content")
+        dv = QVBoxLayout(det)
+        dv.setContentsMargins(0, 0, 0, 0)
         tabs = QTabWidget()
         self.apps_tree = QTreeWidget()
         self.apps_tree.setHeaderLabels(["Your Windows app", "On Linux"])
@@ -101,18 +187,17 @@ class Wizard(Shell):
         self.hw_tree = QTreeWidget()
         self.hw_tree.setHeaderLabels(["Part", "Details"])
         self.hw_tree.setColumnWidth(0, 150)
-        for tree in (self.apps_tree, self.hw_tree):
-            tree.setRootIsDecorated(False)
+        self.hw_tree.setRootIsDecorated(False)
         tabs.addTab(self.apps_tree, "Apps")
         tabs.addTab(self.hw_tree, "Hardware")
-        page.body.addWidget(tabs, 1)
-        row = QHBoxLayout()
-        row.addStretch(1)
-        self.save_report_btn = QPushButton("Save this report")
-        self.save_report_btn.setEnabled(False)
-        self.save_report_btn.clicked.connect(self.save_report)
-        row.addWidget(self.save_report_btn)
-        page.body.addLayout(row)
+        dv.addWidget(tabs, 1)
+        back = QPushButton("Back to the summary")
+        back.clicked.connect(lambda: self.check_views.setCurrentIndex(1))
+        brow = QHBoxLayout()
+        brow.addWidget(back)
+        brow.addStretch(1)
+        dv.addLayout(brow)
+        self.check_views.addWidget(det)
         return page
 
     def _page_pick(self):
@@ -343,27 +428,99 @@ class Wizard(Shell):
 
     # --- step: check this PC ---------------------------------------------
     def start_check(self):
-        self.check_status.setText("Looking at your apps and hardware. This takes about "
-                                  "30 seconds...")
-        start_task(self, lambda report: (match_all(scan_apps()), scan_hardware()),
-                   self.show_check, self.task_failed)
+        self.check_views.setCurrentIndex(0)
+        self.stages.set_stage(0)
+
+        def work(report):
+            report(("stage", 0))
+            apps = scan_apps()
+            report(("stage", 1))
+            pause = min(0.08, 2.5 / max(len(apps), 1))   # let names flick by, never > 2.5 s
+            for app in sorted(apps, key=lambda a: a["name"].lower()):
+                report(("item", f"Found {app['name']}"))
+                time.sleep(pause)
+            grouped = match_all(apps)
+            report(("stage", 2))
+            report(("item", "Processor, memory, graphics, Wi-Fi..."))
+            hw = scan_hardware()
+            report(("stage", 3))
+            report(("item", ""))
+            time.sleep(0.4)
+            return grouped, hw
+
+        start_task(self, work, self.show_check, self.task_failed, self.check_progress)
+
+    def check_progress(self, info):
+        kind, value = info
+        if kind == "stage":
+            self.stages.set_stage(value)
+        else:
+            self.scan_item.setText(value)
 
     def show_check(self, result):
         self.grouped, self.hw = result
+        self.stages.set_stage(4)
         total = sum(len(v) for v in self.grouped.values())
         ready = len(self.grouped[GROUP_SAME]) + len(self.grouped[GROUP_ALT])
-        set_role(self.check_status, "Good" if total and ready == total else "Section")
-        self.check_status.setText(f"{ready} of {total} of your apps work on Linux or have "
-                                  "a Linux alternative.")
+        self.ring.set_score(ready, total)
+        if total == 0:
+            self.apps_headline.setText("No apps to worry about")
+            self.apps_sub.setText("Your files are what matter most, and they're coming with you.")
+        elif ready == total:
+            self.apps_headline.setText("Great news: all your apps are covered")
+            self.apps_sub.setText("Every app has a Linux version or a free alternative. "
+                                  "Next, you'll pick the ones you want.")
+        else:
+            self.apps_headline.setText(f"{ready} of {total} apps are ready for Linux")
+            self.apps_sub.setText("Those have a Linux version or a free alternative. "
+                                  "Next, you'll pick the ones you want.")
+        hw = self.hw
+        bits = []
+        if hw.get("cpu"):
+            bits.append(hw["cpu"][0].replace("(R)", "").replace("(TM)", "").replace("CPU ", ""))
+        if hw.get("ram_gb"):
+            bits.append(f"{hw['ram_gb']:g} GB of memory")
+        if hw.get("gpu"):
+            bits.append(hw["gpu"][0])
+        self.hw_lines.setText("<br>".join(bits) or "Couldn't read the hardware details.")
+        notes = hardware_notes(hw)
+        if notes:
+            set_role(self.hw_status, "Warn")
+            self.hw_status.setText(f"{plural(len(notes), 'thing')} to know, below")
+        else:
+            set_role(self.hw_status, "Good")
+            self.hw_status.setText("\u2714  Looks good for Linux")
+        while self.notes_box.count():
+            item = self.notes_box.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
+            elif item.layout():
+                while item.layout().count():
+                    w = item.layout().takeAt(0).widget()
+                    if w:
+                        w.deleteLater()
+        self.notes_card.setVisible(bool(notes))
+        if notes:
+            self.notes_box.addWidget(label("Good to know before you switch", "Section"))
+            for note in notes:
+                row = QHBoxLayout()
+                row.addWidget(picture(ICONS / "heads-up.svg", 22), 0, Qt.AlignmentFlag.AlignTop)
+                row.addSpacing(8)
+                row.addWidget(label(note), 1)
+                self.notes_box.addLayout(row)
+        self._fill_check_details()
+        self.check_views.setCurrentIndex(1)
+        self.update_buttons()
+
+    def _fill_check_details(self):
         self.apps_tree.clear()
-        self.apps_tree.setRootIsDecorated(True)
         for group in GROUPS:
             parent = QTreeWidgetItem([f"{group} ({len(self.grouped[group])})", ""])
             font = parent.font(0)
             font.setBold(True)
             parent.setFont(0, font)
             for r in self.grouped[group]:
-                linux = ", ".join(option_text(o) for o in r.options) or "Unknown"
+                linux = ", ".join(option_text(o) for o in r.options) or "No Linux alternative"
                 parent.addChild(QTreeWidgetItem([r.app["name"], linux]))
             self.apps_tree.addTopLevelItem(parent)
             parent.setExpanded(True)
@@ -376,10 +533,6 @@ class Wizard(Shell):
             value = self.hw.get(key)
             text = ", ".join(value) if isinstance(value, list) else str(value)
             self.hw_tree.addTopLevelItem(QTreeWidgetItem([name, text or "None found"]))
-        for note in hardware_notes(self.hw):
-            self.hw_tree.addTopLevelItem(QTreeWidgetItem(["Heads-up", note]))
-        self.save_report_btn.setEnabled(True)
-        self.update_buttons()
 
     def save_report(self):
         default = Path.home() / "Desktop" / "Landfall report.html"

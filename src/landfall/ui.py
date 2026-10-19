@@ -512,3 +512,89 @@ class WidthWatcher(QObject):
         if event.type() == QEvent.Type.Resize:
             self.callback(obj.width())
         return False
+
+
+# --- friendly scan widgets --------------------------------------------------
+class ScoreRing(QWidget):
+    """A big ring that fills up to show a score, with the number in the middle."""
+
+    def __init__(self, size: int = 132):
+        super().__init__()
+        self.setFixedSize(size, size)
+        self.value, self.total = 0, 0
+        self._shown = 0.0
+        from PySide6.QtCore import QTimer
+        self._timer = QTimer(self)
+        self._timer.timeout.connect(self._step)
+
+    def set_score(self, value: int, total: int):
+        self.value, self.total = value, total
+        self._shown = 0.0
+        self._timer.start(16)   # animate the fill
+
+    def _step(self):
+        target = (self.value / self.total) if self.total else 1.0
+        self._shown = min(target, self._shown + 0.025)
+        if self._shown >= target:
+            self._timer.stop()
+        self.update()
+
+    def paintEvent(self, event):
+        from PySide6.QtCore import QRectF
+        from PySide6.QtGui import QPainter, QPen
+        p = QPainter(self)
+        p.setRenderHint(QPainter.RenderHint.Antialiasing)
+        pen_w = 12
+        r = QRectF(pen_w / 2, pen_w / 2, self.width() - pen_w, self.height() - pen_w)
+        p.setPen(QPen(QColor("#E3EAF5"), pen_w, Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap))
+        p.drawArc(r, 0, 360 * 16)
+        good = self.total == 0 or self.value / self.total >= 0.6
+        p.setPen(QPen(QColor("#2BA84A" if good else "#F28C28"), pen_w, Qt.PenStyle.SolidLine,
+                      Qt.PenCapStyle.RoundCap))
+        p.drawArc(r, 90 * 16, int(-self._shown * 360 * 16))
+        p.setPen(QColor("#1B2433"))
+        f = QFont(self.font())
+        f.setPointSizeF(24)
+        f.setBold(True)
+        p.setFont(f)
+        top = QRectF(0, self.height() * 0.22, self.width(), self.height() * 0.4)
+        p.drawText(top, Qt.AlignmentFlag.AlignCenter, f"{self.value}/{self.total}")
+        f.setPointSizeF(9.5)
+        f.setBold(False)
+        p.setFont(f)
+        p.setPen(QColor("#5B6B82"))
+        bottom = QRectF(0, self.height() * 0.56, self.width(), self.height() * 0.2)
+        p.drawText(bottom, Qt.AlignmentFlag.AlignCenter, "apps ready")
+        p.end()
+
+
+class StageList(QWidget):
+    """A checklist that ticks itself off as the scan moves along."""
+
+    def __init__(self, stages: list[str]):
+        super().__init__()
+        box = QVBoxLayout(self)
+        box.setContentsMargins(0, 0, 0, 0)
+        box.setSpacing(10)
+        self.rows = []
+        for text in stages:
+            row = QHBoxLayout()
+            row.setSpacing(12)
+            dot = QLabel()
+            dot.setFixedSize(24, 24)
+            dot.setStyleSheet("background: transparent;")
+            lab = label(text, "Muted", wrap=False)
+            row.addWidget(dot)
+            row.addWidget(lab, 1)
+            box.addLayout(row)
+            self.rows.append((dot, lab))
+        self.set_stage(-1)
+
+    def set_stage(self, current: int):
+        for i, (dot, lab) in enumerate(self.rows):
+            state = "done" if i < current else "now" if i == current else "wait"
+            icon = {"done": "step-done", "now": "step-now", "wait": "step-wait"}[state]
+            dot.setPixmap(QIcon(str(ICONS / f"{icon}.svg")).pixmap(22, 22))
+            lab.setStyleSheet({"done": "color: #1E7E3A; font-weight: 600;",
+                               "now": "color: #1B2433; font-weight: 600;",
+                               "wait": "color: #9AA6B8;"}[state])
