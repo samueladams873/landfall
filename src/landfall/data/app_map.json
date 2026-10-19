@@ -2212,18 +2212,65 @@
    "patterns": [
     "^microsoft teams"
    ],
-   "status": "none",
+   "status": "alternative",
    "category": "Video calls",
-   "linux": []
+   "linux": [
+    {
+     "name": "Teams for Linux",
+     "about": "Free, unofficial app for joining your Teams chats and meetings.",
+     "flatpak": "com.github.IsmaelMartinez.teams_for_linux",
+     "commands": [
+      "teams-for-linux"
+     ]
+    },
+    {
+     "name": "Zoom",
+     "about": "Video meetings.",
+     "flatpak": "us.zoom.Zoom",
+     "commands": [
+      "zoom"
+     ],
+     "snap": "zoom-client"
+    },
+    {
+     "name": "Jitsi Meet",
+     "about": "Free video calls, no account needed.",
+     "flatpak": "org.jitsi.jitsi-meet"
+    }
+   ]
   },
   {
    "windows": "Skype",
    "patterns": [
     "^skype"
    ],
-   "status": "none",
+   "status": "alternative",
    "category": "Video calls",
-   "linux": []
+   "linux": [
+    {
+     "name": "Zoom",
+     "about": "Video meetings.",
+     "flatpak": "us.zoom.Zoom",
+     "commands": [
+      "zoom"
+     ],
+     "snap": "zoom-client"
+    },
+    {
+     "name": "Signal",
+     "about": "Private messages and calls.",
+     "flatpak": "org.signal.Signal",
+     "commands": [
+      "signal-desktop"
+     ],
+     "snap": "signal-desktop"
+    },
+    {
+     "name": "Jitsi Meet",
+     "about": "Free video calls, no account needed.",
+     "flatpak": "org.jitsi.jitsi-meet"
+    }
+   ]
   },
   {
    "windows": "Steam",
@@ -2408,9 +2455,23 @@
    "patterns": [
     "^xbox"
    ],
-   "status": "none",
+   "status": "alternative",
    "category": "Games",
-   "linux": []
+   "linux": [
+    {
+     "name": "Greenlight",
+     "about": "Plays your Xbox Cloud Gaming and Game Pass library.",
+     "flatpak": "io.github.unknownskl.greenlight"
+    },
+    {
+     "name": "Steam",
+     "about": "The same Steam. Most Windows games run through Proton.",
+     "flatpak": "com.valvesoftware.Steam",
+     "commands": [
+      "steam"
+     ]
+    }
+   ]
   },
   {
    "windows": "OBS Studio",
@@ -2803,90 +2864,176 @@
    "patterns": [
     "^microsoft onedrive"
    ],
-   "status": "none",
+   "status": "alternative",
    "category": "Cloud storage",
-   "linux": []
+   "linux": [
+    {
+     "name": "Online Accounts",
+     "about": "Comes with Ubuntu: sign in under Settings, and your cloud drive shows up in Files.",
+     "included": true
+    },
+    {
+     "name": "RClone Manager",
+     "about": "Syncs OneDrive, Google Drive, Dropbox and iCloud on Linux.",
+     "flatpak": "io.github.zarestia_dev.rclone-manager"
+    },
+    {
+     "name": "Nextcloud",
+     "about": "Sync with your own private cloud.",
+     "flatpak": "com.nextcloud.desktopclient.nextcloud",
+     "commands": [
+      "nextcloud"
+     ]
+    }
+   ]
   },
   {
    "windows": "Dropbox",
    "patterns": [
     "^dropbox"
    ],
-   "status": "none",
+   "status": "same",
    "category": "Cloud storage",
-   "linux": []
+   "linux": [
+    {
+     "name": "Dropbox",
+     "about": "Dropbox's own Linux app.",
+     "flatpak": "com.dropbox.Client",
+     "commands": [
+      "dropbox"
+     ]
+    },
+    {
+     "name": "RClone Manager",
+     "about": "Syncs OneDrive, Google Drive, Dropbox and iCloud on Linux.",
+     "flatpak": "io.github.zarestia_dev.rclone-manager"
+    }
+   ]
   },
   {
    "windows": "Google Drive",
    "patterns": [
     "^google drive"
    ],
-   "status": "none",
+   "status": "alternative",
    "category": "Cloud storage",
-   "linux": []
+   "linux": [
+    {
+     "name": "Online Accounts",
+     "about": "Comes with Ubuntu: sign in under Settings, and your cloud drive shows up in Files.",
+     "included": true
+    },
+    {
+     "name": "RClone Manager",
+     "about": "Syncs OneDrive, Google Drive, Dropbox and iCloud on Linux.",
+     "flatpak": "io.github.zarestia_dev.rclone-manager"
+    }
+   ]
   },
   {
    "windows": "iCloud",
    "patterns": [
     "^icloud"
    ],
-   "status": "none",
+   "status": "alternative",
    "category": "Cloud storage",
-   "linux": []
+   "linux": [
+    {
+     "name": "RClone Manager",
+     "about": "Syncs OneDrive, Google Drive, Dropbox and iCloud on Linux.",
+     "flatpak": "io.github.zarestia_dev.rclone-manager"
+    }
+   ]
   },
   {
    "windows": "Norton",
    "patterns": [
     "^norton"
    ],
-   "status": "none",
+   "status": "alternative",
    "category": "Antivirus",
-   "linux": []
+   "linux": [
+    {
+     "name": "ClamTk",
+     "about": "Optional virus scanner. Most Linux users don't need one.",
+     "flatpak": "com.gitlab.davem.ClamTk"
+    }
+   ]
   },
   {
    "windows": "McAfee",
    "patterns": [
     "^mcafee"
    ],
-   "status": "none",
+   "status": "alternative",
    "category": "Antivirus",
-   "linux": []
+   "linux": [
+    {
+     "name": "ClamTk",
+     "about": "Optional virus scanner. Most Linux users don't need one.",
+     "flatpak": "com.gitlab.davem.ClamTk"
+    }
+   ]
   },
   {
    "windows": "Avast",
    "patterns": [
     "^avast"
    ],
-   "status": "none",
+   "status": "alternative",
    "category": "Antivirus",
-   "linux": []
+   "linux": [
+    {
+     "name": "ClamTk",
+     "about": "Optional virus scanner. Most Linux users don't need one.",
+     "flatpak": "com.gitlab.davem.ClamTk"
+    }
+   ]
   },
   {
    "windows": "AVG",
    "patterns": [
     "^avg "
    ],
-   "status": "none",
+   "status": "alternative",
    "category": "Antivirus",
-   "linux": []
+   "linux": [
+    {
+     "name": "ClamTk",
+     "about": "Optional virus scanner. Most Linux users don't need one.",
+     "flatpak": "com.gitlab.davem.ClamTk"
+    }
+   ]
   },
   {
    "windows": "Malwarebytes",
    "patterns": [
     "^malwarebytes"
    ],
-   "status": "none",
+   "status": "alternative",
    "category": "Antivirus",
-   "linux": []
+   "linux": [
+    {
+     "name": "ClamTk",
+     "about": "Optional virus scanner. Most Linux users don't need one.",
+     "flatpak": "com.gitlab.davem.ClamTk"
+    }
+   ]
   },
   {
    "windows": "Bitdefender",
    "patterns": [
     "^bitdefender"
    ],
-   "status": "none",
+   "status": "alternative",
    "category": "Antivirus",
-   "linux": []
+   "linux": [
+    {
+     "name": "ClamTk",
+     "about": "Optional virus scanner. Most Linux users don't need one.",
+     "flatpak": "com.gitlab.davem.ClamTk"
+    }
+   ]
   },
   {
    "windows": "Notepad",
@@ -3313,15 +3460,448 @@
    ]
   },
   {
-   "windows": "Windows Defender",
+   "windows": "Windows Security",
    "patterns": [
-    "^Windows Defender$"
+    "^Windows Security$"
    ],
-   "status": "none",
+   "status": "alternative",
    "category": "Antivirus",
    "builtin": true,
    "exe": "",
-   "linux": []
+   "linux": [
+    {
+     "name": "ClamTk",
+     "about": "Optional virus scanner. Most Linux users don't need one.",
+     "flatpak": "com.gitlab.davem.ClamTk"
+    }
+   ]
+  },
+  {
+   "windows": "Microsoft Edge",
+   "patterns": [
+    "^Microsoft Edge$"
+   ],
+   "status": "alternative",
+   "category": "Web browser",
+   "builtin": true,
+   "exe": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+   "linux": [
+    {
+     "name": "Firefox",
+     "about": "Fast, private browser. Imports your bookmarks and saved passwords.",
+     "flatpak": "org.mozilla.firefox",
+     "commands": [
+      "firefox"
+     ],
+     "snap": "firefox"
+    },
+    {
+     "name": "Chromium",
+     "about": "Chrome without Google. Same look; imports your bookmarks and passwords.",
+     "flatpak": "org.chromium.Chromium",
+     "commands": [
+      "chromium",
+      "chromium-browser"
+     ],
+     "snap": "chromium"
+    },
+    {
+     "name": "Brave",
+     "about": "Chrome-like, blocks ads and trackers. Imports bookmarks and passwords.",
+     "flatpak": "com.brave.Browser",
+     "commands": [
+      "brave-browser"
+     ],
+     "snap": "brave"
+    },
+    {
+     "name": "Google Chrome",
+     "about": "Google's browser. Sign in and your bookmarks and passwords come back.",
+     "flatpak": "com.google.Chrome",
+     "commands": [
+      "google-chrome",
+      "google-chrome-stable"
+     ]
+    },
+    {
+     "name": "Vivaldi",
+     "about": "Chrome-based and very customisable. Imports bookmarks and passwords.",
+     "flatpak": "com.vivaldi.Vivaldi",
+     "commands": [
+      "vivaldi"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "Mail (Outlook)",
+   "patterns": [
+    "^Mail (Outlook)$"
+   ],
+   "status": "alternative",
+   "category": "Email",
+   "builtin": true,
+   "exe": "",
+   "linux": [
+    {
+     "name": "Thunderbird",
+     "about": "Email, calendar and contacts. Works with Gmail, Outlook.com and more.",
+     "flatpak": "org.mozilla.Thunderbird",
+     "commands": [
+      "thunderbird"
+     ],
+     "snap": "thunderbird"
+    },
+    {
+     "name": "Evolution",
+     "about": "Email, calendar and contacts in one, Outlook-style.",
+     "flatpak": "org.gnome.Evolution",
+     "commands": [
+      "evolution"
+     ]
+    },
+    {
+     "name": "Geary",
+     "about": "Simple, modern email app.",
+     "flatpak": "org.gnome.Geary",
+     "commands": [
+      "geary"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "OneDrive",
+   "patterns": [
+    "^OneDrive$"
+   ],
+   "status": "alternative",
+   "category": "Cloud storage",
+   "builtin": true,
+   "exe": "",
+   "linux": [
+    {
+     "name": "Online Accounts",
+     "about": "Comes with Ubuntu: sign in under Settings, and your cloud drive shows up in Files.",
+     "included": true
+    },
+    {
+     "name": "RClone Manager",
+     "about": "Syncs OneDrive, Google Drive, Dropbox and iCloud on Linux.",
+     "flatpak": "io.github.zarestia_dev.rclone-manager"
+    },
+    {
+     "name": "Nextcloud",
+     "about": "Sync with your own private cloud.",
+     "flatpak": "com.nextcloud.desktopclient.nextcloud",
+     "commands": [
+      "nextcloud"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "File Explorer",
+   "patterns": [
+    "^File Explorer$"
+   ],
+   "status": "alternative",
+   "category": "Files",
+   "builtin": true,
+   "exe": "C:\\Windows\\explorer.exe",
+   "linux": [
+    {
+     "name": "Files",
+     "about": "Comes with Linux: your file manager, with all your folders.",
+     "included": true
+    }
+   ]
+  },
+  {
+   "windows": "Settings and Control Panel",
+   "patterns": [
+    "^Settings and Control Panel$"
+   ],
+   "status": "alternative",
+   "category": "Settings",
+   "builtin": true,
+   "exe": "C:\\Windows\\System32\\control.exe",
+   "linux": [
+    {
+     "name": "Settings",
+     "about": "Comes with Linux: Wi-Fi, display, printers, accounts and more.",
+     "included": true
+    }
+   ]
+  },
+  {
+   "windows": "Microsoft Store",
+   "patterns": [
+    "^Microsoft Store$"
+   ],
+   "status": "alternative",
+   "category": "App store",
+   "builtin": true,
+   "exe": "",
+   "linux": [
+    {
+     "name": "App Center",
+     "about": "Comes with Linux: the app store for finding and updating apps.",
+     "included": true
+    }
+   ]
+  },
+  {
+   "windows": "Task Manager",
+   "patterns": [
+    "^Task Manager$"
+   ],
+   "status": "alternative",
+   "category": "System monitor",
+   "builtin": true,
+   "exe": "C:\\Windows\\System32\\Taskmgr.exe",
+   "linux": [
+    {
+     "name": "Mission Center",
+     "about": "See what's using your CPU, memory and disks, like Task Manager.",
+     "flatpak": "io.missioncenter.MissionCenter"
+    },
+    {
+     "name": "Resources",
+     "about": "Simple system monitor; close stuck apps.",
+     "flatpak": "net.nokyan.Resources"
+    }
+   ]
+  },
+  {
+   "windows": "Disk Cleanup",
+   "patterns": [
+    "^Disk Cleanup$"
+   ],
+   "status": "alternative",
+   "category": "Clean-up",
+   "builtin": true,
+   "exe": "C:\\Windows\\System32\\cleanmgr.exe",
+   "linux": [
+    {
+     "name": "Disk Usage Analyzer",
+     "about": "See what's filling up your disk.",
+     "flatpak": "org.gnome.baobab",
+     "commands": [
+      "baobab"
+     ]
+    },
+    {
+     "name": "BleachBit",
+     "about": "Frees up space and clears junk, like CCleaner.",
+     "flatpak": "org.bleachbit.BleachBit",
+     "commands": [
+      "bleachbit"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "Command Prompt and PowerShell",
+   "patterns": [
+    "^Command Prompt and PowerShell$"
+   ],
+   "status": "alternative",
+   "category": "Terminal",
+   "builtin": true,
+   "exe": "C:\\Windows\\System32\\cmd.exe",
+   "linux": [
+    {
+     "name": "Terminal",
+     "about": "Comes with Linux. You won't need it, but it's there.",
+     "included": true
+    }
+   ]
+  },
+  {
+   "windows": "Remote Desktop Connection",
+   "patterns": [
+    "^Remote Desktop Connection$"
+   ],
+   "status": "alternative",
+   "category": "Remote desktop",
+   "builtin": true,
+   "exe": "C:\\Windows\\System32\\mstsc.exe",
+   "linux": [
+    {
+     "name": "Remmina",
+     "about": "Connects to Windows PCs with Remote Desktop.",
+     "flatpak": "org.remmina.Remmina",
+     "commands": [
+      "remmina"
+     ]
+    },
+    {
+     "name": "RustDesk",
+     "about": "Free remote-desktop app, like TeamViewer.",
+     "flatpak": "com.rustdesk.RustDesk",
+     "commands": [
+      "rustdesk"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "Backup and File History",
+   "patterns": [
+    "^Backup and File History$"
+   ],
+   "status": "alternative",
+   "category": "Backups",
+   "builtin": true,
+   "exe": "",
+   "linux": [
+    {
+     "name": "Pika Backup",
+     "about": "Easy, automatic backups.",
+     "flatpak": "org.gnome.World.PikaBackup"
+    },
+    {
+     "name": "Deja Dup",
+     "about": "Simple backups to a drive or the cloud.",
+     "flatpak": "org.gnome.DejaDup",
+     "commands": [
+      "deja-dup"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "Character Map",
+   "patterns": [
+    "^Character Map$"
+   ],
+   "status": "alternative",
+   "category": "Special characters",
+   "builtin": true,
+   "exe": "C:\\Windows\\System32\\charmap.exe",
+   "linux": [
+    {
+     "name": "Characters",
+     "about": "Find and copy special characters and emoji.",
+     "flatpak": "org.gnome.Characters",
+     "commands": [
+      "gnome-characters"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "Microsoft Solitaire Collection",
+   "patterns": [
+    "^Microsoft Solitaire Collection$"
+   ],
+   "status": "alternative",
+   "category": "Card games",
+   "builtin": true,
+   "exe": "",
+   "linux": [
+    {
+     "name": "Solitaire",
+     "about": "Classic card games: Klondike, FreeCell, Spider and more.",
+     "flatpak": "org.gnome.Aisleriot",
+     "commands": [
+      "sol"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "Phone Link",
+   "patterns": [
+    "^Phone Link$"
+   ],
+   "status": "alternative",
+   "category": "Phone",
+   "builtin": true,
+   "exe": "",
+   "linux": [
+    {
+     "name": "LocalSend",
+     "about": "Send files to your phone over Wi-Fi.",
+     "flatpak": "org.localsend.localsend_app"
+    }
+   ]
+  },
+  {
+   "windows": "People",
+   "patterns": [
+    "^People$"
+   ],
+   "status": "alternative",
+   "category": "Contacts",
+   "builtin": true,
+   "exe": "",
+   "linux": [
+    {
+     "name": "Contacts",
+     "about": "Your address book.",
+     "flatpak": "org.gnome.Contacts",
+     "commands": [
+      "gnome-contacts"
+     ]
+    }
+   ]
+  },
+  {
+   "windows": "Movies & TV",
+   "patterns": [
+    "^Movies & TV$"
+   ],
+   "status": "alternative",
+   "category": "Video player",
+   "builtin": true,
+   "exe": "",
+   "linux": [
+    {
+     "name": "VLC",
+     "about": "Plays almost any video or music file.",
+     "flatpak": "org.videolan.VLC",
+     "commands": [
+      "vlc"
+     ],
+     "snap": "vlc"
+    },
+    {
+     "name": "Celluloid",
+     "about": "Easy video player with a clean look.",
+     "flatpak": "io.github.celluloid_player.Celluloid",
+     "commands": [
+      "celluloid"
+     ]
+    },
+    {
+     "name": "Showtime",
+     "about": "Simple video player for everyday watching.",
+     "flatpak": "org.gnome.Showtime"
+    }
+   ]
+  },
+  {
+   "windows": "Xbox Game Bar",
+   "patterns": [
+    "^Xbox Game Bar$"
+   ],
+   "status": "alternative",
+   "category": "Screen recording",
+   "builtin": true,
+   "exe": "",
+   "linux": [
+    {
+     "name": "OBS Studio",
+     "about": "Record your screen and stream live.",
+     "flatpak": "com.obsproject.Studio",
+     "commands": [
+      "obs"
+     ],
+     "snap": "obs-studio"
+    }
+   ]
   }
  ]
 }

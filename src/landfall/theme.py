@@ -48,6 +48,8 @@ QFrame#Tile QLabel#Pill, QFrame#Card QLabel#Pill {{ color: #1450B8; background: 
     border-radius: 8px; padding: 2px 8px; font-size: 8.5pt; font-weight: 600; }}
 QFrame#Tile QLabel#PillNew {{ color: #8A4B00; background: #FFF0CC; border-radius: 8px;
     padding: 2px 8px; font-size: 8.5pt; font-weight: 600; }}
+QLabel#PillGood {{ color: #1E7E3A; background: #E2F6E8; border-radius: 8px; padding: 2px 8px;
+    font-size: 8.5pt; font-weight: 600; }}
 QLabel#PillGrey {{ color: #4A5568; background: #EDF1F6; border-radius: 8px; padding: 2px 8px;
     font-size: 8.5pt; font-weight: 600; }}
 QLabel#Hero {{ font-size: 22pt; font-weight: 700; }}

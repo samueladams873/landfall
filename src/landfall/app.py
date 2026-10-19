@@ -267,7 +267,7 @@ class Wizard(Shell):
     def update_pick_total(self):
         picks = self.chosen_apps()
         auto = len({p["flatpak"] for p in picks if p.get("flatpak")})
-        links = len({p["name"] for p in picks if not p.get("flatpak")})
+        links = len({p["name"] for p in picks if not p.get("flatpak") and not p.get("included")})
         text = (f"Up to {plural(auto, 'app')} will install automatically "
                 "(any already on your Linux PC are skipped)")
         if links:
@@ -453,7 +453,7 @@ class Wizard(Shell):
                 time.sleep(pause)
             report(("item", "Notepad, Paint, Photos and the other built-in programs"))
             time.sleep(0.4)
-            grouped = match_all(apps + builtin_apps())
+            grouped = match_all(apps + builtin_apps(scanned=apps))
             report(("stage", 2))
             report(("item", "Processor, memory, graphics, Wi-Fi..."))
             hw = scan_hardware()

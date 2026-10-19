@@ -404,11 +404,13 @@ class OptionTile(QFrame):
         box.addWidget(about, 1)
         badges = QHBoxLayout()
         badges.addStretch(1)
-        if recommended:
+        if recommended and not opt.get("included"):
             badges.addWidget(label("Recommended", "Pill", wrap=False))
         if opt.get("new"):
             badges.addWidget(label("New", "PillNew", wrap=False))
-        if not opt.get("flatpak"):
+        if opt.get("included"):
+            badges.addWidget(label("Comes with Linux", "PillGood", wrap=False))
+        elif not opt.get("flatpak"):
             badges.addWidget(label("Link", "PillGrey", wrap=False))
         badges.addStretch(1)
         box.addLayout(badges)

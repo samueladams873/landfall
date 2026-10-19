@@ -101,3 +101,28 @@ def test_builtin_windows_programs_always_get_alternatives():
     by_name = {c.name: c for c in cats}
     assert by_name["Drawing"].options[0]["name"] == "Pinta"          # Paint -> Pinta first
     assert by_name["Text editor"].windows_apps[0]["name"] == "Notepad"
+
+
+def test_microsoft_and_system_apps_get_linux_alternatives():
+    """Roger: OneDrive, Mail, Teams, Defender and Windows' own tools all need Linux options."""
+    from landfall.mapping import builtin_apps, by_category
+    entries = {e["windows"]: e for e in load_map()}
+    for name in ("Microsoft OneDrive", "Microsoft Teams", "Mail (Outlook)", "Windows Security",
+                 "File Explorer", "Task Manager", "OneDrive", "Microsoft Store"):
+        assert entries[name]["linux"], name
+    scanned = [{"name": "Microsoft OneDrive"}]
+    names = [a["name"] for a in builtin_apps(scanned=scanned)]
+    assert "OneDrive" not in names            # not listed twice
+    cats, _ = by_category(match_all(scanned + builtin_apps(scanned=scanned)))
+    cloud = {c.name: c for c in cats}["Cloud storage"]
+    assert [a["name"] for a in cloud.windows_apps] == ["Microsoft OneDrive"]
+    assert cloud.options[0].get("included")   # Online Accounts comes with Ubuntu
+
+
+def test_builtin_dedupe_uses_whole_names():
+    from landfall.mapping import builtin_apps
+    names = [a["name"] for a in builtin_apps(scanned=[{"name": "Notepad++ (64-bit x64)"},
+                                                      {"name": "Mailbird"},
+                                                      {"name": "Microsoft Edge"}])]
+    assert "Notepad" in names and "Mail (Outlook)" in names
+    assert "Microsoft Edge" not in names

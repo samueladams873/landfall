@@ -28,12 +28,13 @@ class AppChoice:
     about: str = ""
     commands: list = field(default_factory=list)
     snap: str | None = None
+    included: bool = False     # comes with Linux already, nothing to install
 
 
 def _choice(windows: str, opt: dict) -> AppChoice:
     return AppChoice(windows, opt["name"], opt.get("flatpak"), opt.get("url"),
                      bool(opt.get("new")), opt.get("about", ""), opt.get("commands") or [],
-                     opt.get("snap"))
+                     opt.get("snap"), bool(opt.get("included")))
 
 
 def choices_from_manifest(manifest: dict) -> list[AppChoice]:

@@ -10,8 +10,10 @@ import json
 from pathlib import Path
 
 
-def o(name, fp=None, about="", cmds=(), snap=None, url=None, new=False):
+def o(name, fp=None, about="", cmds=(), snap=None, url=None, new=False, included=False):
     d = {"name": name, "about": about}
+    if included:
+        d["included"] = True   # comes with Linux already: shown, never installed
     if fp:
         d["flatpak"] = fp
     if cmds:
@@ -138,26 +140,31 @@ WEATHER = o("Weather", "org.gnome.Weather", "Today's weather and the forecast.",
 MAPS = o("Maps", "org.gnome.Maps", "Maps and directions.", ["gnome-maps"])
 GCAL = o("Calendar", "org.gnome.Calendar", "Simple calendar. Connects to Google and Outlook accounts.", ["gnome-calendar"])
 
-# Programs built into every copy of Windows. They never appear in the installed-programs
-# list, so Landfall always includes them. "exe" is used to show their real icon.
-SYS = "C:\\Windows\\System32\\"
-BUILTIN = [
- ("Notepad", "Text editor", SYS + "notepad.exe", [GTEXT, KATE, NOTEPADQQ]),
- ("Paint", "Drawing", SYS + "mspaint.exe", [PINTA, DRAWING, KRITA]),
- ("Photos", "Photo viewer", "", [LOUPE, GWENVIEW, SHOTWELL, DIGIKAM]),
- ("Snipping Tool", "Screenshots", SYS + "SnippingTool.exe", [FLAMESHOT]),
- ("Calculator", "Calculator", SYS + "calc.exe", [GCALC, KCALC, QALC]),
- ("Windows Media Player", "Video player", "C:\\Program Files\\Windows Media Player\\wmplayer.exe", [VLC, CELLULOID, SHOWTIME, MPV]),
- ("Mail and Calendar", "Email", "", [TB, EVOLUTION, GEARY]),
- ("WordPad", "Office", "C:\\Program Files\\Windows NT\\Accessories\\wordpad.exe", [LO, OO]),
- ("Sticky Notes", "Notes", "", [STICKY, JOPLIN]),
- ("Voice Recorder", "Voice recording", SYS + "SoundRecorder.exe", [RECORDER, AUDACITY]),
- ("Camera", "Camera", "", [SNAPSHOT, CHEESE]),
- ("Alarms & Clock", "Clock", "", [CLOCKS]),
- ("Weather", "Weather", "", [WEATHER]),
- ("Maps", "Maps", "", [MAPS]),
- ("Windows Defender", "Antivirus", "", []),
-]
+
+RCLONE = o("RClone Manager", "io.github.zarestia_dev.rclone-manager", "Syncs OneDrive, Google Drive, Dropbox and iCloud on Linux.")
+ONLINE = o("Online Accounts", None, "Comes with Ubuntu: sign in under Settings, and your cloud drive shows up in Files.", included=True)
+DROPBOX = o("Dropbox", "com.dropbox.Client", "Dropbox's own Linux app.", ["dropbox"])
+NEXTCLOUD = o("Nextcloud", "com.nextcloud.desktopclient.nextcloud", "Sync with your own private cloud.", ["nextcloud"])
+TEAMS_LINUX = o("Teams for Linux", "com.github.IsmaelMartinez.teams_for_linux", "Free, unofficial app for joining your Teams chats and meetings.", ["teams-for-linux"])
+JITSI = o("Jitsi Meet", "org.jitsi.jitsi-meet", "Free video calls, no account needed.")
+ZOOM = o("Zoom", "us.zoom.Zoom", "Video meetings.", ["zoom"], "zoom-client")
+SIGNAL = o("Signal", "org.signal.Signal", "Private messages and calls.", ["signal-desktop"], "signal-desktop")
+GREENLIGHT = o("Greenlight", "io.github.unknownskl.greenlight", "Plays your Xbox Cloud Gaming and Game Pass library.")
+CLAMTK = o("ClamTk", "com.gitlab.davem.ClamTk", "Optional virus scanner. Most Linux users don't need one.")
+FILES = o("Files", None, "Comes with Linux: your file manager, with all your folders.", included=True)
+SETTINGS = o("Settings", None, "Comes with Linux: Wi-Fi, display, printers, accounts and more.", included=True)
+SOFTWARE = o("App Center", None, "Comes with Linux: the app store for finding and updating apps.", included=True)
+TERMINAL = o("Terminal", None, "Comes with Linux. You won't need it, but it's there.", included=True)
+MISSION = o("Mission Center", "io.missioncenter.MissionCenter", "See what's using your CPU, memory and disks, like Task Manager.")
+RESOURCES = o("Resources", "net.nokyan.Resources", "Simple system monitor; close stuck apps.")
+BAOBAB = o("Disk Usage Analyzer", "org.gnome.baobab", "See what's filling up your disk.", ["baobab"])
+REMMINA = o("Remmina", "org.remmina.Remmina", "Connects to Windows PCs with Remote Desktop.", ["remmina"])
+PIKA = o("Pika Backup", "org.gnome.World.PikaBackup", "Easy, automatic backups.")
+DEJADUP = o("Deja Dup", "org.gnome.DejaDup", "Simple backups to a drive or the cloud.", ["deja-dup"])
+CHARACTERS = o("Characters", "org.gnome.Characters", "Find and copy special characters and emoji.", ["gnome-characters"])
+SOLITAIRE = o("Solitaire", "org.gnome.Aisleriot", "Classic card games: Klondike, FreeCell, Spider and more.", ["sol"])
+LOCALSEND = o("LocalSend", "org.localsend.localsend_app", "Send files to your phone over Wi-Fi.")
+CONTACTS = o("Contacts", "org.gnome.Contacts", "Your address book.", ["gnome-contacts"])
 
 ONE = lambda name, fp, about, cmds=(), snap=None: [o(name, fp, about, cmds, snap)]
 
@@ -243,8 +250,8 @@ APPS = [
  ("Telegram Desktop", ["^telegram"], "same", "Chat", ONE("Telegram", "org.telegram.desktop", "The same Telegram.", ["telegram-desktop"], "telegram-desktop")),
  ("WhatsApp", ["^whatsapp"], "alternative", "Chat", [ZAPZAP]),
  ("Zoom", ["^zoom"], "same", "Video calls", ONE("Zoom", "us.zoom.Zoom", "The same Zoom.", ["zoom"], "zoom-client")),
- ("Microsoft Teams", ["^microsoft teams"], "none", "Video calls", []),
- ("Skype", ["^skype"], "none", "Video calls", []),
+ ("Microsoft Teams", ["^microsoft teams"], "alternative", "Video calls", [TEAMS_LINUX, ZOOM, JITSI]),
+ ("Skype", ["^skype"], "alternative", "Video calls", [ZOOM, SIGNAL, JITSI]),
  # Games
  ("Steam", ["^steam$"], "same", "Games", [STEAM]),
  ("Epic Games Launcher", ["^epic games launcher"], "alternative", "Games", [HEROIC, LUTRIS]),
@@ -253,7 +260,7 @@ APPS = [
  ("Ubisoft Connect", ["^ubisoft connect", "^uplay"], "alternative", "Games", [LUTRIS, HEROIC]),
  ("Battle.net", ["^battle\\.net"], "wine", "Games", [LUTRIS, BOTTLES]),
  ("Minecraft Launcher", ["^minecraft launcher", "^minecraft$"], "alternative", "Games", [PRISM]),
- ("Xbox", ["^xbox"], "none", "Games", []),
+ ("Xbox", ["^xbox"], "alternative", "Games", [GREENLIGHT, STEAM]),
  # Recording, sharing, tools
  ("OBS Studio", ["^obs studio"], "same", "Screen recording", [OBS]),
  ("ShareX", ["^sharex"], "alternative", "Screenshots", [FLAMESHOT]),
@@ -273,17 +280,55 @@ APPS = [
  ("Postman", ["^postman"], "same", "Coding", [POSTMAN]),
  ("MATLAB", ["^matlab"], "alternative", "Maths and science", [OCTAVE]),
  # Cloud storage: no Linux app needed; the files themselves move with everything else.
- ("Microsoft OneDrive", ["^microsoft onedrive"], "none", "Cloud storage", []),
- ("Dropbox", ["^dropbox"], "none", "Cloud storage", []),
- ("Google Drive", ["^google drive"], "none", "Cloud storage", []),
- ("iCloud", ["^icloud"], "none", "Cloud storage", []),
+ ("Microsoft OneDrive", ["^microsoft onedrive"], "alternative", "Cloud storage", [ONLINE, RCLONE, NEXTCLOUD]),
+ ("Dropbox", ["^dropbox"], "same", "Cloud storage", [DROPBOX, RCLONE]),
+ ("Google Drive", ["^google drive"], "alternative", "Cloud storage", [ONLINE, RCLONE]),
+ ("iCloud", ["^icloud"], "alternative", "Cloud storage", [RCLONE]),
  # Antivirus: Linux doesn't need these.
- ("Norton", ["^norton"], "none", "Antivirus", []),
- ("McAfee", ["^mcafee"], "none", "Antivirus", []),
- ("Avast", ["^avast"], "none", "Antivirus", []),
- ("AVG", ["^avg "], "none", "Antivirus", []),
- ("Malwarebytes", ["^malwarebytes"], "none", "Antivirus", []),
- ("Bitdefender", ["^bitdefender"], "none", "Antivirus", []),
+ ("Norton", ["^norton"], "alternative", "Antivirus", [CLAMTK]),
+ ("McAfee", ["^mcafee"], "alternative", "Antivirus", [CLAMTK]),
+ ("Avast", ["^avast"], "alternative", "Antivirus", [CLAMTK]),
+ ("AVG", ["^avg "], "alternative", "Antivirus", [CLAMTK]),
+ ("Malwarebytes", ["^malwarebytes"], "alternative", "Antivirus", [CLAMTK]),
+ ("Bitdefender", ["^bitdefender"], "alternative", "Antivirus", [CLAMTK]),
+]
+
+# Programs built into every copy of Windows. They never appear in the installed-programs
+# list, so Landfall always includes them. "exe" is used to show their real icon.
+SYS = "C:\\Windows\\System32\\"
+BUILTIN = [
+ ("Notepad", "Text editor", SYS + "notepad.exe", [GTEXT, KATE, NOTEPADQQ]),
+ ("Paint", "Drawing", SYS + "mspaint.exe", [PINTA, DRAWING, KRITA]),
+ ("Photos", "Photo viewer", "", [LOUPE, GWENVIEW, SHOTWELL, DIGIKAM]),
+ ("Snipping Tool", "Screenshots", SYS + "SnippingTool.exe", [FLAMESHOT]),
+ ("Calculator", "Calculator", SYS + "calc.exe", [GCALC, KCALC, QALC]),
+ ("Windows Media Player", "Video player", "C:\\Program Files\\Windows Media Player\\wmplayer.exe", [VLC, CELLULOID, SHOWTIME, MPV]),
+ ("Mail and Calendar", "Email", "", [TB, EVOLUTION, GEARY]),
+ ("WordPad", "Office", "C:\\Program Files\\Windows NT\\Accessories\\wordpad.exe", [LO, OO]),
+ ("Sticky Notes", "Notes", "", [STICKY, JOPLIN]),
+ ("Voice Recorder", "Voice recording", SYS + "SoundRecorder.exe", [RECORDER, AUDACITY]),
+ ("Camera", "Camera", "", [SNAPSHOT, CHEESE]),
+ ("Alarms & Clock", "Clock", "", [CLOCKS]),
+ ("Weather", "Weather", "", [WEATHER]),
+ ("Maps", "Maps", "", [MAPS]),
+ ("Windows Security", "Antivirus", "", [CLAMTK]),
+ ("Microsoft Edge", "Web browser", "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe", [FF, CHR, BRV, GC, VIV]),
+ ("Mail (Outlook)", "Email", "", [TB, EVOLUTION, GEARY]),
+ ("OneDrive", "Cloud storage", "", [ONLINE, RCLONE, NEXTCLOUD]),
+ ("File Explorer", "Files", "C:\\Windows\\explorer.exe", [FILES]),
+ ("Settings and Control Panel", "Settings", SYS + "control.exe", [SETTINGS]),
+ ("Microsoft Store", "App store", "", [SOFTWARE]),
+ ("Task Manager", "System monitor", SYS + "Taskmgr.exe", [MISSION, RESOURCES]),
+ ("Disk Cleanup", "Clean-up", SYS + "cleanmgr.exe", [BAOBAB, BLEACHBIT]),
+ ("Command Prompt and PowerShell", "Terminal", SYS + "cmd.exe", [TERMINAL]),
+ ("Remote Desktop Connection", "Remote desktop", SYS + "mstsc.exe", [REMMINA, RUSTDESK]),
+ ("Backup and File History", "Backups", "", [PIKA, DEJADUP]),
+ ("Character Map", "Special characters", SYS + "charmap.exe", [CHARACTERS]),
+ ("Microsoft Solitaire Collection", "Card games", "", [SOLITAIRE]),
+ ("Phone Link", "Phone", "", [LOCALSEND]),
+ ("People", "Contacts", "", [CONTACTS]),
+ ("Movies & TV", "Video player", "", [VLC, CELLULOID, SHOWTIME]),
+ ("Xbox Game Bar", "Screen recording", "", [OBS]),
 ]
 
 out = {

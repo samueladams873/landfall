@@ -353,7 +353,7 @@ class Importer(Shell):
         flatpaks, snaps = apps_mod.installed_flatpaks(), apps_mod.installed_snaps()
         self.to_install, self.present_apps, self.link_apps = [], [], []
         for c in choices:
-            if c.flatpak and apps_mod.already_present(c, flatpaks, snaps):
+            if c.included or (c.flatpak and apps_mod.already_present(c, flatpaks, snaps)):
                 self.present_apps.append(c)
             elif c.flatpak:
                 self.to_install.append(c)

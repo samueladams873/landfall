@@ -34,12 +34,25 @@ def load_map(path: Path = DATA_FILE) -> list[dict]:
     return entries
 
 
-def builtin_apps(entries: list[dict] | None = None) -> list[dict]:
-    """Programs that come with every copy of Windows (Notepad, Paint, Photos...). They never
-    show up as installed programs, so they're always added to what the scan found."""
+def builtin_apps(entries: list[dict] | None = None, scanned: list[dict] = ()) -> list[dict]:
+    """Programs that come with every copy of Windows (Notepad, Paint, Photos, OneDrive...).
+    Most never show up as installed programs, so they're always added to what the scan
+    found, unless the scan already found them (e.g. "Microsoft OneDrive")."""
     entries = entries if entries is not None else load_map()
-    return [{"name": e["windows"], "icon": e.get("exe", ""), "source": "Built into Windows",
-             "builtin": True} for e in entries if e.get("builtin")]
+    found = [a.get("name", "").lower() for a in scanned]
+    out = []
+    for e in entries:
+        if not e.get("builtin"):
+            continue
+        key = e["windows"].lower().split(" (")[0]
+        # whole-name match only: "Microsoft OneDrive" covers OneDrive, but "Notepad++" is
+        # not Notepad and "Mailbird" is not Mail
+        whole = re.compile(r"(^|\W)" + re.escape(key) + r"($|[^\w+])")
+        if any(whole.search(name) for name in found):
+            continue
+        out.append({"name": e["windows"], "icon": e.get("exe", ""),
+                    "source": "Built into Windows", "builtin": True})
+    return out
 
 
 def match_app(app: dict, entries: list[dict]) -> MatchResult:
