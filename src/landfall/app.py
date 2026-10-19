@@ -19,9 +19,10 @@ from landfall.mapping import (GROUP_ALT, GROUP_SAME, GROUPS, builtin_apps, by_ca
 from landfall.pack import PackCancelled, pack, space_needed
 from landfall.report import build_html, option_text
 from landfall.scan.apps import scan_apps
-from landfall.scan.folders import find_folders, human_size, measure
+from landfall.scan.folders import extra_files, extra_folder, find_folders, human_size, measure
 from landfall.scan.hardware import hardware_notes, scan_hardware
-from landfall.ui import (ICON, ICONS, CategoryCard, ChoiceRow, ScoreRing, StageList,
+from landfall.ui import (ICON, ICONS, CategoryCard, ChoiceRow, FolderPicker, ScoreRing,
+                         StageList,
                          WidthWatcher, HeroPage, Page, Shell, card, folder_icon,
                          label, logo, make_app, picture, run_window, set_role,
                          start_task, text_field, fit_list, plural)
@@ -567,16 +568,31 @@ class Wizard(Shell):
     # --- step: choose what to move ---------------------------------------
     def start_measure(self):
         self.folders = find_folders()
+        self._measuring = 0
         self.what_box.addWidget(label("Your folders", "Section"))
         for folder in self.folders:
-            row = ChoiceRow(folder_icon(folder.name), folder.name, "Measuring...")
-            row.box.toggled.connect(lambda _: self.update_total())
-            self.folder_rows[folder.name] = row
-            self.what_box.addWidget(row)
+            self._add_folder_row(folder)
         if not self.folders:
             self.what_box.addWidget(label("No personal folders were found.", "Muted"))
+        self.what_box.addSpacing(8)
+        self.what_box.addWidget(label("Other folders and files", "Section"))
+        self.what_box.addWidget(label("Bring anything else too: a folder on another drive, "
+                                      "your projects folder, or a few single files.", "Muted"))
+        self.extra_box = QVBoxLayout()
+        self.extra_box.setSpacing(8)
+        self.what_box.addLayout(self.extra_box)
+        add_row = QHBoxLayout()
+        add_folder = QPushButton("+  Add a folder...")
+        add_folder.clicked.connect(self.add_extra_folder)
+        add_files = QPushButton("+  Add files...")
+        add_files.clicked.connect(self.add_extra_files)
+        add_row.addWidget(add_folder)
+        add_row.addWidget(add_files)
+        add_row.addStretch(1)
+        self.what_box.addLayout(add_row)
+        self.what_box.addSpacing(8)
         apps = ChoiceRow(ICONS / "Apps.svg", "Your app list",
-                         "So Linux can install the matching apps", True, False)
+                         "So Linux can install the apps you picked", True, False)
         apps.title.setStyleSheet("")
         self.what_box.addWidget(apps)
         self.what_box.addSpacing(8)
@@ -584,21 +600,89 @@ class Wizard(Shell):
         for item in COMING_SOON:
             self.what_box.addWidget(ChoiceRow(ICONS / "Soon.svg", item, "", False, False))
         self.what_box.addStretch(1)
+        for folder in self.folders:
+            self._measure(folder)
+
+    def _add_folder_row(self, folder, box=None):
+        icon = ICONS / "Downloads.svg" if folder.only_files else folder_icon(folder.name)
+        detail = str(folder.path) if folder.extra and not folder.only_files else "Measuring..."
+        row = ChoiceRow(icon, folder.name, detail)
+        row.box.toggled.connect(lambda _: self.update_total())
+        if not folder.only_files:
+            choose = QPushButton("Choose...")
+            choose.setToolTip("Pick exactly which files and folders to bring")
+            choose.clicked.connect(lambda _=False, f=folder: self.choose_inside(f))
+            row.side.addWidget(choose)
+        if folder.extra:
+            remove = QPushButton("Remove")
+            remove.clicked.connect(lambda _=False, f=folder: self.remove_extra(f))
+            row.side.addWidget(remove)
+        self.folder_rows[folder.name] = row
+        (box or self.what_box).addWidget(row)
+
+    def _measure(self, folder):
+        self._measuring += 1
+        self.measured = False
+        self.folder_rows[folder.name].detail.setText("Measuring...")
         self.what_total.setText("Measuring your folders...")
+        self.update_buttons()
+        start_task(self, lambda report: measure(folder), self._measured_one, self.task_failed)
 
-        def work(report):
-            for folder in self.folders:
-                measure(folder)
-                report(folder)
-            return True
-
-        start_task(self, work, self.measure_done, self.task_failed, self.show_measured)
+    def _measured_one(self, folder):
+        self._measuring -= 1
+        if folder.name in self.folder_rows:
+            self.show_measured(folder)
+        if self._measuring == 0:
+            self.measure_done(None)
 
     def show_measured(self, folder):
         text = f"{plural(folder.files, 'file')}  \u00b7  {human_size(folder.bytes)}"
+        if folder.excludes:
+            text += f"  \u00b7  {plural(len(folder.excludes), 'item')} left out"
         if folder.cloud_only:
             text += f"  \u00b7  {folder.cloud_only:,} online-only OneDrive files stay in the cloud"
+        if folder.extra and not folder.only_files:
+            text = f"{folder.path}  \u00b7  " + text
         self.folder_rows[folder.name].detail.setText(text)
+
+    def choose_inside(self, folder):
+        picked = FolderPicker(folder.path, folder.excludes,
+                              f"Choose what to bring from {folder.name}", self).run()
+        if picked is not None:
+            folder.excludes = picked
+            self._measure(folder)
+
+    def add_extra_folder(self):
+        path = QFileDialog.getExistingDirectory(self, "Pick a folder to bring along",
+                                                str(Path.home()))
+        if not path:
+            return
+        if any(Path(path) == f.path and not f.only_files for f in self.folders):
+            QMessageBox.information(self, "Already added", "That folder is already on the list.")
+            return
+        folder = extra_folder(path, {f.name for f in self.folders})
+        self.folders.append(folder)
+        self._add_folder_row(folder, self.extra_box)
+        self._measure(folder)
+
+    def add_extra_files(self):
+        paths, _ = QFileDialog.getOpenFileNames(self, "Pick files to bring along",
+                                                str(Path.home()))
+        if not paths:
+            return
+        folder = extra_files(paths, {f.name for f in self.folders})
+        self.folders.append(folder)
+        self._add_folder_row(folder, self.extra_box)
+        self.folder_rows[folder.name].title.setText(
+            f"<b>{folder.name}</b>  ({plural(len(paths), 'file')})")
+        self._measure(folder)
+
+    def remove_extra(self, folder):
+        self.folders.remove(folder)
+        row = self.folder_rows.pop(folder.name)
+        row.setParent(None)
+        row.deleteLater()
+        self.update_total()
 
     def measure_done(self, _):
         self.measured = True
@@ -614,7 +698,7 @@ class Wizard(Shell):
     def update_total(self):
         if self.measured:
             files = sum(f.files for f in self.selected_folders())
-            self.what_total.setText(f"Total to move: {files:,} files, "
+            self.what_total.setText(f"Total to move: {plural(files, 'file')}, "
                                     f"{human_size(self.selected_bytes())}")
 
     # --- step: choose where ----------------------------------------------
@@ -678,6 +762,7 @@ class Wizard(Shell):
         self.stop_btn.setEnabled(True)
         folders, drive, password = self.selected_folders(), self.current_drive(), self.pw1.text()
         extra = {"apps": self._app_records(), "install": self.chosen_apps(),
+                 "extra_folders": [f.name for f in folders if f.extra],
                  "hardware": self.hw or {}}
         self.pack_status.setText(f"Packing to {drive.title}...")
 

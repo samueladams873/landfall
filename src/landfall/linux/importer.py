@@ -308,7 +308,7 @@ class Importer(Shell):
             s[1] += f["size"]
         for name in self.manifest.get("folders", []):
             files, size = stats.get(name, [0, 0])
-            dest = self.dests.get(name, Path.home() / name)
+            dest = self.dest_for(name)
             detail = (f"{plural(files, 'file')}  \u00b7  {human_size(size)}  \u2192  {dest}" if files
                       else "Empty")
             row = ChoiceRow(folder_icon(name), name, detail, files > 0, files > 0)
@@ -320,6 +320,14 @@ class Importer(Shell):
             "\u201cname (from Windows)\u201d. Nothing gets replaced.", "Muted"))
         self.fill_apps()
         self.update_what()
+
+    def dest_for(self, name: str) -> Path:
+        """Standard folders go to their Linux twins (Documents -> ~/Documents). Anything the
+        user added on Windows goes into ~/From Windows/<name>, so nothing gets mixed up."""
+        extras = set(self.manifest.get("extra_folders", [])) if self.manifest else set()
+        if name in self.dests and name not in extras:
+            return self.dests[name]
+        return Path.home() / "From Windows" / name
 
     def chosen_folders(self):
         return [n for n, r in self.folder_rows.items() if r.box.isChecked()]
@@ -387,7 +395,8 @@ class Importer(Shell):
         self.stop_btn.setEnabled(True)
         folders = self.chosen_folders()
         apps = list(self.to_install)
-        bundle, password, manifest, dests = self.bundle, self.password, self.manifest, self.dests
+        bundle, password, manifest = self.bundle, self.password, self.manifest
+        dests = {name: self.dest_for(name) for name in manifest.get("folders", [])}
 
         def work(report):
             result = restore(bundle, password, folders, dests, manifest,

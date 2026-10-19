@@ -630,3 +630,119 @@ class StageList(QWidget):
             lab.setStyleSheet({"done": "color: #1E7E3A; font-weight: 600;",
                                "now": "color: #1B2433; font-weight: 600;",
                                "wait": "color: #9AA6B8;"}[state])
+
+
+# --- pick exactly what to bring from inside a folder ------------------------
+class FolderPicker(QWidget):
+    """A dialog listing everything inside a folder with checkboxes. Untick anything you
+    don't want; subfolders open when you click their arrow. Returns the unticked paths."""
+
+    def __init__(self, folder_path, excludes=(), title="Choose what to bring", parent=None):
+        from PySide6.QtWidgets import QDialog, QDialogButtonBox, QTreeWidget
+        super().__init__()
+        self.root = folder_path
+        self.dialog = QDialog(parent)
+        self.dialog.setWindowTitle(title)
+        self.dialog.setObjectName("Root")
+        self.dialog.resize(640, 520)
+        box = QVBoxLayout(self.dialog)
+        box.setContentsMargins(20, 18, 20, 16)
+        box.addWidget(label(title, "Section"))
+        box.addWidget(label(f"Everything in {folder_path} is ticked. Untick what you want to "
+                            "leave behind. Click an arrow to look inside a folder.", "Muted"))
+        self.tree = QTreeWidget()
+        self.tree.setHeaderLabels(["Name", "Size"])
+        self.tree.setColumnWidth(0, 430)
+        self.tree.itemExpanded.connect(self._load_children)
+        box.addWidget(self.tree, 1)
+        row = QHBoxLayout()
+        for text, state in (("Tick all", Qt.CheckState.Checked),
+                            ("Untick all", Qt.CheckState.Unchecked)):
+            btn = QPushButton(text)
+            btn.clicked.connect(lambda _=False, st=state: self._set_all(st))
+            row.addWidget(btn)
+        row.addStretch(1)
+        buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok
+                                   | QDialogButtonBox.StandardButton.Cancel)
+        buttons.button(QDialogButtonBox.StandardButton.Ok).setText("Done")
+        buttons.button(QDialogButtonBox.StandardButton.Ok).setObjectName("Primary")
+        buttons.accepted.connect(self.dialog.accept)
+        buttons.rejected.connect(self.dialog.reject)
+        row.addWidget(buttons)
+        box.addLayout(row)
+        self._excluded = {str(p) for p in excludes}
+        self._fill(self.tree.invisibleRootItem(), folder_path, Qt.CheckState.Checked)
+
+    def _fill(self, parent, path, inherited):
+        import os
+        from pathlib import Path as _P
+        from PySide6.QtWidgets import QFileIconProvider, QTreeWidgetItem
+        from PySide6.QtCore import QFileInfo
+        from landfall.scan.folders import human_size
+        icons = QFileIconProvider()
+        try:
+            entries = sorted(os.scandir(path), key=lambda e: (not e.is_dir(), e.name.lower()))
+        except OSError:
+            return
+        for entry in entries:
+            if entry.name.lower() in ("desktop.ini", "thumbs.db"):
+                continue
+            is_dir = entry.is_dir(follow_symlinks=False)
+            try:
+                size = "" if is_dir else human_size(entry.stat().st_size)
+            except OSError:
+                size = ""
+            item = QTreeWidgetItem([entry.name, size])
+            item.setData(0, Qt.ItemDataRole.UserRole, entry.path)
+            item.setIcon(0, icons.icon(QFileInfo(entry.path)))
+            flags = item.flags() | Qt.ItemFlag.ItemIsUserCheckable
+            state = (Qt.CheckState.Unchecked if str(_P(entry.path)) in self._excluded
+                     else inherited)
+            if is_dir:
+                flags |= Qt.ItemFlag.ItemIsAutoTristate
+                # placeholder until the folder is opened; it carries the folder's own tick so
+                # Qt's automatic parent/child ticking doesn't untick unopened folders
+                placeholder = QTreeWidgetItem(["…"])
+                placeholder.setFlags(Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled)
+                placeholder.setCheckState(0, state)
+                item.addChild(placeholder)
+            item.setFlags(flags)
+            item.setCheckState(0, state)
+            parent.addChild(item)
+
+    def _load_children(self, item):
+        if item.childCount() == 1 and item.child(0).data(0, Qt.ItemDataRole.UserRole) is None:
+            item.takeChild(0)
+            state = item.checkState(0)
+            if state == Qt.CheckState.PartiallyChecked:
+                state = Qt.CheckState.Checked
+            self._fill(item, item.data(0, Qt.ItemDataRole.UserRole), state)
+
+    def _set_all(self, state):
+        root = self.tree.invisibleRootItem()
+        for i in range(root.childCount()):
+            root.child(i).setCheckState(0, state)
+
+    def excluded(self) -> set:
+        """Paths the user unticked (a whole unticked folder is one entry)."""
+        from pathlib import Path as _P
+        out = set()
+
+        def walk(item):
+            for i in range(item.childCount()):
+                child = item.child(i)
+                path = child.data(0, Qt.ItemDataRole.UserRole)
+                if path is None:
+                    continue
+                state = child.checkState(0)
+                if state == Qt.CheckState.Unchecked:
+                    out.add(str(_P(path)))
+                elif state == Qt.CheckState.PartiallyChecked:
+                    walk(child)
+
+        walk(self.tree.invisibleRootItem())
+        return out
+
+    def run(self) -> set | None:
+        from PySide6.QtWidgets import QDialog
+        return self.excluded() if self.dialog.exec() == QDialog.DialogCode.Accepted else None

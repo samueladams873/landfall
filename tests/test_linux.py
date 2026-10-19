@@ -127,3 +127,45 @@ def test_user_dirs_reads_translated_names(tmp_path, monkeypatch):
     d = user_dirs(tmp_path)
     assert d["Pictures"] == tmp_path / "Bilder"
     assert d["Documents"] == tmp_path / "Documents"
+
+
+def test_extra_folders_and_files_round_trip(tmp_path):
+    """Folders/files the user adds on Windows (with some items unticked) land in
+    ~/From Windows on Linux."""
+    from landfall.scan.folders import extra_files, extra_folder
+    win = tmp_path / "win"
+    proj = win / "D-drive" / "Projects"
+    (proj / "keep").mkdir(parents=True)
+    (proj / "skip").mkdir()
+    (proj / "keep" / "plan.txt").write_text("plan")
+    (proj / "skip" / "huge.bin").write_bytes(b"x" * 1000)
+    (proj / "notes.txt").write_text("notes")
+    single = win / "taxes.pdf"
+    single.write_bytes(b"%PDF-1")
+    docs = win / "Documents"
+    docs.mkdir()
+    (docs / "a.txt").write_text("a")
+    std = measure(FolderInfo("Documents", docs))
+    taken = {"Documents"}
+    fold = extra_folder(proj, taken)
+    fold.excludes = {str(proj / "skip")}
+    measure(fold)
+    files = measure(extra_files([single], taken | {fold.name}))
+    assert fold.name == "Projects" and fold.files == 2          # skip/ left out
+    assert files.files == 1
+    usb = tmp_path / "usb"
+    usb.mkdir()
+    pack([std, fold, files], "pw1234", usb,
+         {"extra_folders": [fold.name, files.name]})
+    bundle = find_bundles([usb])[0]
+    manifest = read_manifest(bundle, "pw1234")
+    home = tmp_path / "home"
+    dests = {"Documents": home / "Documents",
+             "Projects": home / "From Windows" / "Projects",
+             "Other files": home / "From Windows" / "Other files"}
+    r = restore(bundle, "pw1234", manifest["folders"], dests, manifest, home=home)
+    assert r.restored == 4
+    assert (home / "From Windows" / "Projects" / "keep" / "plan.txt").read_text() == "plan"
+    assert not (home / "From Windows" / "Projects" / "skip").exists()
+    assert (home / "From Windows" / "Other files" / "taxes.pdf").exists()
+    assert (home / "Documents" / "a.txt").exists()

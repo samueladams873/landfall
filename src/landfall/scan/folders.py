@@ -33,6 +33,9 @@ class FolderInfo:
     cloud_only: int = 0
     unreadable: int = 0
     file_list: list = field(default_factory=list, repr=False)  # (abs_path, rel_path, size)
+    excludes: set = field(default_factory=set)       # paths inside the folder to leave out
+    extra: bool = False                              # added by the user, not a standard folder
+    only_files: list | None = None                   # a hand-picked list of single files
 
 
 def _known_folder_path(guid: str) -> Path | None:
@@ -75,6 +78,18 @@ def measure(folder: FolderInfo, cancelled=lambda: False) -> FolderInfo:
     """Walk a folder, filling in file count, size and the list of files to pack."""
     folder.files = folder.bytes = folder.cloud_only = folder.unreadable = 0
     folder.file_list = []
+    if folder.only_files is not None:
+        for path in folder.only_files:
+            try:
+                size = Path(path).stat().st_size
+            except OSError:
+                folder.unreadable += 1
+                continue
+            folder.file_list.append((Path(path), Path(folder.name) / Path(path).name, size))
+            folder.files += 1
+            folder.bytes += size
+        return folder
+    excludes = {str(Path(p)) for p in folder.excludes}
     stack = [folder.path]
     while stack:
         if cancelled():
@@ -86,6 +101,8 @@ def measure(folder: FolderInfo, cancelled=lambda: False) -> FolderInfo:
             folder.unreadable += 1
             continue
         for entry in entries:
+            if excludes and str(Path(entry.path)) in excludes:
+                continue  # the user unticked this one
             try:
                 attrs = getattr(entry.stat(follow_symlinks=False), "st_file_attributes", 0)
                 is_junction = getattr(entry, "is_junction", lambda: False)()
@@ -117,3 +134,25 @@ def human_size(n: int) -> str:
             return f"{size:.0f} {unit}" if unit == "bytes" else f"{size:.1f} {unit}"
         size /= 1024
     return f"{n} bytes"
+
+
+def unique_name(wanted: str, taken) -> str:
+    name, n = wanted or "Folder", 2
+    while name in taken:
+        name = f"{wanted} ({n})"
+        n += 1
+    return name
+
+
+def extra_folder(path, taken) -> FolderInfo:
+    """A folder the user added from anywhere on the PC (e.g. C:\\Projects)."""
+    path = Path(path)
+    return FolderInfo(unique_name(path.name or path.anchor.strip(":\\/"), taken), path,
+                      extra=True)
+
+
+def extra_files(paths, taken) -> FolderInfo:
+    """Single files the user picked; they travel together in one "Other files" folder."""
+    paths = [Path(p) for p in paths]
+    return FolderInfo(unique_name("Other files", taken), paths[0].parent if paths else Path("."),
+                      extra=True, only_files=paths)

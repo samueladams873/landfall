@@ -125,5 +125,11 @@ QCheckBox::indicator:checked {{ background: {BLUE}; border-color: {BLUE};
     image: url({_ICONS}/check-white.svg); }}
 QCheckBox::indicator:disabled {{ background: #F1F4F9; border-color: #D5DCE6; }}
 QCheckBox::indicator:checked:disabled {{ background: #A9C3EE; border-color: #A9C3EE; }}
+QTreeView::indicator {{ width: 16px; height: 16px; border-radius: 4px;
+    border: 1.5px solid #9FB0C8; background: white; }}
+QTreeView::indicator:checked {{ background: {BLUE}; border-color: {BLUE};
+    image: url({_ICONS}/check-white.svg); }}
+QTreeView::indicator:indeterminate {{ background: #A9C3EE; border-color: {BLUE};
+    image: url({_ICONS}/dash-white.svg); }}
 QToolTip {{ background: {TEXT}; color: white; border: none; padding: 6px; border-radius: 6px; }}
 """
