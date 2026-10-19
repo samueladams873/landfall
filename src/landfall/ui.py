@@ -235,7 +235,6 @@ class Shell(QWidget):
         self.steps = steps
 
         root = QHBoxLayout(self)
-        root.setSizeConstraint(QLayout.SizeConstraint.SetMinimumSize)  # never squash pages
         root.setContentsMargins(0, 0, 0, 0)
         root.setSpacing(0)
 
@@ -295,22 +294,36 @@ class Shell(QWidget):
         self.cancel_btn.clicked.connect(self.close)
 
     def showEvent(self, event):
-        """Fit the window to the screen it opens on, so no button is ever off-screen."""
+        """Fit the window to the screen it opens on, so no button is ever hidden behind
+        the taskbar. Runs once the window is really on screen (title bar included), and
+        again a moment later in case the system resized it."""
         super().showEvent(event)
         if getattr(self, "_fitted", False):
             return
         self._fitted = True
+        from PySide6.QtCore import QTimer
+        QTimer.singleShot(0, self.fit_to_screen)
+        QTimer.singleShot(400, self.fit_to_screen)
+
+    def fit_to_screen(self):
         screen = self.screen() or QApplication.primaryScreen()
         if screen is None:
             return
-        area = screen.availableGeometry()
+        area = screen.availableGeometry()          # the screen minus the taskbar
         if area.width() < 1100:
-            self.sidebar.setFixedWidth(205)   # small screens: more room for the page
-        w = min(self.width(), int(area.width() * 0.95))
-        h = min(self.height(), int(area.height() * 0.92))
+            self.sidebar.setFixedWidth(205)       # small screens: more room for the page
+        frame = self.frameGeometry()
+        extra_w = frame.width() - self.width()     # window borders
+        extra_h = frame.height() - self.height()   # title bar + borders
+        w = min(self.width(), area.width() - extra_w - 16)
+        h = min(self.height(), area.height() - extra_h - 16)
+        h = max(h, self.minimumSizeHint().height() if self.minimumSizeHint().height() <
+                area.height() - extra_h else 0)
         self.resize(w, h)
         frame = self.frameGeometry()
         frame.moveCenter(area.center())
+        if frame.top() < area.top():
+            frame.moveTop(area.top())
         self.move(frame.topLeft())
 
     def set_step(self, index: int):
