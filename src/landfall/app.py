@@ -7,19 +7,20 @@ import time
 import webbrowser
 from pathlib import Path
 
-from PySide6.QtWidgets import (QCheckBox, QComboBox, QFrame, QFileDialog, QGridLayout, QHBoxLayout, QLabel,
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import (QCheckBox, QFileDialog, QGridLayout, QHBoxLayout, QLabel,
                                QLineEdit, QListWidget, QListWidgetItem, QMessageBox,
                                QProgressBar, QPushButton, QScrollArea, QTabWidget,
                                QTreeWidget, QTreeWidgetItem, QVBoxLayout, QWidget)
 
 from landfall.drives import list_drives
-from landfall.mapping import GROUP_ALT, GROUP_SAME, GROUPS, match_all
+from landfall.mapping import GROUP_ALT, GROUP_SAME, GROUPS, by_category, match_all
 from landfall.pack import PackCancelled, pack, space_needed
 from landfall.report import build_html, option_text
 from landfall.scan.apps import scan_apps
 from landfall.scan.folders import find_folders, human_size, measure
 from landfall.scan.hardware import hardware_notes, scan_hardware
-from landfall.ui import (ICON, ICONS, ChoiceRow, HeroPage, Page, Shell, card, folder_icon,
+from landfall.ui import (ICON, ICONS, CategoryCard, ChoiceRow, HeroPage, Page, Shell, card, folder_icon,
                          label, logo, make_app, picture, run_window, set_role,
                          start_task, text_field, fit_list, plural)
 
@@ -35,7 +36,6 @@ COMING_SOON = [
 ]
 STEPS = ["Welcome", "Check this PC", "Pick your Linux apps", "Choose what to move",
          "Choose where to save", "Packing", "All done"]
-SKIP = "Don't install"
 
 
 class Wizard(Shell):
@@ -51,7 +51,8 @@ class Wizard(Shell):
         self.result = None
         self._cancel_pack = False
         self.folder_rows: dict[str, ChoiceRow] = {}
-        self.pick_rows: list[tuple[dict, QComboBox, QLabel]] = []
+        self.pick_cards: list[CategoryCard] = []
+        self.pick_filled = False
         self.back_btn.clicked.connect(self.on_back)
         self.next_btn.clicked.connect(self.on_next)
         for build in (self._page_welcome, self._page_check, self._page_pick, self._page_what,
@@ -116,11 +117,12 @@ class Wizard(Shell):
 
     def _page_pick(self):
         page = Page("Pick your Linux apps",
-                    "We matched your Windows apps. Choose what you'd like on Linux; your new "
-                    "PC installs them for you.")
+                    "Here's what you use on Windows, next to the Linux apps that do the same "
+                    "job. Click the ones you want; your new PC installs them for you.")
         self.pick_box = QVBoxLayout()
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
+        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         holder = QWidget()
         holder.setObjectName("Content")
         holder.setLayout(self.pick_box)
@@ -137,69 +139,46 @@ class Wizard(Shell):
             item = self.pick_box.takeAt(0)
             if item.widget():
                 item.widget().deleteLater()
-        self.pick_rows.clear()
-        matched = [r for g in GROUPS for r in self.grouped.get(g, []) if r.options]
-        unknown = [r for r in self.grouped.get(GROUPS[-1], []) if not r.options]
-        if not matched:
-            self.pick_box.addWidget(label("None of your apps have a Linux match we know of "
-                                          "yet. That's fine: your files still move.", "Muted"))
-        for r in matched:
-            row = QFrame()
-            row.setObjectName("Row")
-            line = QHBoxLayout(row)
-            line.setContentsMargins(14, 10, 14, 10)
-            line.setSpacing(12)
-            line.addWidget(picture(ICONS / "Apps.svg", 28))
-            words = QVBoxLayout()
-            words.setSpacing(1)
-            words.addWidget(label(f"<b>{r.app['name']}</b>", wrap=False))
-            about = label("", "Muted")
-            words.addWidget(about)
-            line.addLayout(words, 1)
-            combo = QComboBox()
-            combo.setMinimumWidth(230)
-            combo.setMinimumHeight(combo.fontMetrics().height() + 18)
-            for opt in r.options:
-                combo.addItem(opt["name"] + ("  (new)" if opt.get("new") else ""), opt)
-            combo.addItem(SKIP, None)
-            combo.currentIndexChanged.connect(lambda _=0, c=combo, a=about: self._pick_changed(c, a))
-            line.addWidget(combo)
-            self._pick_changed(combo, about)
-            self.pick_rows.append((r.app, combo, about))
-            self.pick_box.addWidget(row)
-        if unknown:
+        self.pick_cards.clear()
+        categories, unmatched = by_category(self.grouped)
+        if not categories:
+            self.pick_box.addWidget(label("None of your apps have a Linux alternative we know "
+                                          "of yet. That's fine: your files still move.",
+                                          "Muted"))
+        for cat in categories:
+            card_ = CategoryCard(cat)
+            card_.changed.connect(self.update_pick_total)
+            self.pick_cards.append(card_)
+            self.pick_box.addWidget(card_)
+        if unmatched:
             self.pick_box.addSpacing(6)
-            self.pick_box.addWidget(label(f"No Linux version known yet ({len(unknown)})",
-                                          "Section"))
-            self.pick_box.addWidget(label(", ".join(r.app["name"] for r in unknown), "Muted"))
+            self.pick_box.addWidget(label(f"No Linux alternative needed or known "
+                                          f"({len(unmatched)})", "Section"))
+            self.pick_box.addWidget(label(
+                ", ".join(a["name"] for a in unmatched) + ". Your files from these still move "
+                "with everything else.", "Muted"))
         self.pick_box.addStretch(1)
-        self.update_pick_total()
-
-    def _pick_changed(self, combo, about):
-        opt = combo.currentData()
-        if opt is None:
-            about.setText("Won't be installed.")
-        elif opt.get("flatpak"):
-            about.setText(opt.get("about", ""))
-        else:
-            about.setText(opt.get("about", "") + "  You'll get a link to it on your new PC.")
+        self.pick_filled = True
         self.update_pick_total()
 
     def update_pick_total(self):
-        picks = [c.currentData() for _, c, _ in self.pick_rows]
-        auto = len({p["flatpak"] for p in picks if p and p.get("flatpak")})
-        links = len({p["name"] for p in picks if p and not p.get("flatpak")})
+        picks = self.chosen_apps()
+        auto = len({p["flatpak"] for p in picks if p.get("flatpak")})
+        links = len({p["name"] for p in picks if not p.get("flatpak")})
         text = f"{plural(auto, 'app')} will install automatically on your Linux PC"
         if links:
-            text += f"  \u00b7  {plural(links, 'link')} for you to open"
+            text += f"  \u00b7  {plural(links, 'website link')} for you to open"
         self.pick_total.setText(text)
 
     def chosen_apps(self) -> list[dict]:
-        out = []
-        for app, combo, _ in self.pick_rows:
-            opt = combo.currentData()
-            if opt:
-                out.append({"windows": app["name"], **opt})
+        out, seen = [], set()
+        for card_ in self.pick_cards:
+            names = ", ".join(a["name"] for a in card_.category.windows_apps)
+            for opt in card_.picks():
+                key = opt.get("flatpak") or opt.get("url") or opt["name"]
+                if key not in seen:
+                    seen.add(key)
+                    out.append({"windows": names, "category": card_.category.name, **opt})
         return out
 
     def _page_what(self):
@@ -312,7 +291,7 @@ class Wizard(Shell):
         self.set_step(index)
         if index == self.CHECK and self.grouped is None:
             self.start_check()
-        if index == self.PICK and not self.pick_rows and self.grouped is not None:
+        if index == self.PICK and not self.pick_filled and self.grouped is not None:
             self.fill_pick()
         if index == self.WHAT and not self.folders:
             self.start_measure()

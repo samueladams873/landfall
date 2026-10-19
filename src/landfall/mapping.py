@@ -14,7 +14,8 @@ GROUP_ALT = "Has a Linux alternative"
 GROUP_NONE = "Needs Wine or no match yet"
 GROUPS = (GROUP_SAME, GROUP_ALT, GROUP_NONE)
 
-_STATUS_TO_GROUP = {"same": GROUP_SAME, "alternative": GROUP_ALT, "wine": GROUP_NONE}
+_STATUS_TO_GROUP = {"same": GROUP_SAME, "alternative": GROUP_ALT, "wine": GROUP_NONE,
+                    "none": GROUP_NONE}
 
 
 @dataclass
@@ -48,3 +49,40 @@ def match_all(apps: list[dict], entries: list[dict] | None = None) -> dict[str, 
         result = match_app(app, entries)
         grouped[result.group].append(result)
     return grouped
+
+
+@dataclass
+class Category:
+    """One job, like "Web browser": the Windows apps doing it, and the Linux options."""
+    name: str
+    windows_apps: list = field(default_factory=list)
+    options: list = field(default_factory=list)
+    recommended: set = field(default_factory=set)   # option keys picked to start with
+
+
+def option_key(opt: dict) -> str:
+    return opt.get("flatpak") or opt.get("url") or opt["name"]
+
+
+def by_category(grouped: dict[str, list[MatchResult]]) -> tuple[list[Category], list[dict]]:
+    """Merge apps doing the same job, so e.g. Chrome + Edge + Firefox become ONE browser
+    choice and no Linux app is ever offered twice. Returns (categories, apps_with_no_match)."""
+    cats: dict[str, Category] = {}
+    unmatched = []
+    for results in grouped.values():
+        for r in results:
+            if not r.entry or not r.options:
+                unmatched.append(r.app)
+                continue
+            cat = cats.setdefault(r.entry.get("category", r.entry["windows"]),
+                                  Category(r.entry.get("category", r.entry["windows"])))
+            cat.windows_apps.append(r.app)
+            keys = {option_key(o) for o in cat.options}
+            for opt in r.options:
+                if option_key(opt) not in keys:
+                    cat.options.append(opt)
+                    keys.add(option_key(opt))
+            cat.recommended.add(option_key(r.options[0]))
+    for cat in cats.values():  # recommended picks first, then the rest in map order
+        cat.options.sort(key=lambda o: option_key(o) not in cat.recommended)
+    return sorted(cats.values(), key=lambda c: c.name), unmatched

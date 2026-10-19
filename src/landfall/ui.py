@@ -231,7 +231,7 @@ class Shell(QWidget):
         super().__init__()
         self.setObjectName("Root")
         self.setWindowTitle("Landfall")
-        self.resize(940, 660)
+        self.resize(1120, 720)
         self.steps = steps
 
         root = QHBoxLayout(self)
@@ -310,3 +310,153 @@ def fit_list(widget, rows_min: int = 2, rows_max: int = 4):
 def plural(n: int, word: str) -> str:
     """'1 file', '2 files', '1,234 files'."""
     return f"{n:,} {word}" + ("" if n == 1 else "s")
+
+
+# --- app comparison widgets -------------------------------------------------
+APPLOGOS = DATA / "applogos"
+
+
+def logo_for(opt: dict):
+    """The official Linux app logo (fetched from Flathub at build time), or a neutral tile."""
+    fp = opt.get("flatpak")
+    if fp and (APPLOGOS / f"{fp}.png").exists():
+        return APPLOGOS / f"{fp}.png"
+    return ICONS / "Apps.svg"
+
+
+def windows_icon(app: dict, size: int = 32) -> QLabel:
+    """The icon of the program as installed on this Windows PC, read from its own .exe."""
+    from pathlib import Path as _P
+    from PySide6.QtCore import QFileInfo
+    from PySide6.QtWidgets import QFileIconProvider
+    lab = QLabel()
+    lab.setFixedSize(size, size)
+    lab.setStyleSheet("background: transparent; border: none;")
+    path = app.get("icon") or ""
+    icon = None
+    if path and _P(path).exists():
+        icon = QFileIconProvider().icon(QFileInfo(path))
+    if icon is None or icon.isNull():
+        icon = QIcon(str(ICONS / "Apps.svg"))
+    lab.setPixmap(icon.pixmap(size, size))
+    return lab
+
+
+class OptionTile(QFrame):
+    """A big clickable app tile: logo, name, one line about it. Click to pick or unpick."""
+    toggled = Signal(bool)
+
+    def __init__(self, opt: dict, recommended: bool, selected: bool):
+        super().__init__()
+        self.opt = opt
+        self.setObjectName("Tile")
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.setFixedWidth(152)
+        box = QVBoxLayout(self)
+        box.setContentsMargins(12, 12, 12, 12)
+        box.setSpacing(6)
+        top = QHBoxLayout()
+        top.addStretch(1)
+        top.addWidget(picture(logo_for(opt), 56))
+        top.addStretch(1)
+        box.addLayout(top)
+        name = label(f"<b>{opt['name']}</b>")
+        name.setAlignment(Qt.AlignmentFlag.AlignHCenter)
+        box.addWidget(name)
+        about = label(opt.get("about", ""), "TileAbout")
+        about.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop)
+        box.addWidget(about, 1)
+        badges = QHBoxLayout()
+        badges.addStretch(1)
+        if recommended:
+            badges.addWidget(label("Recommended", "Pill", wrap=False))
+        if opt.get("new"):
+            badges.addWidget(label("New", "PillNew", wrap=False))
+        if not opt.get("flatpak"):
+            badges.addWidget(label("Link", "PillGrey", wrap=False))
+        badges.addStretch(1)
+        box.addLayout(badges)
+        self.check = picture(ICONS / "step-done.svg", 22)
+        self.check.setParent(self)
+        self.check.move(152 - 30, 8)
+        self.set_selected(selected)
+
+    def set_selected(self, on: bool):
+        self.selected = on
+        self.setProperty("selected", on)
+        self.style().unpolish(self)
+        self.style().polish(self)
+        self.check.setVisible(on)
+
+    def mousePressEvent(self, event):
+        self.set_selected(not self.selected)
+        self.toggled.emit(self.selected)
+        super().mousePressEvent(event)
+
+
+class CategoryCard(QFrame):
+    """One job (e.g. Web browser): your Windows apps on the left, Linux choices on the right."""
+    changed = Signal()
+
+    def __init__(self, category):
+        super().__init__()
+        from PySide6.QtWidgets import QGridLayout
+        self.setObjectName("Card")
+        self.category = category
+        outer = QHBoxLayout(self)
+        outer.setContentsMargins(18, 16, 18, 16)
+        outer.setSpacing(12)
+
+        left = QVBoxLayout()
+        left.setContentsMargins(0, 0, 0, 0)
+        left.setSpacing(8)
+        left.addWidget(label(category.name, "Section", wrap=False))
+        left.addWidget(label("On Windows you use", "Muted", wrap=False))
+        for app in category.windows_apps:
+            row = QHBoxLayout()
+            row.setSpacing(8)
+            row.addWidget(windows_icon(app, 28))
+            row.addWidget(label(app["name"], wrap=True), 1)
+            left.addLayout(row)
+        left.addStretch(1)
+        side = QWidget()
+        side.setFixedWidth(180)
+        side.setLayout(left)
+        side.setStyleSheet("background: transparent;")
+        outer.addWidget(side, 0, Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
+
+        arrow = picture(ICONS / "arrow.svg", 28)
+        outer.addWidget(arrow, 0, Qt.AlignmentFlag.AlignVCenter)
+
+        right = QVBoxLayout()
+        right.setSpacing(8)
+        right.addWidget(label("On Linux, click to pick (pick more than one if you like)",
+                              "Muted", wrap=False))
+        grid = QGridLayout()
+        grid.setSpacing(10)
+        grid.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
+        self.tiles = []
+        from landfall.mapping import option_key
+        for n, opt in enumerate(category.options):
+            key = option_key(opt)
+            tile = OptionTile(opt, key in category.recommended, key in category.recommended)
+            tile.toggled.connect(lambda _on: self._changed())
+            self.tiles.append(tile)
+            grid.addWidget(tile, n // 3, n % 3)
+        right.addLayout(grid)
+        right.addStretch(1)
+        self.note = label("", "Muted")
+        right.addWidget(self.note)
+        outer.addLayout(right)
+        outer.addStretch(1)
+        self._changed(emit=False)
+
+    def picks(self) -> list[dict]:
+        return [t.opt for t in self.tiles if t.selected]
+
+    def _changed(self, emit=True):
+        n = len(self.picks())
+        self.note.setText("Nothing picked, so nothing gets installed for this." if n == 0
+                          else f"{n} picked")
+        if emit:
+            self.changed.emit()

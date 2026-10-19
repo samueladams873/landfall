@@ -1,6 +1,6 @@
 {
- "version": 2,
- "notes": "status: same = the same app exists on Linux; alternative = a different app does the same job; wine = only runs through Wine. The first option is the recommended pick.",
+ "version": 3,
+ "notes": "status: none = no Linux alternative we recommend; same = the same app exists on Linux; alternative = a different app does the same job; wine = only runs through Wine. The first option is the recommended pick.",
  "apps": [
   {
    "windows": "Google Chrome",
@@ -8,6 +8,7 @@
     "^google chrome"
    ],
    "status": "same",
+   "category": "Web browser",
    "linux": [
     {
      "name": "Google Chrome",
@@ -54,6 +55,7 @@
     "^mozilla firefox"
    ],
    "status": "same",
+   "category": "Web browser",
    "linux": [
     {
      "name": "Firefox",
@@ -72,6 +74,7 @@
     "^microsoft edge$"
    ],
    "status": "alternative",
+   "category": "Web browser",
    "linux": [
     {
      "name": "Firefox",
@@ -109,15 +112,6 @@
       "google-chrome",
       "google-chrome-stable"
      ]
-    },
-    {
-     "name": "Microsoft Edge",
-     "about": "The same Edge, if you really want to keep it.",
-     "flatpak": "com.microsoft.Edge",
-     "commands": [
-      "microsoft-edge",
-      "microsoft-edge-stable"
-     ]
     }
    ]
   },
@@ -127,6 +121,7 @@
     "^brave"
    ],
    "status": "same",
+   "category": "Web browser",
    "linux": [
     {
      "name": "Brave",
@@ -164,6 +159,7 @@
     "^opera"
    ],
    "status": "same",
+   "category": "Web browser",
    "linux": [
     {
      "name": "Opera",
@@ -200,6 +196,7 @@
     "^vivaldi"
    ],
    "status": "same",
+   "category": "Web browser",
    "linux": [
     {
      "name": "Vivaldi",
@@ -236,6 +233,7 @@
     "thunderbird"
    ],
    "status": "same",
+   "category": "Email",
    "linux": [
     {
      "name": "Thunderbird",
@@ -254,6 +252,7 @@
     "^microsoft outlook"
    ],
    "status": "alternative",
+   "category": "Email",
    "linux": [
     {
      "name": "Thunderbird",
@@ -263,11 +262,6 @@
       "thunderbird"
      ],
      "snap": "thunderbird"
-    },
-    {
-     "name": "Outlook in your browser",
-     "about": "Use Outlook on the web at outlook.live.com. Nothing to install.",
-     "url": "https://outlook.live.com"
     }
    ]
   },
@@ -277,6 +271,7 @@
     "^spotify"
    ],
    "status": "same",
+   "category": "Music streaming",
    "linux": [
     {
      "name": "Spotify",
@@ -295,6 +290,7 @@
     "^discord$"
    ],
    "status": "same",
+   "category": "Chat",
    "linux": [
     {
      "name": "Discord",
@@ -313,6 +309,7 @@
     "^steam$"
    ],
    "status": "same",
+   "category": "Games",
    "linux": [
     {
      "name": "Steam",
@@ -330,6 +327,7 @@
     "^vlc media player"
    ],
    "status": "same",
+   "category": "Video player",
    "linux": [
     {
      "name": "VLC",
@@ -356,6 +354,7 @@
     "^zoom"
    ],
    "status": "same",
+   "category": "Video calls",
    "linux": [
     {
      "name": "Zoom",
@@ -374,6 +373,7 @@
     "^slack"
    ],
    "status": "same",
+   "category": "Chat",
    "linux": [
     {
      "name": "Slack",
@@ -392,6 +392,7 @@
     "^signal"
    ],
    "status": "same",
+   "category": "Chat",
    "linux": [
     {
      "name": "Signal",
@@ -410,6 +411,7 @@
     "^telegram"
    ],
    "status": "same",
+   "category": "Chat",
    "linux": [
     {
      "name": "Telegram",
@@ -428,6 +430,7 @@
     "^obs studio"
    ],
    "status": "same",
+   "category": "Screen recording",
    "linux": [
     {
      "name": "OBS Studio",
@@ -446,6 +449,7 @@
     "^audacity"
    ],
    "status": "same",
+   "category": "Audio editing",
    "linux": [
     {
      "name": "Audacity",
@@ -463,6 +467,7 @@
     "^blender"
    ],
    "status": "same",
+   "category": "3D",
    "linux": [
     {
      "name": "Blender",
@@ -481,6 +486,7 @@
     "^gimp"
    ],
    "status": "same",
+   "category": "Photo editing",
    "linux": [
     {
      "name": "GIMP",
@@ -499,6 +505,7 @@
     "^microsoft visual studio code"
    ],
    "status": "same",
+   "category": "Coding",
    "linux": [
     {
      "name": "Visual Studio Code",
@@ -517,6 +524,7 @@
     "^obsidian"
    ],
    "status": "same",
+   "category": "Notes",
    "linux": [
     {
      "name": "Obsidian",
@@ -534,6 +542,7 @@
     "^bitwarden"
    ],
    "status": "same",
+   "category": "Passwords",
    "linux": [
     {
      "name": "Bitwarden",
@@ -553,6 +562,7 @@
     "^microsoft 365"
    ],
    "status": "alternative",
+   "category": "Office",
    "linux": [
     {
      "name": "LibreOffice",
@@ -565,16 +575,11 @@
     },
     {
      "name": "ONLYOFFICE",
-     "about": "Office suite that looks a lot like Microsoft Office.",
+     "about": "Office suite with a familiar ribbon toolbar. Opens Word and Excel files.",
      "flatpak": "org.onlyoffice.desktopeditors",
      "commands": [
       "onlyoffice-desktopeditors"
      ]
-    },
-    {
-     "name": "Office in your browser",
-     "about": "Use Office on the web at office.com. Nothing to install.",
-     "url": "https://office.com"
     }
    ]
   },
@@ -583,28 +588,18 @@
    "patterns": [
     "^microsoft teams"
    ],
-   "status": "alternative",
-   "linux": [
-    {
-     "name": "Teams in your browser",
-     "about": "Use Teams on the web at teams.microsoft.com. Nothing to install.",
-     "url": "https://teams.microsoft.com"
-    }
-   ]
+   "status": "none",
+   "category": "Video calls",
+   "linux": []
   },
   {
    "windows": "Microsoft OneDrive",
    "patterns": [
     "^microsoft onedrive"
    ],
-   "status": "alternative",
-   "linux": [
-    {
-     "name": "OneDrive in your browser",
-     "about": "Use OneDrive on the web at onedrive.live.com. Nothing to install.",
-     "url": "https://onedrive.live.com"
-    }
-   ]
+   "status": "none",
+   "category": "Cloud storage",
+   "linux": []
   },
   {
    "windows": "Adobe Photoshop",
@@ -612,6 +607,7 @@
     "^adobe photoshop"
    ],
    "status": "alternative",
+   "category": "Photo editing",
    "linux": [
     {
      "name": "GIMP",
@@ -645,6 +641,7 @@
     "^adobe illustrator"
    ],
    "status": "alternative",
+   "category": "Drawing and design",
    "linux": [
     {
      "name": "Inkscape",
@@ -669,6 +666,7 @@
     "^adobe premiere"
    ],
    "status": "alternative",
+   "category": "Video editing",
    "linux": [
     {
      "name": "Kdenlive",
@@ -707,6 +705,7 @@
     "^adobe lightroom"
    ],
    "status": "alternative",
+   "category": "Photo library",
    "linux": [
     {
      "name": "darktable",
@@ -731,6 +730,7 @@
     "^adobe after effects"
    ],
    "status": "alternative",
+   "category": "Visual effects",
    "linux": [
     {
      "name": "Natron",
@@ -754,6 +754,7 @@
     "^adobe indesign"
    ],
    "status": "alternative",
+   "category": "Page layout",
    "linux": [
     {
      "name": "Scribus",
@@ -778,6 +779,7 @@
     "^adobe acrobat"
    ],
    "status": "alternative",
+   "category": "PDF",
    "linux": [
     {
      "name": "Okular",
@@ -810,6 +812,7 @@
     "^notepad\\+\\+"
    ],
    "status": "alternative",
+   "category": "Text editor",
    "linux": [
     {
      "name": "Kate",
@@ -836,6 +839,7 @@
     "^itunes$"
    ],
    "status": "alternative",
+   "category": "Music player",
    "linux": [
     {
      "name": "Strawberry",
@@ -861,6 +865,7 @@
     "^7-zip"
    ],
    "status": "alternative",
+   "category": "Zip files",
    "linux": [
     {
      "name": "PeaZip",
@@ -878,6 +883,7 @@
     "^winrar"
    ],
    "status": "alternative",
+   "category": "Zip files",
    "linux": [
     {
      "name": "PeaZip",
@@ -895,6 +901,7 @@
     "^keepass"
    ],
    "status": "alternative",
+   "category": "Passwords",
    "linux": [
     {
      "name": "KeePassXC",
@@ -913,6 +920,7 @@
     "^paint\\.net"
    ],
    "status": "alternative",
+   "category": "Photo editing",
    "linux": [
     {
      "name": "Pinta",
@@ -931,6 +939,7 @@
     "^epic games launcher"
    ],
    "status": "alternative",
+   "category": "Games",
    "linux": [
     {
      "name": "Heroic Games Launcher",
@@ -943,11 +952,30 @@
    ]
   },
   {
+   "windows": "Dropbox",
+   "patterns": [
+    "^dropbox"
+   ],
+   "status": "none",
+   "category": "Cloud storage",
+   "linux": []
+  },
+  {
+   "windows": "Google Drive",
+   "patterns": [
+    "^google drive"
+   ],
+   "status": "none",
+   "category": "Cloud storage",
+   "linux": []
+  },
+  {
    "windows": "Battle.net",
    "patterns": [
     "^battle\\.net"
    ],
    "status": "wine",
+   "category": "Games",
    "linux": [
     {
      "name": "Lutris",

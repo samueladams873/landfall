@@ -71,8 +71,19 @@ def _entry_from_key(winreg, key) -> dict:
         "system_component": value("SystemComponent", 0) == 1,
         "parent": str(value("ParentKeyName")).strip(),
         "release_type": str(value("ReleaseType")).strip(),
+        "icon": icon_path(str(value("DisplayIcon")), str(value("InstallLocation"))),
         "source": "Installed program",
     }
+
+
+def icon_path(display_icon: str, install_location: str = "") -> str:
+    """Turn a registry DisplayIcon value like '"C:\\App\\app.exe",0' into a file path."""
+    raw = display_icon.strip()
+    if raw:
+        raw = raw.split(",")[0].strip().strip('"')
+        if raw.lower().endswith((".exe", ".ico", ".dll")):
+            return raw
+    return ""
 
 
 def _read_store_apps() -> list[dict]:
@@ -100,7 +111,8 @@ def clean(entries: list[dict]) -> list[dict]:
             continue
         key = name.lower()
         if key not in seen:
-            seen[key] = {k: entry.get(k, "") for k in ("name", "version", "publisher", "source")}
+            seen[key] = {k: entry.get(k, "") for k in ("name", "version", "publisher", "source",
+                                                       "icon")}
     return list(seen.values())
 
 

@@ -16,7 +16,7 @@ from landfall.linux.restore import (RestoreCancelled, WrongPassword, find_bundle
                                     read_manifest, restore)
 from landfall.scan.folders import human_size
 from landfall.sysenv import open_path
-from landfall.ui import (ICONS, ChoiceRow, HeroPage, Page, Shell, card, folder_icon, label,
+from landfall.ui import (ICONS, ChoiceRow, logo_for, HeroPage, Page, Shell, card, folder_icon, label,
                          make_app, picture, run_window, set_role, start_task,
                          text_field, plural)
 
@@ -368,7 +368,7 @@ class Importer(Shell):
                 + [(c, "Link at the end", "Muted") for c in self.link_apps])
         for c, status, role in rows:
             detail = f"For your {c.windows_name}" + (f"  \u00b7  {c.about}" if c.about else "")
-            row = ChoiceRow(ICONS / "Apps.svg", c.linux_name, detail, False, False)
+            row = ChoiceRow(logo_for({"flatpak": c.flatpak}), c.linux_name, detail, False, False)
             row.box.hide()
             row.title.setStyleSheet("")
             row.detail.setWordWrap(True)

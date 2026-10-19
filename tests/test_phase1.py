@@ -22,8 +22,9 @@ def test_map_is_valid():
     entries = load_map()
     assert len(entries) >= 30
     for e in entries:
-        assert e["status"] in {"same", "alternative", "wine"}
-        assert e["linux"], e["windows"]
+        assert e["status"] in {"same", "alternative", "wine", "none"}
+        assert e["category"], e["windows"]
+        assert e["linux"] or e["status"] == "none", e["windows"]
         for opt in e["linux"]:
             assert opt["name"]
             if "flatpak" in opt:
@@ -70,3 +71,22 @@ def test_report_html():
     assert "PhotoCraft" in html and "new, Oct 2026" in html
     assert "https://flathub.org/apps/com.google.Chrome" in html
     assert "Nothing on this PC was changed" in html
+
+
+def test_never_offers_microsoft_apps_on_linux():
+    """Roger's rule: nobody wants Microsoft Edge (or any Microsoft app) on Linux."""
+    for e in load_map():
+        for opt in e["linux"]:
+            blob = " ".join(str(v) for v in opt.values()).lower()
+            assert "microsoft" not in blob and "edge" not in blob, (e["windows"], opt["name"])
+
+
+def test_browsers_become_one_choice_without_repeats():
+    from landfall.mapping import by_category
+    grouped = match_all([{"name": "Microsoft Edge"}, {"name": "Google Chrome"},
+                         {"name": "Mozilla Firefox (x64 en-US)"}])
+    cats, _ = by_category(grouped)
+    assert [c.name for c in cats] == ["Web browser"]
+    names = [o["name"] for o in cats[0].options]
+    assert len(names) == len(set(names))
+    assert "Firefox" in names and "Microsoft Edge" not in names
