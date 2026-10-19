@@ -154,3 +154,17 @@ def test_rogers_real_vm_scan():
     browsers = [a["name"] for a in cats["Web browser"].windows_apps]
     assert sorted(browsers) == ["Microsoft Edge", "Mozilla Firefox (x64 en-US)"]
     assert cats["Web browser"].options[0]["name"] == "Firefox"
+
+
+def test_every_app_offers_choices():
+    """Roger: even when the same app exists on Linux (Steam), show other Linux options too.
+    Up to five per app."""
+    single_ok = {"YouTube", "HandBrake", "Anki", "FileZilla", "Everything", "iCloud",
+                 "Phone Link", "Windows Security", "Norton", "McAfee", "Avast", "AVG",
+                 "Malwarebytes", "Bitdefender"}
+    for e in load_map():
+        assert len(e["linux"]) <= 5, e["windows"]
+        if e["linux"] and e["windows"] not in single_ok:
+            assert len(e["linux"]) >= 2, e["windows"]
+    steam = next(e for e in load_map() if e["windows"] == "Steam")
+    assert [o["name"] for o in steam["linux"]][:3] == ["Steam", "Heroic Games Launcher", "Lutris"]

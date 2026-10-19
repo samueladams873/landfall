@@ -20,12 +20,29 @@
      "snap": "firefox"
     },
     {
+     "name": "LibreWolf",
+     "about": "Firefox with extra privacy built in.",
+     "flatpak": "io.gitlab.librewolf-community",
+     "commands": [
+      "librewolf"
+     ]
+    },
+    {
      "name": "Zen Browser",
      "about": "Sleek Firefox-based browser with vertical tabs.",
      "flatpak": "app.zen_browser.zen",
      "commands": [
       "zen-browser"
      ]
+    },
+    {
+     "name": "Brave",
+     "about": "Chrome-like, blocks ads and trackers. Imports bookmarks and passwords.",
+     "flatpak": "com.brave.Browser",
+     "commands": [
+      "brave-browser"
+     ],
+     "snap": "brave"
     },
     {
      "name": "Chromium",
@@ -36,15 +53,6 @@
       "chromium-browser"
      ],
      "snap": "chromium"
-    },
-    {
-     "name": "Brave",
-     "about": "Chrome-like, blocks ads and trackers. Imports bookmarks and passwords.",
-     "flatpak": "com.brave.Browser",
-     "commands": [
-      "brave-browser"
-     ],
-     "snap": "brave"
     }
    ]
   },
@@ -193,6 +201,22 @@
       "chromium-browser"
      ],
      "snap": "chromium"
+    },
+    {
+     "name": "Vivaldi",
+     "about": "Chrome-based and very customisable. Imports bookmarks and passwords.",
+     "flatpak": "com.vivaldi.Vivaldi",
+     "commands": [
+      "vivaldi"
+     ]
+    },
+    {
+     "name": "LibreWolf",
+     "about": "Firefox with extra privacy built in.",
+     "flatpak": "io.gitlab.librewolf-community",
+     "commands": [
+      "librewolf"
+     ]
     }
    ]
   },
@@ -259,6 +283,15 @@
      ]
     },
     {
+     "name": "Brave",
+     "about": "Chrome-like, blocks ads and trackers. Imports bookmarks and passwords.",
+     "flatpak": "com.brave.Browser",
+     "commands": [
+      "brave-browser"
+     ],
+     "snap": "brave"
+    },
+    {
      "name": "Firefox",
      "about": "Fast, private browser. Imports your bookmarks and saved passwords.",
      "flatpak": "org.mozilla.firefox",
@@ -302,6 +335,22 @@
      "flatpak": "eu.betterbird.Betterbird",
      "commands": [
       "betterbird"
+     ]
+    },
+    {
+     "name": "Evolution",
+     "about": "Email, calendar and contacts in one, Outlook-style.",
+     "flatpak": "org.gnome.Evolution",
+     "commands": [
+      "evolution"
+     ]
+    },
+    {
+     "name": "Geary",
+     "about": "Simple, modern email app.",
+     "flatpak": "org.gnome.Geary",
+     "commands": [
+      "geary"
      ]
     }
    ]
@@ -712,6 +761,26 @@
       "spotify"
      ],
      "snap": "spotify"
+    },
+    {
+     "name": "Spotube",
+     "about": "Free music streaming app with your Spotify playlists.",
+     "flatpak": "com.github.KRTirtho.Spotube"
+    },
+    {
+     "name": "YouTube Music",
+     "about": "YouTube Music on your desktop.",
+     "flatpak": "app.ytmdesktop.ytmdesktop"
+    },
+    {
+     "name": "TIDAL Hi-Fi",
+     "about": "High-quality music streaming.",
+     "flatpak": "com.mastermindzh.tidal-hifi"
+    },
+    {
+     "name": "Deezer",
+     "about": "Music streaming with Flow.",
+     "flatpak": "dev.aunetx.deezer"
     }
    ]
   },
@@ -886,6 +955,21 @@
    ]
   },
   {
+   "windows": "YouTube",
+   "patterns": [
+    "^youtube"
+   ],
+   "status": "alternative",
+   "category": "Video player",
+   "linux": [
+    {
+     "name": "FreeTube",
+     "about": "YouTube without ads or tracking.",
+     "flatpak": "io.freetubeapp.FreeTube"
+    }
+   ]
+  },
+  {
    "windows": "Kodi",
    "patterns": [
     "^kodi"
@@ -900,6 +984,16 @@
      "commands": [
       "kodi"
      ]
+    },
+    {
+     "name": "Jellyfin Media Player",
+     "about": "Free, private media server player.",
+     "flatpak": "com.github.iwalton3.jellyfin-media-player"
+    },
+    {
+     "name": "Plex",
+     "about": "Watch your Plex library.",
+     "flatpak": "tv.plex.PlexDesktop"
     }
    ]
   },
@@ -915,6 +1009,11 @@
      "name": "Plex",
      "about": "Watch your Plex library.",
      "flatpak": "tv.plex.PlexDesktop"
+    },
+    {
+     "name": "Jellyfin Media Player",
+     "about": "Free, private media server player.",
+     "flatpak": "com.github.iwalton3.jellyfin-media-player"
     },
     {
      "name": "Kodi",
@@ -985,6 +1084,30 @@
       "gimp"
      ],
      "snap": "gimp"
+    },
+    {
+     "name": "Krita",
+     "about": "Great for drawing and painting.",
+     "flatpak": "org.kde.krita",
+     "commands": [
+      "krita"
+     ],
+     "snap": "krita"
+    },
+    {
+     "name": "Pinta",
+     "about": "Simple image editor, like Paint.NET.",
+     "flatpak": "com.github.PintaProject.Pinta",
+     "commands": [
+      "pinta"
+     ],
+     "snap": "pinta"
+    },
+    {
+     "name": "PhotoCraft",
+     "about": "Brand-new free Photoshop look-alike that opens PSD files. Still young.",
+     "url": "https://github.com/storytold/photocraft",
+     "new": true
     }
    ]
   },
@@ -1357,6 +1480,21 @@
       "kdenlive"
      ],
      "snap": "kdenlive"
+    },
+    {
+     "name": "Shotcut",
+     "about": "Simple, reliable video editor.",
+     "flatpak": "org.shotcut.Shotcut",
+     "commands": [
+      "shotcut"
+     ],
+     "snap": "shotcut"
+    },
+    {
+     "name": "FilmCraft",
+     "about": "Brand-new free Premiere look-alike. Still young.",
+     "url": "https://github.com/storytold/filmcraft",
+     "new": true
     }
    ]
   },
@@ -1545,6 +1683,14 @@
       "blender"
      ],
      "snap": "blender"
+    },
+    {
+     "name": "FreeCAD",
+     "about": "3D design for real-world parts.",
+     "flatpak": "org.freecad.FreeCAD",
+     "commands": [
+      "freecad"
+     ]
     }
    ]
   },
@@ -1621,6 +1767,14 @@
      "name": "Tenacity",
      "about": "Audacity-based, no tracking.",
      "flatpak": "org.tenacityaudio.Tenacity"
+    },
+    {
+     "name": "Ardour",
+     "about": "Pro recording and mixing studio.",
+     "flatpak": "org.ardour.Ardour",
+     "commands": [
+      "ardour"
+     ]
     }
    ]
   },
@@ -1744,6 +1898,23 @@
       "kate"
      ],
      "snap": "kate"
+    },
+    {
+     "name": "VSCodium",
+     "about": "VS Code without the tracking.",
+     "flatpak": "com.vscodium.codium",
+     "commands": [
+      "codium"
+     ],
+     "snap": "codium"
+    },
+    {
+     "name": "Text Editor",
+     "about": "Clean, simple text editor.",
+     "flatpak": "org.gnome.TextEditor",
+     "commands": [
+      "gnome-text-editor"
+     ]
     }
    ]
   },
@@ -1772,6 +1943,23 @@
       "codium"
      ],
      "snap": "codium"
+    },
+    {
+     "name": "Kate",
+     "about": "Powerful text editor with tabs, like Notepad++.",
+     "flatpak": "org.kde.kate",
+     "commands": [
+      "kate"
+     ],
+     "snap": "kate"
+    },
+    {
+     "name": "Sublime Text",
+     "about": "Fast, polished text and code editor.",
+     "flatpak": "com.sublimetext.three",
+     "commands": [
+      "subl"
+     ]
     }
    ]
   },
@@ -1874,6 +2062,19 @@
      "commands": [
       "logseq"
      ]
+    },
+    {
+     "name": "Joplin",
+     "about": "Free notes app. Imports OneNote and Evernote notes.",
+     "flatpak": "net.cozic.joplin_desktop",
+     "commands": [
+      "joplin"
+     ]
+    },
+    {
+     "name": "AppFlowy",
+     "about": "Notion-style notes, tasks and databases.",
+     "flatpak": "io.appflowy.AppFlowy"
     }
    ]
   },
@@ -1920,6 +2121,11 @@
      "name": "Errands",
      "about": "Simple to-do lists.",
      "flatpak": "io.github.mrvladus.List"
+    },
+    {
+     "name": "Planify",
+     "about": "To-do lists and projects, Todoist-style.",
+     "flatpak": "io.github.alainm23.planify"
     }
    ]
   },
@@ -1956,6 +2162,11 @@
      "commands": [
       "calibre"
      ]
+    },
+    {
+     "name": "Foliate",
+     "about": "Beautiful e-book reader.",
+     "flatpak": "com.github.johnfactotum.Foliate"
     }
    ]
   },
@@ -1975,6 +2186,15 @@
       "keepassxc"
      ],
      "snap": "keepassxc"
+    },
+    {
+     "name": "Bitwarden",
+     "about": "Free password manager that syncs everywhere.",
+     "flatpak": "com.bitwarden.desktop",
+     "commands": [
+      "bitwarden"
+     ],
+     "snap": "bitwarden"
     }
    ]
   },
@@ -2111,6 +2331,14 @@
      "name": "Vesktop",
      "about": "Discord with better screen sharing on Linux.",
      "flatpak": "dev.vencord.Vesktop"
+    },
+    {
+     "name": "Element",
+     "about": "Private chat rooms and calls (Matrix).",
+     "flatpak": "im.riot.Riot",
+     "commands": [
+      "element-desktop"
+     ]
     }
    ]
   },
@@ -2130,6 +2358,22 @@
       "slack"
      ],
      "snap": "slack"
+    },
+    {
+     "name": "Mattermost",
+     "about": "Team chat, like Slack.",
+     "flatpak": "com.mattermost.Desktop",
+     "commands": [
+      "mattermost-desktop"
+     ]
+    },
+    {
+     "name": "Element",
+     "about": "Private chat rooms and calls (Matrix).",
+     "flatpak": "im.riot.Riot",
+     "commands": [
+      "element-desktop"
+     ]
     }
    ]
   },
@@ -2143,12 +2387,29 @@
    "linux": [
     {
      "name": "Signal",
-     "about": "The same Signal.",
+     "about": "Private messages and calls.",
      "flatpak": "org.signal.Signal",
      "commands": [
       "signal-desktop"
      ],
      "snap": "signal-desktop"
+    },
+    {
+     "name": "Telegram",
+     "about": "Fast messaging and big group chats.",
+     "flatpak": "org.telegram.desktop",
+     "commands": [
+      "telegram-desktop"
+     ],
+     "snap": "telegram-desktop"
+    },
+    {
+     "name": "Element",
+     "about": "Private chat rooms and calls (Matrix).",
+     "flatpak": "im.riot.Riot",
+     "commands": [
+      "element-desktop"
+     ]
     }
    ]
   },
@@ -2162,12 +2423,29 @@
    "linux": [
     {
      "name": "Telegram",
-     "about": "The same Telegram.",
+     "about": "Fast messaging and big group chats.",
      "flatpak": "org.telegram.desktop",
      "commands": [
       "telegram-desktop"
      ],
      "snap": "telegram-desktop"
+    },
+    {
+     "name": "Signal",
+     "about": "Private messages and calls.",
+     "flatpak": "org.signal.Signal",
+     "commands": [
+      "signal-desktop"
+     ],
+     "snap": "signal-desktop"
+    },
+    {
+     "name": "Element",
+     "about": "Private chat rooms and calls (Matrix).",
+     "flatpak": "im.riot.Riot",
+     "commands": [
+      "element-desktop"
+     ]
     }
    ]
   },
@@ -2186,6 +2464,24 @@
      "commands": [
       "zapzap"
      ]
+    },
+    {
+     "name": "Signal",
+     "about": "Private messages and calls.",
+     "flatpak": "org.signal.Signal",
+     "commands": [
+      "signal-desktop"
+     ],
+     "snap": "signal-desktop"
+    },
+    {
+     "name": "Telegram",
+     "about": "Fast messaging and big group chats.",
+     "flatpak": "org.telegram.desktop",
+     "commands": [
+      "telegram-desktop"
+     ],
+     "snap": "telegram-desktop"
     }
    ]
   },
@@ -2199,12 +2495,25 @@
    "linux": [
     {
      "name": "Zoom",
-     "about": "The same Zoom.",
+     "about": "Video meetings.",
      "flatpak": "us.zoom.Zoom",
      "commands": [
       "zoom"
      ],
      "snap": "zoom-client"
+    },
+    {
+     "name": "Jitsi Meet",
+     "about": "Free video calls, no account needed.",
+     "flatpak": "org.jitsi.jitsi-meet"
+    },
+    {
+     "name": "Teams for Linux",
+     "about": "Free, unofficial app for joining your Teams chats and meetings.",
+     "flatpak": "com.github.IsmaelMartinez.teams_for_linux",
+     "commands": [
+      "teams-for-linux"
+     ]
     }
    ]
   },
@@ -2288,6 +2597,38 @@
      "commands": [
       "steam"
      ]
+    },
+    {
+     "name": "Heroic Games Launcher",
+     "about": "Plays your Epic, GOG and Amazon games on Linux.",
+     "flatpak": "com.heroicgameslauncher.hgl",
+     "commands": [
+      "heroic"
+     ]
+    },
+    {
+     "name": "Lutris",
+     "about": "Runs Battle.net, EA and Ubisoft games through Wine.",
+     "flatpak": "net.lutris.Lutris",
+     "commands": [
+      "lutris"
+     ]
+    },
+    {
+     "name": "itch",
+     "about": "Indie games store, lots of free games.",
+     "flatpak": "io.itch.itch",
+     "commands": [
+      "itch"
+     ]
+    },
+    {
+     "name": "Bottles",
+     "about": "Runs many Windows programs on Linux.",
+     "flatpak": "com.usebottles.bottles",
+     "commands": [
+      "bottles"
+     ]
     }
    ]
   },
@@ -2314,6 +2655,14 @@
      "commands": [
       "lutris"
      ]
+    },
+    {
+     "name": "Bottles",
+     "about": "Runs many Windows programs on Linux.",
+     "flatpak": "com.usebottles.bottles",
+     "commands": [
+      "bottles"
+     ]
     }
    ]
   },
@@ -2332,6 +2681,11 @@
      "commands": [
       "heroic"
      ]
+    },
+    {
+     "name": "Minigalaxy",
+     "about": "Simple launcher for your GOG games.",
+     "flatpak": "io.github.sharkwouter.Minigalaxy"
     },
     {
      "name": "Lutris",
@@ -2448,6 +2802,11 @@
      "commands": [
       "prismlauncher"
      ]
+    },
+    {
+     "name": "ATLauncher",
+     "about": "Minecraft with ready-made modpacks.",
+     "flatpak": "com.atlauncher.ATLauncher"
     }
    ]
   },
@@ -2472,6 +2831,14 @@
      "commands": [
       "steam"
      ]
+    },
+    {
+     "name": "Heroic Games Launcher",
+     "about": "Plays your Epic, GOG and Amazon games on Linux.",
+     "flatpak": "com.heroicgameslauncher.hgl",
+     "commands": [
+      "heroic"
+     ]
     }
    ]
   },
@@ -2491,6 +2858,11 @@
       "obs"
      ],
      "snap": "obs-studio"
+    },
+    {
+     "name": "Kooha",
+     "about": "Simple screen recorder: one click to record.",
+     "flatpak": "io.github.seadve.Kooha"
     }
    ]
   },
@@ -2509,6 +2881,19 @@
      "commands": [
       "flameshot"
      ]
+    },
+    {
+     "name": "ksnip",
+     "about": "Screenshots with arrows, text and blur.",
+     "flatpak": "org.ksnip.ksnip",
+     "commands": [
+      "ksnip"
+     ]
+    },
+    {
+     "name": "Kooha",
+     "about": "Simple screen recorder: one click to record.",
+     "flatpak": "io.github.seadve.Kooha"
     }
    ]
   },
@@ -2526,6 +2911,14 @@
      "flatpak": "org.flameshot.Flameshot",
      "commands": [
       "flameshot"
+     ]
+    },
+    {
+     "name": "ksnip",
+     "about": "Screenshots with arrows, text and blur.",
+     "flatpak": "org.ksnip.ksnip",
+     "commands": [
+      "ksnip"
      ]
     }
    ]
@@ -2545,6 +2938,19 @@
      "commands": [
       "flameshot"
      ]
+    },
+    {
+     "name": "ksnip",
+     "about": "Screenshots with arrows, text and blur.",
+     "flatpak": "org.ksnip.ksnip",
+     "commands": [
+      "ksnip"
+     ]
+    },
+    {
+     "name": "Kooha",
+     "about": "Simple screen recorder: one click to record.",
+     "flatpak": "io.github.seadve.Kooha"
     },
     {
      "name": "OBS Studio",
@@ -2674,6 +3080,19 @@
      "commands": [
       "qbittorrent"
      ]
+    },
+    {
+     "name": "Transmission",
+     "about": "Simple, light torrent app.",
+     "flatpak": "com.transmissionbt.Transmission",
+     "commands": [
+      "transmission-gtk"
+     ]
+    },
+    {
+     "name": "Fragments",
+     "about": "Simple, clean torrent app.",
+     "flatpak": "de.haeckerfelix.Fragments"
     }
    ]
   },
@@ -2701,6 +3120,11 @@
      "commands": [
       "transmission-gtk"
      ]
+    },
+    {
+     "name": "Fragments",
+     "about": "Simple, clean torrent app.",
+     "flatpak": "de.haeckerfelix.Fragments"
     }
    ]
   },
@@ -2737,6 +3161,14 @@
      "commands": [
       "filezilla"
      ]
+    },
+    {
+     "name": "Remmina",
+     "about": "Connects to Windows PCs with Remote Desktop.",
+     "flatpak": "org.remmina.Remmina",
+     "commands": [
+      "remmina"
+     ]
     }
    ]
   },
@@ -2763,6 +3195,14 @@
      "commands": [
       "anydesk"
      ]
+    },
+    {
+     "name": "Remmina",
+     "about": "Connects to Windows PCs with Remote Desktop.",
+     "flatpak": "org.remmina.Remmina",
+     "commands": [
+      "remmina"
+     ]
     }
    ]
   },
@@ -2788,6 +3228,14 @@
      "flatpak": "com.rustdesk.RustDesk",
      "commands": [
       "rustdesk"
+     ]
+    },
+    {
+     "name": "Remmina",
+     "about": "Connects to Windows PCs with Remote Desktop.",
+     "flatpak": "org.remmina.Remmina",
+     "commands": [
+      "remmina"
      ]
     }
    ]
@@ -2825,6 +3273,14 @@
      "commands": [
       "bleachbit"
      ]
+    },
+    {
+     "name": "Disk Usage Analyzer",
+     "about": "See what's filling up your disk.",
+     "flatpak": "org.gnome.baobab",
+     "commands": [
+      "baobab"
+     ]
     }
    ]
   },
@@ -2840,6 +3296,16 @@
      "name": "Postman",
      "about": "Test and build web APIs.",
      "flatpak": "com.getpostman.Postman"
+    },
+    {
+     "name": "Bruno",
+     "about": "Free, offline API tester.",
+     "flatpak": "com.usebruno.Bruno"
+    },
+    {
+     "name": "Insomnia",
+     "about": "API tester, Postman-style.",
+     "flatpak": "rest.insomnia.Insomnia"
     }
    ]
   },
@@ -2858,6 +3324,11 @@
      "commands": [
       "octave"
      ]
+    },
+    {
+     "name": "Spyder",
+     "about": "Science and maths coding, MATLAB-style.",
+     "flatpak": "org.spyder_ide.spyder"
     }
    ]
   },
@@ -2909,6 +3380,14 @@
      "name": "RClone Manager",
      "about": "Syncs OneDrive, Google Drive, Dropbox and iCloud on Linux.",
      "flatpak": "io.github.zarestia_dev.rclone-manager"
+    },
+    {
+     "name": "Nextcloud",
+     "about": "Sync with your own private cloud.",
+     "flatpak": "com.nextcloud.desktopclient.nextcloud",
+     "commands": [
+      "nextcloud"
+     ]
     }
    ]
   },
@@ -3128,6 +3607,14 @@
      "flatpak": "org.flameshot.Flameshot",
      "commands": [
       "flameshot"
+     ]
+    },
+    {
+     "name": "ksnip",
+     "about": "Screenshots with arrows, text and blur.",
+     "flatpak": "org.ksnip.ksnip",
+     "commands": [
+      "ksnip"
      ]
     }
    ]
@@ -3485,6 +3972,11 @@
       "obs"
      ],
      "snap": "obs-studio"
+    },
+    {
+     "name": "Kooha",
+     "about": "Simple screen recorder: one click to record.",
+     "flatpak": "io.github.seadve.Kooha"
     }
    ]
   }

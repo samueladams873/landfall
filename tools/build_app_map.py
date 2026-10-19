@@ -142,6 +142,30 @@ MAPS = o("Maps", "org.gnome.Maps", "Maps and directions.", ["gnome-maps"])
 GCAL = o("Calendar", "org.gnome.Calendar", "Simple calendar. Connects to Google and Outlook accounts.", ["gnome-calendar"])
 
 
+ITCH = o("itch", "io.itch.itch", "Indie games store, lots of free games.", ["itch"])
+MINIGALAXY = o("Minigalaxy", "io.github.sharkwouter.Minigalaxy", "Simple launcher for your GOG games.")
+PROTONUP = o("ProtonUp-Qt", "net.davidotek.pupgui2", "Adds newer Proton versions so more Windows games run.")
+SPOTUBE = o("Spotube", "com.github.KRTirtho.Spotube", "Free music streaming app with your Spotify playlists.")
+TIDAL = o("TIDAL Hi-Fi", "com.mastermindzh.tidal-hifi", "High-quality music streaming.")
+DEEZER = o("Deezer", "dev.aunetx.deezer", "Music streaming with Flow.")
+YTMUSIC = o("YouTube Music", "app.ytmdesktop.ytmdesktop", "YouTube Music on your desktop.")
+ELEMENT = o("Element", "im.riot.Riot", "Private chat rooms and calls (Matrix).", ["element-desktop"])
+MATTERMOST = o("Mattermost", "com.mattermost.Desktop", "Team chat, like Slack.", ["mattermost-desktop"])
+TELEGRAM = o("Telegram", "org.telegram.desktop", "Fast messaging and big group chats.", ["telegram-desktop"], "telegram-desktop")
+JELLYFIN = o("Jellyfin Media Player", "com.github.iwalton3.jellyfin-media-player", "Free, private media server player.")
+KOOHA = o("Kooha", "io.github.seadve.Kooha", "Simple screen recorder: one click to record.")
+FOLIATE = o("Foliate", "com.github.johnfactotum.Foliate", "Beautiful e-book reader.")
+LIBREWOLF = o("LibreWolf", "io.gitlab.librewolf-community", "Firefox with extra privacy built in.", ["librewolf"])
+FRAGMENTS = o("Fragments", "de.haeckerfelix.Fragments", "Simple, clean torrent app.")
+BRUNO = o("Bruno", "com.usebruno.Bruno", "Free, offline API tester.")
+INSOMNIA = o("Insomnia", "rest.insomnia.Insomnia", "API tester, Postman-style.")
+FREETUBE = o("FreeTube", "io.freetubeapp.FreeTube", "YouTube without ads or tracking.")
+
+PLANIFY = o("Planify", "io.github.alainm23.planify", "To-do lists and projects, Todoist-style.")
+ATLAUNCHER = o("ATLauncher", "com.atlauncher.ATLauncher", "Minecraft with ready-made modpacks.")
+KSNIP = o("ksnip", "org.ksnip.ksnip", "Screenshots with arrows, text and blur.", ["ksnip"])
+SPYDER = o("Spyder", "org.spyder_ide.spyder", "Science and maths coding, MATLAB-style.")
+
 RCLONE = o("RClone Manager", "io.github.zarestia_dev.rclone-manager", "Syncs OneDrive, Google Drive, Dropbox and iCloud on Linux.")
 ONLINE = o("Online Accounts", None, "Comes with Ubuntu: sign in under Settings, and your cloud drive shows up in Files.", included=True)
 DROPBOX = o("Dropbox", "com.dropbox.Client", "Dropbox's own Linux app.", ["dropbox"])
@@ -172,14 +196,14 @@ ONE = lambda name, fp, about, cmds=(), snap=None: [o(name, fp, about, cmds, snap
 # (Windows app, name patterns, status, category, options).  status "none" = nothing to install.
 APPS = [
  # Web browsers: the recommended pick is the one that carries the user's data best.
- ("Mozilla Firefox", ["^mozilla firefox"], "same", "Web browser", [FF_KEEP, ZEN, CHR, BRV]),
+ ("Mozilla Firefox", ["^mozilla firefox"], "same", "Web browser", [FF_KEEP, LIBREWOLF, ZEN, BRV, CHR]),
  ("Google Chrome", ["^google chrome"], "same", "Web browser", [GC, CHR, BRV, FF, VIV]),
  ("Microsoft Edge", ["^microsoft edge$"], "alternative", "Web browser", [FF, CHR, BRV, GC, VIV]),
- ("Brave", ["^brave"], "same", "Web browser", [BRV, FF, CHR]),
+ ("Brave", ["^brave"], "same", "Web browser", [BRV, FF, CHR, VIV, LIBREWOLF]),
  ("Opera", ["^opera"], "alternative", "Web browser", [VIV, BRV, FF, CHR]),
- ("Vivaldi", ["^vivaldi"], "same", "Web browser", [VIV, FF, CHR]),
+ ("Vivaldi", ["^vivaldi"], "same", "Web browser", [VIV, BRV, FF, CHR]),
  # Email
- ("Mozilla Thunderbird", ["thunderbird"], "same", "Email", [TB, BETTERBIRD]),
+ ("Mozilla Thunderbird", ["thunderbird"], "same", "Email", [TB, BETTERBIRD, EVOLUTION, GEARY]),
  ("Microsoft Outlook", ["^microsoft outlook", "^outlook"], "alternative", "Email", [TB, EVOLUTION, BETTERBIRD, GEARY]),
  ("Mailbird", ["^mailbird"], "alternative", "Email", [TB, GEARY, EVOLUTION]),
  ("eM Client", ["^em client"], "alternative", "Email", [TB, EVOLUTION, BETTERBIRD]),
@@ -193,16 +217,17 @@ APPS = [
  ("foobar2000", ["^foobar2000"], "alternative", "Music player", [STRAWBERRY, ELISA, AMBEROL]),
  ("Winamp", ["^winamp"], "alternative", "Music player", [STRAWBERRY, AMBEROL, ELISA]),
  ("AIMP", ["^aimp"], "alternative", "Music player", [STRAWBERRY, ELISA, AMBEROL]),
- ("Spotify", ["^spotify"], "same", "Music streaming", ONE("Spotify", "com.spotify.Client", "The same Spotify.", ["spotify"], "spotify")),
+ ("Spotify", ["^spotify"], "same", "Music streaming", [o("Spotify", "com.spotify.Client", "The same Spotify.", ["spotify"], "spotify"), SPOTUBE, YTMUSIC, TIDAL, DEEZER]),
  ("VLC media player", ["^vlc media player"], "same", "Video player", [VLC, MPV, CELLULOID, HARUNA, SHOWTIME]),
  ("PotPlayer", ["potplayer"], "alternative", "Video player", [VLC, MPV, CELLULOID, HARUNA]),
  ("MPC-HC", ["^mpc-hc", "media player classic"], "alternative", "Video player", [MPV, VLC, CELLULOID, HARUNA]),
  ("KMPlayer", ["^kmplayer"], "alternative", "Video player", [VLC, MPV, CELLULOID]),
- ("Kodi", ["^kodi"], "same", "Media centre", [KODI]),
- ("Plex", ["^plex"], "same", "Media centre", [PLEX, KODI]),
+ ("YouTube", ["^youtube"], "alternative", "Video player", [FREETUBE]),
+ ("Kodi", ["^kodi"], "same", "Media centre", [KODI, JELLYFIN, PLEX]),
+ ("Plex", ["^plex"], "same", "Media centre", [PLEX, JELLYFIN, KODI]),
  # Photos and design
  ("Adobe Photoshop", ["^adobe photoshop"], "alternative", "Photo editing", [GIMP, KRITA, PHOTOCRAFT, PINTA]),
- ("GIMP", ["^gimp"], "same", "Photo editing", [GIMP]),
+ ("GIMP", ["^gimp"], "same", "Photo editing", [GIMP, KRITA, PINTA, PHOTOCRAFT]),
  ("Paint.NET", ["^paint\\.net"], "alternative", "Photo editing", [PINTA, GIMP, KRITA]),
  ("Affinity Photo", ["^affinity photo"], "alternative", "Photo editing", [GIMP, KRITA, PHOTOCRAFT]),
  ("Adobe Illustrator", ["^adobe illustrator"], "alternative", "Drawing and design", [INKSCAPE, VECTORCRAFT, KRITA]),
@@ -213,76 +238,76 @@ APPS = [
  ("Filmora", ["filmora"], "alternative", "Video editing", [KDENLIVE, SHOTCUT, OPENSHOT]),
  ("CapCut", ["^capcut"], "alternative", "Video editing", [KDENLIVE, SHOTCUT, OPENSHOT]),
  ("VEGAS Pro", ["^vegas pro"], "alternative", "Video editing", [KDENLIVE, SHOTCUT, RESOLVE]),
- ("DaVinci Resolve", ["^davinci resolve"], "same", "Video editing", [RESOLVE, KDENLIVE]),
+ ("DaVinci Resolve", ["^davinci resolve"], "same", "Video editing", [RESOLVE, KDENLIVE, SHOTCUT, FILMCRAFT]),
  ("HandBrake", ["^handbrake"], "same", "Video converting", [HANDBRAKE]),
  ("Adobe After Effects", ["^adobe after effects"], "alternative", "Visual effects", [NATRON, EFFECTCRAFT]),
  ("Adobe InDesign", ["^adobe indesign"], "alternative", "Page layout", [SCRIBUS, DESIGNCRAFT]),
  ("Adobe Acrobat", ["^adobe acrobat"], "alternative", "PDF", [OKULAR, PAPERS, PDFARRANGER, XOURNAL, PDFCRAFT]),
  ("Foxit PDF Reader", ["^foxit"], "alternative", "PDF", [OKULAR, PAPERS, XOURNAL]),
  ("SumatraPDF", ["^sumatrapdf"], "alternative", "PDF", [PAPERS, OKULAR]),
- ("Blender", ["^blender"], "same", "3D", [BLENDER]),
+ ("Blender", ["^blender"], "same", "3D", [BLENDER, FREECAD]),
  ("AutoCAD", ["^autocad"], "alternative", "CAD", [FREECAD, LIBRECAD]),
  ("SketchUp", ["^sketchup"], "alternative", "CAD", [FREECAD, BLENDER]),
  # Audio
- ("Audacity", ["^audacity"], "same", "Audio editing", [AUDACITY, TENACITY]),
+ ("Audacity", ["^audacity"], "same", "Audio editing", [AUDACITY, TENACITY, ARDOUR]),
  ("FL Studio", ["^fl studio", "^image-line fl studio"], "alternative", "Music making", [LMMS, ARDOUR]),
  ("Ableton Live", ["^ableton live"], "alternative", "Music making", [ARDOUR, LMMS]),
  # Writing, notes, tasks
  ("Notepad++", ["^notepad\\+\\+"], "alternative", "Text editor", [KATE, NOTEPADQQ, GTEXT, SUBLIME]),
- ("Sublime Text", ["^sublime text"], "same", "Text editor", [SUBLIME, KATE]),
- ("Visual Studio Code", ["^microsoft visual studio code"], "same", "Coding", [VSCODE, VSCODIUM]),
+ ("Sublime Text", ["^sublime text"], "same", "Text editor", [SUBLIME, KATE, VSCODIUM, GTEXT]),
+ ("Visual Studio Code", ["^microsoft visual studio code"], "same", "Coding", [VSCODE, VSCODIUM, KATE, SUBLIME]),
  ("Microsoft OneNote", ["^microsoft onenote"], "alternative", "Notes", [JOPLIN, XOURNAL, OBSIDIAN, LOGSEQ]),
  ("Evernote", ["^evernote"], "alternative", "Notes", [JOPLIN, OBSIDIAN, LOGSEQ]),
- ("Obsidian", ["^obsidian"], "same", "Notes", [OBSIDIAN, LOGSEQ]),
+ ("Obsidian", ["^obsidian"], "same", "Notes", [OBSIDIAN, LOGSEQ, JOPLIN, APPFLOWY]),
  ("Notion", ["^notion"], "alternative", "Notes", [APPFLOWY, OBSIDIAN, JOPLIN]),
- ("Microsoft To Do", ["^microsoft to do"], "alternative", "To-do lists", [ERRANDS]),
+ ("Microsoft To Do", ["^microsoft to do"], "alternative", "To-do lists", [ERRANDS, PLANIFY]),
  ("Anki", ["^anki"], "same", "Study", [ANKI]),
- ("Calibre", ["^calibre"], "same", "E-books", [CALIBRE]),
+ ("Calibre", ["^calibre"], "same", "E-books", [CALIBRE, FOLIATE]),
  # Passwords
- ("KeePass", ["^keepass"], "alternative", "Passwords", [KEEPASSXC]),
+ ("KeePass", ["^keepass"], "alternative", "Passwords", [KEEPASSXC, BITWARDEN]),
  ("Bitwarden", ["^bitwarden"], "same", "Passwords", [BITWARDEN, KEEPASSXC]),
  ("LastPass", ["^lastpass"], "alternative", "Passwords", [BITWARDEN, KEEPASSXC]),
  ("1Password", ["^1password"], "alternative", "Passwords", [BITWARDEN, KEEPASSXC]),
  ("Dashlane", ["^dashlane"], "alternative", "Passwords", [BITWARDEN, KEEPASSXC]),
  # Chat and calls
- ("Discord", ["^discord$"], "same", "Chat", [DISCORD, VESKTOP]),
- ("Slack", ["^slack"], "same", "Chat", ONE("Slack", "com.slack.Slack", "The same Slack.", ["slack"], "slack")),
- ("Signal", ["^signal"], "same", "Chat", ONE("Signal", "org.signal.Signal", "The same Signal.", ["signal-desktop"], "signal-desktop")),
- ("Telegram Desktop", ["^telegram"], "same", "Chat", ONE("Telegram", "org.telegram.desktop", "The same Telegram.", ["telegram-desktop"], "telegram-desktop")),
- ("WhatsApp", ["^whatsapp"], "alternative", "Chat", [ZAPZAP]),
- ("Zoom", ["^zoom"], "same", "Video calls", ONE("Zoom", "us.zoom.Zoom", "The same Zoom.", ["zoom"], "zoom-client")),
+ ("Discord", ["^discord$"], "same", "Chat", [DISCORD, VESKTOP, ELEMENT]),
+ ("Slack", ["^slack"], "same", "Chat", [o("Slack", "com.slack.Slack", "The same Slack.", ["slack"], "slack"), MATTERMOST, ELEMENT]),
+ ("Signal", ["^signal"], "same", "Chat", [SIGNAL, TELEGRAM, ELEMENT]),
+ ("Telegram Desktop", ["^telegram"], "same", "Chat", [TELEGRAM, SIGNAL, ELEMENT]),
+ ("WhatsApp", ["^whatsapp"], "alternative", "Chat", [ZAPZAP, SIGNAL, TELEGRAM]),
+ ("Zoom", ["^zoom"], "same", "Video calls", [ZOOM, JITSI, TEAMS_LINUX]),
  ("Microsoft Teams", ["^microsoft teams"], "alternative", "Video calls", [TEAMS_LINUX, ZOOM, JITSI]),
  ("Skype", ["^skype"], "alternative", "Video calls", [ZOOM, SIGNAL, JITSI]),
  # Games
- ("Steam", ["^steam$"], "same", "Games", [STEAM]),
- ("Epic Games Launcher", ["^epic games launcher"], "alternative", "Games", [HEROIC, LUTRIS]),
- ("GOG GALAXY", ["^gog galaxy"], "alternative", "Games", [HEROIC, LUTRIS]),
+ ("Steam", ["^steam$"], "same", "Games", [STEAM, HEROIC, LUTRIS, ITCH, BOTTLES]),
+ ("Epic Games Launcher", ["^epic games launcher"], "alternative", "Games", [HEROIC, LUTRIS, BOTTLES]),
+ ("GOG GALAXY", ["^gog galaxy"], "alternative", "Games", [HEROIC, MINIGALAXY, LUTRIS]),
  ("EA app", ["^ea app$", "^ea desktop", "^origin$"], "alternative", "Games", [LUTRIS, HEROIC, BOTTLES]),
  ("Ubisoft Connect", ["^ubisoft connect", "^uplay"], "alternative", "Games", [LUTRIS, HEROIC]),
  ("Battle.net", ["^battle\\.net"], "wine", "Games", [LUTRIS, BOTTLES]),
- ("Minecraft Launcher", ["^minecraft launcher", "^minecraft$"], "alternative", "Games", [PRISM]),
- ("Xbox", ["^xbox$", "^xbox app"], "alternative", "Games", [GREENLIGHT, STEAM]),
+ ("Minecraft Launcher", ["^minecraft launcher", "^minecraft$"], "alternative", "Games", [PRISM, ATLAUNCHER]),
+ ("Xbox", ["^xbox$", "^xbox app"], "alternative", "Games", [GREENLIGHT, STEAM, HEROIC]),
  # Recording, sharing, tools
- ("OBS Studio", ["^obs studio"], "same", "Screen recording", [OBS]),
- ("ShareX", ["^sharex"], "alternative", "Screenshots", [FLAMESHOT]),
- ("Greenshot", ["^greenshot"], "alternative", "Screenshots", [FLAMESHOT]),
- ("Snagit", ["^snagit"], "alternative", "Screenshots", [FLAMESHOT, OBS]),
+ ("OBS Studio", ["^obs studio"], "same", "Screen recording", [OBS, KOOHA]),
+ ("ShareX", ["^sharex"], "alternative", "Screenshots", [FLAMESHOT, KSNIP, KOOHA]),
+ ("Greenshot", ["^greenshot"], "alternative", "Screenshots", [FLAMESHOT, KSNIP]),
+ ("Snagit", ["^snagit"], "alternative", "Screenshots", [FLAMESHOT, KSNIP, KOOHA, OBS]),
  ("7-Zip", ["^7-zip"], "alternative", "Zip files", [PEAZIP, ARK, FILEROLLER]),
  ("WinRAR", ["^winrar"], "alternative", "Zip files", [PEAZIP, ARK, FILEROLLER]),
  ("WinZip", ["^winzip"], "alternative", "Zip files", [PEAZIP, ARK, FILEROLLER]),
- ("qBittorrent", ["^qbittorrent"], "same", "Downloads", [QBIT]),
- ("uTorrent", ["torrent$", "^bittorrent"], "alternative", "Downloads", [QBIT, TRANSMISSION]),
+ ("qBittorrent", ["^qbittorrent"], "same", "Downloads", [QBIT, TRANSMISSION, FRAGMENTS]),
+ ("uTorrent", ["torrent$", "^bittorrent"], "alternative", "Downloads", [QBIT, TRANSMISSION, FRAGMENTS]),
  ("FileZilla", ["^filezilla"], "same", "File transfer", [FILEZILLA]),
- ("WinSCP", ["^winscp"], "alternative", "File transfer", [FILEZILLA]),
- ("TeamViewer", ["^teamviewer"], "alternative", "Remote desktop", [RUSTDESK, ANYDESK]),
- ("AnyDesk", ["^anydesk"], "same", "Remote desktop", [ANYDESK, RUSTDESK]),
+ ("WinSCP", ["^winscp"], "alternative", "File transfer", [FILEZILLA, REMMINA]),
+ ("TeamViewer", ["^teamviewer"], "alternative", "Remote desktop", [RUSTDESK, ANYDESK, REMMINA]),
+ ("AnyDesk", ["^anydesk"], "same", "Remote desktop", [ANYDESK, RUSTDESK, REMMINA]),
  ("Everything", ["^everything"], "alternative", "File search", [FSEARCH]),
- ("CCleaner", ["^ccleaner"], "alternative", "Clean-up", [BLEACHBIT]),
- ("Postman", ["^postman"], "same", "Coding", [POSTMAN]),
- ("MATLAB", ["^matlab"], "alternative", "Maths and science", [OCTAVE]),
+ ("CCleaner", ["^ccleaner"], "alternative", "Clean-up", [BLEACHBIT, BAOBAB]),
+ ("Postman", ["^postman"], "same", "Coding", [POSTMAN, BRUNO, INSOMNIA]),
+ ("MATLAB", ["^matlab"], "alternative", "Maths and science", [OCTAVE, SPYDER]),
  # Cloud storage: no Linux app needed; the files themselves move with everything else.
  ("Microsoft OneDrive", ["^microsoft onedrive"], "alternative", "Cloud storage", [ONLINE, RCLONE, NEXTCLOUD]),
- ("Dropbox", ["^dropbox"], "same", "Cloud storage", [DROPBOX, RCLONE]),
+ ("Dropbox", ["^dropbox"], "same", "Cloud storage", [DROPBOX, RCLONE, NEXTCLOUD]),
  ("Google Drive", ["^google drive"], "alternative", "Cloud storage", [ONLINE, RCLONE]),
  ("iCloud", ["^icloud"], "alternative", "Cloud storage", [RCLONE]),
  # Antivirus: Linux doesn't need these.
@@ -300,7 +325,7 @@ SYS = "C:\\Windows\\System32\\"
 BUILTIN = [
  ("Notepad", "Text editor", SYS + "notepad.exe", [GTEXT, KATE, NOTEPADQQ]),
  ("Paint", "Drawing", SYS + "mspaint.exe", [PINTA, DRAWING, KRITA]),
- ("Snipping Tool", "Screenshots", SYS + "SnippingTool.exe", [FLAMESHOT]),
+ ("Snipping Tool", "Screenshots", SYS + "SnippingTool.exe", [FLAMESHOT, KSNIP]),
  ("Windows Media Player", "Video player", "C:\\Program Files\\Windows Media Player\\wmplayer.exe", [VLC, CELLULOID, SHOWTIME, MPV]),
  ("Mail and Calendar", "Email", "", [TB, EVOLUTION, GEARY]),
  ("WordPad", "Office", "C:\\Program Files\\Windows NT\\Accessories\\wordpad.exe", [LO, OO]),
@@ -312,7 +337,7 @@ BUILTIN = [
  ("Remote Desktop Connection", "Remote desktop", SYS + "mstsc.exe", [REMMINA, RUSTDESK]),
  ("Backup and File History", "Backups", "", [PIKA, DEJADUP]),
  ("Phone Link", "Phone", "", [LOCALSEND]),
- ("Xbox Game Bar", "Screen recording", "", [OBS]),
+ ("Xbox Game Bar", "Screen recording", "", [OBS, KOOHA]),
 ]
 
 out = {
