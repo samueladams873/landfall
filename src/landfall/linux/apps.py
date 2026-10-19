@@ -137,3 +137,49 @@ def friendly_error(msg: str) -> str:
     if "not found" in low or "nothing matches" in low:
         return "This app isn't available on Flathub right now."
     return msg.splitlines()[-1] if msg else "Unknown problem."
+
+
+def make_visible(home=None) -> int:
+    """Show newly installed apps in the app menu right away.
+
+    The desktop only learns where per-user Flatpak apps live when you log in. If Flatpak was
+    just installed (a fresh Ubuntu doesn't ship it) or the session started earlier, the apps
+    are installed but invisible until you log out and back in. Linking each app's menu entry
+    and icons into ~/.local/share - which the desktop always watches - makes them appear
+    immediately. Harmless if they were already visible. Returns how many apps were linked."""
+    import os
+    from pathlib import Path
+    home = Path(home or Path.home())
+    exports = home / ".local/share/flatpak/exports/share"
+    apps_dir = home / ".local/share/applications"
+    linked = 0
+    if (exports / "applications").is_dir():
+        apps_dir.mkdir(parents=True, exist_ok=True)
+        for desktop in (exports / "applications").glob("*.desktop"):
+            target = apps_dir / desktop.name
+            if not target.exists():
+                try:
+                    target.symlink_to(desktop.resolve())
+                    linked += 1
+                except OSError:
+                    pass
+    icons = exports / "icons"
+    if icons.is_dir():
+        for src in icons.rglob("*"):
+            if src.is_dir():
+                continue
+            dest = home / ".local/share/icons" / src.relative_to(icons)
+            if dest.exists() or dest.is_symlink():
+                continue
+            try:
+                dest.parent.mkdir(parents=True, exist_ok=True)
+                dest.symlink_to(src.resolve())
+            except OSError:
+                pass
+    for cmd in (["update-desktop-database", str(apps_dir)],
+                ["gtk-update-icon-cache", "-q", "-t", str(home / ".local/share/icons/hicolor")]):
+        try:
+            run(cmd, capture_output=True, timeout=60)
+        except (OSError, subprocess.SubprocessError):
+            pass
+    return linked

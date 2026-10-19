@@ -187,6 +187,9 @@ def restore(bundle: Bundle, password: str, folders: list[str], destinations: dic
                           callback=_Progress(total, progress, cancelled))
         if cancelled():  # stopped while unpacking: move nothing into place
             raise RestoreCancelled()
+        for name in folders:        # bring empty folders along too (e.g. "Saved Games")
+            if name in destinations:
+                destinations[name].mkdir(parents=True, exist_ok=True)
         for rel in wanted:
             src = staging / rel
             top, _, rest = rel.partition("/")

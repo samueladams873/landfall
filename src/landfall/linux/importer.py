@@ -417,6 +417,7 @@ class Importer(Shell):
                     report(("app", n, len(apps), a.linux_name))
                     ok, msg = apps_mod.install_app(a.flatpak)
                     app_results.append((a.linux_name, ok, msg))
+                apps_mod.make_visible()   # show them in the app menu now, no logging out
             return result, app_results
 
         start_task(self, work, self.work_done, self.work_failed, self.work_progress)
@@ -463,7 +464,7 @@ class Importer(Shell):
         bad = [(n, msg) for n, ok, msg in self.app_results if not ok]
         if good:
             lines.append(f"<b>{plural(len(good), 'app')}</b> installed: {', '.join(good)}. "
-                         "Find them in your app menu.")
+                         "Find them in your app menu: press the Windows key and type the name.")
         if self.present_apps:
             lines.append("Already on this PC: "
                          + ", ".join(c.linux_name for c in self.present_apps) + ".")
@@ -496,6 +497,7 @@ class Importer(Shell):
             return [(a.linux_name, *apps_mod.install_app(a.flatpak)) for a in apps]
 
         def finished(results):
+            apps_mod.make_visible()
             by_name = {n: (n, ok, msg) for n, ok, msg in results}
             self.app_results = [by_name.get(n, (n, ok, msg)) for n, ok, msg in self.app_results]
             self.retry_btn.setEnabled(True)

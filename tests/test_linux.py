@@ -169,3 +169,27 @@ def test_extra_folders_and_files_round_trip(tmp_path):
     assert not (home / "From Windows" / "Projects" / "skip").exists()
     assert (home / "From Windows" / "Other files" / "taxes.pdf").exists()
     assert (home / "Documents" / "a.txt").exists()
+
+
+def test_new_apps_show_in_the_menu_without_logging_out(tmp_path):
+    from landfall.linux.apps import make_visible
+    exp = tmp_path / ".local/share/flatpak/exports/share"
+    (exp / "applications").mkdir(parents=True)
+    (exp / "applications" / "org.videolan.VLC.desktop").write_text("[Desktop Entry]\nName=VLC\n")
+    (exp / "icons/hicolor/128x128/apps").mkdir(parents=True)
+    (exp / "icons/hicolor/128x128/apps/org.videolan.VLC.png").write_bytes(b"png")
+    assert make_visible(tmp_path) == 1
+    link = tmp_path / ".local/share/applications/org.videolan.VLC.desktop"
+    assert link.is_symlink() and "VLC" in link.read_text()
+    assert (tmp_path / ".local/share/icons/hicolor/128x128/apps/org.videolan.VLC.png").exists()
+    assert make_visible(tmp_path) == 0          # running again changes nothing
+
+
+def test_empty_chosen_folder_is_still_created(made):
+    tmp, home, dests = made
+    bundle = find_bundles([tmp / "media"])[0]
+    manifest = read_manifest(bundle, "hunter22")
+    manifest["folders"].append("Saved Games")
+    dests["Saved Games"] = home / "From Windows" / "Saved Games"
+    restore(bundle, "hunter22", ["Documents", "Saved Games"], dests, manifest, home=home)
+    assert (home / "From Windows" / "Saved Games").is_dir()
