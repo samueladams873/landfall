@@ -199,9 +199,23 @@ class Page(QWidget):
         if subtitle:
             outer.addWidget(label(subtitle, "PageSub"))
         outer.addSpacing(14)
-        self.body = QVBoxLayout()
+        # The page content sits in a scroll area that only scrolls when the screen is too
+        # short (small laptops, 125-150% display scaling), so the window never has to be
+        # taller than the screen and the buttons are never pushed off the bottom.
+        from PySide6.QtWidgets import QScrollArea
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.Shape.NoFrame)
+        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        scroll.setObjectName("PageScroll")
+        holder = QWidget()
+        holder.setObjectName("Content")
+        self.body = QVBoxLayout(holder)
+        self.body.setContentsMargins(0, 0, 4, 0)
         self.body.setSpacing(10)
-        outer.addLayout(self.body, 1)
+        scroll.setWidget(holder)
+        scroll.viewport().setObjectName("Content")
+        outer.addWidget(scroll, 1)
 
 
 class HeroPage(Page):

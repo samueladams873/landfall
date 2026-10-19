@@ -309,7 +309,8 @@
   {
    "windows": "Microsoft Outlook",
    "patterns": [
-    "^microsoft outlook"
+    "^microsoft outlook",
+    "^outlook"
    ],
    "status": "alternative",
    "category": "Email",
@@ -2453,7 +2454,8 @@
   {
    "windows": "Xbox",
    "patterns": [
-    "^xbox"
+    "^xbox$",
+    "^xbox app"
    ],
    "status": "alternative",
    "category": "Games",
@@ -3111,53 +3113,9 @@
    ]
   },
   {
-   "windows": "Photos",
-   "patterns": [
-    "^Photos$"
-   ],
-   "status": "alternative",
-   "category": "Photo viewer",
-   "builtin": true,
-   "exe": "",
-   "linux": [
-    {
-     "name": "Image Viewer",
-     "about": "Fast, simple photo viewer.",
-     "flatpak": "org.gnome.Loupe",
-     "commands": [
-      "loupe"
-     ]
-    },
-    {
-     "name": "Gwenview",
-     "about": "Photo viewer with quick edits.",
-     "flatpak": "org.kde.gwenview",
-     "commands": [
-      "gwenview"
-     ]
-    },
-    {
-     "name": "Shotwell",
-     "about": "Photo albums and simple fixes.",
-     "flatpak": "org.gnome.Shotwell",
-     "commands": [
-      "shotwell"
-     ]
-    },
-    {
-     "name": "digiKam",
-     "about": "Organises big photo collections.",
-     "flatpak": "org.kde.digikam",
-     "commands": [
-      "digikam"
-     ]
-    }
-   ]
-  },
-  {
    "windows": "Snipping Tool",
    "patterns": [
-    "^Snipping Tool$"
+    "^Snipping\\ Tool$"
    ],
    "status": "alternative",
    "category": "Screenshots",
@@ -3175,45 +3133,9 @@
    ]
   },
   {
-   "windows": "Calculator",
-   "patterns": [
-    "^Calculator$"
-   ],
-   "status": "alternative",
-   "category": "Calculator",
-   "builtin": true,
-   "exe": "C:\\Windows\\System32\\calc.exe",
-   "linux": [
-    {
-     "name": "Calculator",
-     "about": "Everyday calculator.",
-     "flatpak": "org.gnome.Calculator",
-     "commands": [
-      "gnome-calculator"
-     ]
-    },
-    {
-     "name": "KCalc",
-     "about": "Scientific calculator.",
-     "flatpak": "org.kde.kcalc",
-     "commands": [
-      "kcalc"
-     ]
-    },
-    {
-     "name": "Qalculate!",
-     "about": "Powerful calculator with unit conversion.",
-     "flatpak": "io.github.Qalculate",
-     "commands": [
-      "qalculate-gtk"
-     ]
-    }
-   ]
-  },
-  {
    "windows": "Windows Media Player",
    "patterns": [
-    "^Windows Media Player$"
+    "^Windows\\ Media\\ Player$"
    ],
    "status": "alternative",
    "category": "Video player",
@@ -3255,7 +3177,7 @@
   {
    "windows": "Mail and Calendar",
    "patterns": [
-    "^Mail and Calendar$"
+    "^Mail\\ and\\ Calendar$"
    ],
    "status": "alternative",
    "category": "Email",
@@ -3321,7 +3243,7 @@
   {
    "windows": "Sticky Notes",
    "patterns": [
-    "^Sticky Notes$"
+    "^Sticky\\ Notes$"
    ],
    "status": "alternative",
    "category": "Notes",
@@ -3344,125 +3266,9 @@
    ]
   },
   {
-   "windows": "Voice Recorder",
-   "patterns": [
-    "^Voice Recorder$"
-   ],
-   "status": "alternative",
-   "category": "Voice recording",
-   "builtin": true,
-   "exe": "C:\\Windows\\System32\\SoundRecorder.exe",
-   "linux": [
-    {
-     "name": "Sound Recorder",
-     "about": "Record voice memos.",
-     "flatpak": "org.gnome.SoundRecorder",
-     "commands": [
-      "gnome-sound-recorder"
-     ]
-    },
-    {
-     "name": "Audacity",
-     "about": "Record and edit audio.",
-     "flatpak": "org.audacityteam.Audacity",
-     "commands": [
-      "audacity"
-     ]
-    }
-   ]
-  },
-  {
-   "windows": "Camera",
-   "patterns": [
-    "^Camera$"
-   ],
-   "status": "alternative",
-   "category": "Camera",
-   "builtin": true,
-   "exe": "",
-   "linux": [
-    {
-     "name": "Camera",
-     "about": "Take photos and videos with your webcam.",
-     "flatpak": "org.gnome.Snapshot",
-     "commands": [
-      "snapshot"
-     ]
-    },
-    {
-     "name": "Cheese",
-     "about": "Webcam photos with fun effects.",
-     "flatpak": "org.gnome.Cheese",
-     "commands": [
-      "cheese"
-     ]
-    }
-   ]
-  },
-  {
-   "windows": "Alarms & Clock",
-   "patterns": [
-    "^Alarms & Clock$"
-   ],
-   "status": "alternative",
-   "category": "Clock",
-   "builtin": true,
-   "exe": "",
-   "linux": [
-    {
-     "name": "Clocks",
-     "about": "Alarms, timers and world clocks.",
-     "flatpak": "org.gnome.clocks",
-     "commands": [
-      "gnome-clocks"
-     ]
-    }
-   ]
-  },
-  {
-   "windows": "Weather",
-   "patterns": [
-    "^Weather$"
-   ],
-   "status": "alternative",
-   "category": "Weather",
-   "builtin": true,
-   "exe": "",
-   "linux": [
-    {
-     "name": "Weather",
-     "about": "Today's weather and the forecast.",
-     "flatpak": "org.gnome.Weather",
-     "commands": [
-      "gnome-weather"
-     ]
-    }
-   ]
-  },
-  {
-   "windows": "Maps",
-   "patterns": [
-    "^Maps$"
-   ],
-   "status": "alternative",
-   "category": "Maps",
-   "builtin": true,
-   "exe": "",
-   "linux": [
-    {
-     "name": "Maps",
-     "about": "Maps and directions.",
-     "flatpak": "org.gnome.Maps",
-     "commands": [
-      "gnome-maps"
-     ]
-    }
-   ]
-  },
-  {
    "windows": "Windows Security",
    "patterns": [
-    "^Windows Security$"
+    "^Windows\\ Security$"
    ],
    "status": "alternative",
    "category": "Antivirus",
@@ -3479,7 +3285,7 @@
   {
    "windows": "Microsoft Edge",
    "patterns": [
-    "^Microsoft Edge$"
+    "^Microsoft\\ Edge$"
    ],
    "status": "alternative",
    "category": "Web browser",
@@ -3534,43 +3340,6 @@
    ]
   },
   {
-   "windows": "Mail (Outlook)",
-   "patterns": [
-    "^Mail (Outlook)$"
-   ],
-   "status": "alternative",
-   "category": "Email",
-   "builtin": true,
-   "exe": "",
-   "linux": [
-    {
-     "name": "Thunderbird",
-     "about": "Email, calendar and contacts. Works with Gmail, Outlook.com and more.",
-     "flatpak": "org.mozilla.Thunderbird",
-     "commands": [
-      "thunderbird"
-     ],
-     "snap": "thunderbird"
-    },
-    {
-     "name": "Evolution",
-     "about": "Email, calendar and contacts in one, Outlook-style.",
-     "flatpak": "org.gnome.Evolution",
-     "commands": [
-      "evolution"
-     ]
-    },
-    {
-     "name": "Geary",
-     "about": "Simple, modern email app.",
-     "flatpak": "org.gnome.Geary",
-     "commands": [
-      "geary"
-     ]
-    }
-   ]
-  },
-  {
    "windows": "OneDrive",
    "patterns": [
     "^OneDrive$"
@@ -3601,82 +3370,9 @@
    ]
   },
   {
-   "windows": "File Explorer",
-   "patterns": [
-    "^File Explorer$"
-   ],
-   "status": "alternative",
-   "category": "Files",
-   "builtin": true,
-   "exe": "C:\\Windows\\explorer.exe",
-   "linux": [
-    {
-     "name": "Files",
-     "about": "Comes with Linux: your file manager, with all your folders.",
-     "included": true
-    }
-   ]
-  },
-  {
-   "windows": "Settings and Control Panel",
-   "patterns": [
-    "^Settings and Control Panel$"
-   ],
-   "status": "alternative",
-   "category": "Settings",
-   "builtin": true,
-   "exe": "C:\\Windows\\System32\\control.exe",
-   "linux": [
-    {
-     "name": "Settings",
-     "about": "Comes with Linux: Wi-Fi, display, printers, accounts and more.",
-     "included": true
-    }
-   ]
-  },
-  {
-   "windows": "Microsoft Store",
-   "patterns": [
-    "^Microsoft Store$"
-   ],
-   "status": "alternative",
-   "category": "App store",
-   "builtin": true,
-   "exe": "",
-   "linux": [
-    {
-     "name": "App Center",
-     "about": "Comes with Linux: the app store for finding and updating apps.",
-     "included": true
-    }
-   ]
-  },
-  {
-   "windows": "Task Manager",
-   "patterns": [
-    "^Task Manager$"
-   ],
-   "status": "alternative",
-   "category": "System monitor",
-   "builtin": true,
-   "exe": "C:\\Windows\\System32\\Taskmgr.exe",
-   "linux": [
-    {
-     "name": "Mission Center",
-     "about": "See what's using your CPU, memory and disks, like Task Manager.",
-     "flatpak": "io.missioncenter.MissionCenter"
-    },
-    {
-     "name": "Resources",
-     "about": "Simple system monitor; close stuck apps.",
-     "flatpak": "net.nokyan.Resources"
-    }
-   ]
-  },
-  {
    "windows": "Disk Cleanup",
    "patterns": [
-    "^Disk Cleanup$"
+    "^Disk\\ Cleanup$"
    ],
    "status": "alternative",
    "category": "Clean-up",
@@ -3702,26 +3398,9 @@
    ]
   },
   {
-   "windows": "Command Prompt and PowerShell",
-   "patterns": [
-    "^Command Prompt and PowerShell$"
-   ],
-   "status": "alternative",
-   "category": "Terminal",
-   "builtin": true,
-   "exe": "C:\\Windows\\System32\\cmd.exe",
-   "linux": [
-    {
-     "name": "Terminal",
-     "about": "Comes with Linux. You won't need it, but it's there.",
-     "included": true
-    }
-   ]
-  },
-  {
    "windows": "Remote Desktop Connection",
    "patterns": [
-    "^Remote Desktop Connection$"
+    "^Remote\\ Desktop\\ Connection$"
    ],
    "status": "alternative",
    "category": "Remote desktop",
@@ -3749,7 +3428,7 @@
   {
    "windows": "Backup and File History",
    "patterns": [
-    "^Backup and File History$"
+    "^Backup\\ and\\ File\\ History$"
    ],
    "status": "alternative",
    "category": "Backups",
@@ -3772,49 +3451,9 @@
    ]
   },
   {
-   "windows": "Character Map",
-   "patterns": [
-    "^Character Map$"
-   ],
-   "status": "alternative",
-   "category": "Special characters",
-   "builtin": true,
-   "exe": "C:\\Windows\\System32\\charmap.exe",
-   "linux": [
-    {
-     "name": "Characters",
-     "about": "Find and copy special characters and emoji.",
-     "flatpak": "org.gnome.Characters",
-     "commands": [
-      "gnome-characters"
-     ]
-    }
-   ]
-  },
-  {
-   "windows": "Microsoft Solitaire Collection",
-   "patterns": [
-    "^Microsoft Solitaire Collection$"
-   ],
-   "status": "alternative",
-   "category": "Card games",
-   "builtin": true,
-   "exe": "",
-   "linux": [
-    {
-     "name": "Solitaire",
-     "about": "Classic card games: Klondike, FreeCell, Spider and more.",
-     "flatpak": "org.gnome.Aisleriot",
-     "commands": [
-      "sol"
-     ]
-    }
-   ]
-  },
-  {
    "windows": "Phone Link",
    "patterns": [
-    "^Phone Link$"
+    "^Phone\\ Link$"
    ],
    "status": "alternative",
    "category": "Phone",
@@ -3829,63 +3468,9 @@
    ]
   },
   {
-   "windows": "People",
-   "patterns": [
-    "^People$"
-   ],
-   "status": "alternative",
-   "category": "Contacts",
-   "builtin": true,
-   "exe": "",
-   "linux": [
-    {
-     "name": "Contacts",
-     "about": "Your address book.",
-     "flatpak": "org.gnome.Contacts",
-     "commands": [
-      "gnome-contacts"
-     ]
-    }
-   ]
-  },
-  {
-   "windows": "Movies & TV",
-   "patterns": [
-    "^Movies & TV$"
-   ],
-   "status": "alternative",
-   "category": "Video player",
-   "builtin": true,
-   "exe": "",
-   "linux": [
-    {
-     "name": "VLC",
-     "about": "Plays almost any video or music file.",
-     "flatpak": "org.videolan.VLC",
-     "commands": [
-      "vlc"
-     ],
-     "snap": "vlc"
-    },
-    {
-     "name": "Celluloid",
-     "about": "Easy video player with a clean look.",
-     "flatpak": "io.github.celluloid_player.Celluloid",
-     "commands": [
-      "celluloid"
-     ]
-    },
-    {
-     "name": "Showtime",
-     "about": "Simple video player for everyday watching.",
-     "flatpak": "org.gnome.Showtime"
-    }
-   ]
-  },
-  {
    "windows": "Xbox Game Bar",
    "patterns": [
-    "^Xbox Game Bar$"
+    "^Xbox\\ Game\\ Bar$"
    ],
    "status": "alternative",
    "category": "Screen recording",

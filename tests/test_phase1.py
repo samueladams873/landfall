@@ -96,7 +96,7 @@ def test_builtin_windows_programs_always_get_alternatives():
     from landfall.mapping import builtin_apps, by_category
     built = builtin_apps()
     names = {a["name"] for a in built}
-    assert {"Notepad", "Paint", "Photos", "Calculator", "Snipping Tool"} <= names
+    assert {"Notepad", "Paint", "Snipping Tool", "Windows Media Player"} <= names
     cats, _ = by_category(match_all(built))
     by_name = {c.name: c for c in cats}
     assert by_name["Drawing"].options[0]["name"] == "Pinta"          # Paint -> Pinta first
@@ -107,8 +107,8 @@ def test_microsoft_and_system_apps_get_linux_alternatives():
     """Roger: OneDrive, Mail, Teams, Defender and Windows' own tools all need Linux options."""
     from landfall.mapping import builtin_apps, by_category
     entries = {e["windows"]: e for e in load_map()}
-    for name in ("Microsoft OneDrive", "Microsoft Teams", "Mail (Outlook)", "Windows Security",
-                 "File Explorer", "Task Manager", "OneDrive", "Microsoft Store"):
+    for name in ("Microsoft OneDrive", "Microsoft Teams", "Mail and Calendar", "Windows Security",
+                 "OneDrive", "Disk Cleanup", "Remote Desktop Connection", "Phone Link"):
         assert entries[name]["linux"], name
     scanned = [{"name": "Microsoft OneDrive"}]
     names = [a["name"] for a in builtin_apps(scanned=scanned)]
@@ -124,5 +124,33 @@ def test_builtin_dedupe_uses_whole_names():
     names = [a["name"] for a in builtin_apps(scanned=[{"name": "Notepad++ (64-bit x64)"},
                                                       {"name": "Mailbird"},
                                                       {"name": "Microsoft Edge"}])]
-    assert "Notepad" in names and "Mail (Outlook)" in names
+    assert "Notepad" in names and "Mail and Calendar" in names
     assert "Microsoft Edge" not in names
+
+
+def test_obvious_programs_every_linux_pc_has_are_not_listed():
+    """Roger: no Calculator, Clock, Camera, Solitaire... Linux already has them."""
+    from landfall.mapping import builtin_apps
+    names = {a["name"] for a in builtin_apps()}
+    for obvious in ("Calculator", "Alarms & Clock", "Camera", "Microsoft Solitaire Collection",
+                    "Weather", "Maps", "File Explorer", "Task Manager", "Microsoft Store"):
+        assert obvious not in names, obvious
+
+
+def test_rogers_real_vm_scan():
+    """The apps Roger's Windows 10 VM actually reported on Oct 19 2026."""
+    from landfall.mapping import builtin_apps, by_category
+    scanned = [{"name": n} for n in (
+        "Mozilla Firefox (x64 en-US)", "Steam", "Adobe Acrobat (64-bit)", "iTunes",
+        "McAfee Security Scan Plus", "Microsoft 365 - en-us", "Microsoft Edge",
+        "Microsoft OneDrive", "\u00b5Torrent")]
+    grouped = match_all(scanned + builtin_apps(scanned=scanned))
+    unmatched = [r.app["name"] for r in grouped[GROUP_NONE] if not r.options]
+    assert unmatched == [], unmatched
+    cats = {c.name: c for c in by_category(grouped)[0]}
+    games = [a["name"] for a in cats["Games"].windows_apps]
+    assert games == ["Steam"]                                   # Game Bar isn't a game store
+    assert "Xbox Game Bar" in [a["name"] for a in cats["Screen recording"].windows_apps]
+    browsers = [a["name"] for a in cats["Web browser"].windows_apps]
+    assert sorted(browsers) == ["Microsoft Edge", "Mozilla Firefox (x64 en-US)"]
+    assert cats["Web browser"].options[0]["name"] == "Firefox"

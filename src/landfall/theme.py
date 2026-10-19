@@ -9,7 +9,7 @@ BLUE, BLUE_DARK, GREEN, TEXT, MUTED = "#2F7DF6", "#1450B8", "#2BA84A", "#1B2433"
 
 STYLE = f"""
 * {{ font-family: "{FONT}"; font-size: 10.5pt; color: {TEXT}; }}
-QWidget#Root, QWidget#Content {{ background: #EEF3FA; }}
+QWidget#Root, QWidget#Content, QScrollArea#PageScroll {{ background: #EEF3FA; }}
 
 /* Left side: brand and the list of steps */
 QFrame#Sidebar {{

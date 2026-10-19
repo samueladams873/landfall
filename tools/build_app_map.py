@@ -7,6 +7,7 @@ first, real Linux apps only (never Microsoft apps), every Flatpak ID checked aga
 Sources: Flathub listings; github.com/hardbsdk/awesome-alternatives; AlternativeTo.
 """
 import json
+import re
 from pathlib import Path
 
 
@@ -179,7 +180,7 @@ APPS = [
  ("Vivaldi", ["^vivaldi"], "same", "Web browser", [VIV, FF, CHR]),
  # Email
  ("Mozilla Thunderbird", ["thunderbird"], "same", "Email", [TB, BETTERBIRD]),
- ("Microsoft Outlook", ["^microsoft outlook"], "alternative", "Email", [TB, EVOLUTION, BETTERBIRD, GEARY]),
+ ("Microsoft Outlook", ["^microsoft outlook", "^outlook"], "alternative", "Email", [TB, EVOLUTION, BETTERBIRD, GEARY]),
  ("Mailbird", ["^mailbird"], "alternative", "Email", [TB, GEARY, EVOLUTION]),
  ("eM Client", ["^em client"], "alternative", "Email", [TB, EVOLUTION, BETTERBIRD]),
  # Office
@@ -260,7 +261,7 @@ APPS = [
  ("Ubisoft Connect", ["^ubisoft connect", "^uplay"], "alternative", "Games", [LUTRIS, HEROIC]),
  ("Battle.net", ["^battle\\.net"], "wine", "Games", [LUTRIS, BOTTLES]),
  ("Minecraft Launcher", ["^minecraft launcher", "^minecraft$"], "alternative", "Games", [PRISM]),
- ("Xbox", ["^xbox"], "alternative", "Games", [GREENLIGHT, STEAM]),
+ ("Xbox", ["^xbox$", "^xbox app"], "alternative", "Games", [GREENLIGHT, STEAM]),
  # Recording, sharing, tools
  ("OBS Studio", ["^obs studio"], "same", "Screen recording", [OBS]),
  ("ShareX", ["^sharex"], "alternative", "Screenshots", [FLAMESHOT]),
@@ -299,35 +300,18 @@ SYS = "C:\\Windows\\System32\\"
 BUILTIN = [
  ("Notepad", "Text editor", SYS + "notepad.exe", [GTEXT, KATE, NOTEPADQQ]),
  ("Paint", "Drawing", SYS + "mspaint.exe", [PINTA, DRAWING, KRITA]),
- ("Photos", "Photo viewer", "", [LOUPE, GWENVIEW, SHOTWELL, DIGIKAM]),
  ("Snipping Tool", "Screenshots", SYS + "SnippingTool.exe", [FLAMESHOT]),
- ("Calculator", "Calculator", SYS + "calc.exe", [GCALC, KCALC, QALC]),
  ("Windows Media Player", "Video player", "C:\\Program Files\\Windows Media Player\\wmplayer.exe", [VLC, CELLULOID, SHOWTIME, MPV]),
  ("Mail and Calendar", "Email", "", [TB, EVOLUTION, GEARY]),
  ("WordPad", "Office", "C:\\Program Files\\Windows NT\\Accessories\\wordpad.exe", [LO, OO]),
  ("Sticky Notes", "Notes", "", [STICKY, JOPLIN]),
- ("Voice Recorder", "Voice recording", SYS + "SoundRecorder.exe", [RECORDER, AUDACITY]),
- ("Camera", "Camera", "", [SNAPSHOT, CHEESE]),
- ("Alarms & Clock", "Clock", "", [CLOCKS]),
- ("Weather", "Weather", "", [WEATHER]),
- ("Maps", "Maps", "", [MAPS]),
  ("Windows Security", "Antivirus", "", [CLAMTK]),
  ("Microsoft Edge", "Web browser", "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe", [FF, CHR, BRV, GC, VIV]),
- ("Mail (Outlook)", "Email", "", [TB, EVOLUTION, GEARY]),
  ("OneDrive", "Cloud storage", "", [ONLINE, RCLONE, NEXTCLOUD]),
- ("File Explorer", "Files", "C:\\Windows\\explorer.exe", [FILES]),
- ("Settings and Control Panel", "Settings", SYS + "control.exe", [SETTINGS]),
- ("Microsoft Store", "App store", "", [SOFTWARE]),
- ("Task Manager", "System monitor", SYS + "Taskmgr.exe", [MISSION, RESOURCES]),
  ("Disk Cleanup", "Clean-up", SYS + "cleanmgr.exe", [BAOBAB, BLEACHBIT]),
- ("Command Prompt and PowerShell", "Terminal", SYS + "cmd.exe", [TERMINAL]),
  ("Remote Desktop Connection", "Remote desktop", SYS + "mstsc.exe", [REMMINA, RUSTDESK]),
  ("Backup and File History", "Backups", "", [PIKA, DEJADUP]),
- ("Character Map", "Special characters", SYS + "charmap.exe", [CHARACTERS]),
- ("Microsoft Solitaire Collection", "Card games", "", [SOLITAIRE]),
  ("Phone Link", "Phone", "", [LOCALSEND]),
- ("People", "Contacts", "", [CONTACTS]),
- ("Movies & TV", "Video player", "", [VLC, CELLULOID, SHOWTIME]),
  ("Xbox Game Bar", "Screen recording", "", [OBS]),
 ]
 
@@ -338,7 +322,7 @@ out = {
              "option is the recommended pick.",
     "apps": [{"windows": w, "patterns": p, "status": s, "category": c, "linux": opts}
              for w, p, s, c, opts in APPS]
-            + [{"windows": w, "patterns": ["^" + w.replace("+", "\\+") + "$"],
+            + [{"windows": w, "patterns": ["^" + re.escape(w) + "$"],
                 "status": "alternative" if opts else "none", "category": c, "builtin": True,
                 "exe": exe, "linux": opts}
                for w, c, exe, opts in BUILTIN],
