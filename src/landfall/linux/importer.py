@@ -19,7 +19,7 @@ from landfall.linux.restore import (RestoreCancelled, WrongPassword, extract_pri
                                     find_bundles, read_manifest, restore)
 from landfall.scan.folders import human_size
 from landfall.sysenv import open_path
-from landfall.ui import (ICONS, ChoiceRow, StageList, TipCard, logo_for, HeroPage, Page, Shell, card, folder_icon, label,
+from landfall.ui import (ICONS, ChoiceRow, StageList, StepDialog, TipCard, logo_for, HeroPage, Page, Shell, card, folder_icon, label,
                          make_app, picture, run_window, set_role, start_task,
                          text_field, plural)
 
@@ -728,31 +728,48 @@ class Importer(Shell):
                                              f"{', '.join(got)} moved in."))
             if r.passwords == "file":
                 row = QHBoxLayout()
-                row.addWidget(label(f"Passwords from {r.source}: one click left.", "Muted"), 1)
-                imp = QPushButton(f"Import into {r.target}")
+                row.addWidget(label(f"Passwords from {r.source}: one short step left.", "Muted"), 1)
+                imp = QPushButton(f"Finish {r.source} passwords")
                 imp.setObjectName("Primary")
                 imp.clicked.connect(lambda _=False, res=r: self.import_passwords(res))
                 row.addWidget(imp)
                 self.browser_box.addLayout(row)
 
     def import_passwords(self, res):
-        browsers_mod.open_import_page(res)
-        box = QMessageBox(self)
-        box.setWindowTitle("Import your passwords")
-        box.setTextFormat(Qt.TextFormat.RichText)
-        where = ("click the <b>\u22ef</b> menu, then <b>Import from a File</b>"
-                 if res.target == "Firefox" else "click <b>Select file</b> next to Import passwords")
-        box.setText(f"{res.target} is opening its passwords page.<br><br>"
-                    f"<b>1.</b> There, {where}.<br>"
-                    f"<b>2.</b> Pick this file:<br><code>{res.password_file}</code><br><br>"
-                    "When your passwords show up, come back and delete the file: it holds "
-                    "your passwords in plain text.")
-        delete = box.addButton("Delete the file now", QMessageBox.ButtonRole.DestructiveRole)
-        box.addButton("Not yet", QMessageBox.ButtonRole.RejectRole)
-        box.exec()
-        if box.clickedButton() is delete and res.password_file:
-            res.password_file.unlink(missing_ok=True)
+        where = ("click the \u22ef menu (top right), then <b>Import from a File</b>"
+                 if res.target == "Firefox"
+                 else "scroll to <b>Import passwords</b> and click <b>Select file</b>")
+
+        def open_browser():
+            browsers_mod.open_import_page(res)
+            return None
+
+        def delete_file():
+            if res.password_file:
+                res.password_file.unlink(missing_ok=True)
             res.passwords = ""
+            return "advance"
+
+        steps = [
+            {"title": f"Bring your passwords into {res.target}",
+             "body": f"Your {res.source} passwords came across. The last step is to load them "
+                     f"into {res.target}. Landfall will open the right page and tell you exactly "
+                     "what to click. It takes about a minute."},
+            {"title": f"Open {res.target}'s password page",
+             "body": f"Click the button below to open {res.target} on its passwords page.<br><br>"
+                     f"There, {where}. When it asks for a file, choose this one:<br>"
+                     f"<code>{res.password_file}</code><br><br>Your passwords appear in "
+                     f"{res.target}. Then come back here and click <b>Next</b>.",
+             "action": (f"Open {res.target}", open_browser)},
+            {"title": "Tidy up",
+             "body": "All done. For safety, Landfall will now delete the leftover passwords "
+                     "file, since it holds your passwords in plain text. Your passwords stay "
+                     f"safely inside {res.target}.",
+             "action": ("Delete the leftover file", delete_file)},
+        ]
+        result = StepDialog(f"Passwords \u2192 {res.target}", steps, self,
+                            accent_last="Finish").run()
+        if result in ("done", "skip"):
             self.show_browser_results()
 
     def retry_failed(self):

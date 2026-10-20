@@ -22,7 +22,8 @@ from landfall.report import build_html, option_text
 from landfall.scan.apps import scan_apps
 from landfall.scan.folders import extra_files, extra_folder, find_folders, human_size, measure
 from landfall.scan.hardware import hardware_notes, scan_hardware
-from landfall.ui import (ICON, ICONS, CategoryCard, ChoiceRow, FolderPicker, ScoreRing, logo_for,
+from landfall.ui import (ICON, ICONS, CategoryCard, ChoiceRow, FolderPicker, ScoreRing, StepDialog,
+                         logo_for,
                          StageList,
                          WidthWatcher, HeroPage, Page, Shell, card, folder_icon,
                          label, logo, make_app, picture, run_window, set_role,
@@ -657,9 +658,9 @@ class Wizard(Shell):
             icon = logo_for({"flatpak": self.BROWSER_LOGOS.get(p.browser, "")})
             row = ChoiceRow(icon, p.label, self._browser_detail(p))
             if p.family == "chromium":
-                btn = QPushButton("Add passwords...")
-                btn.setToolTip(f"Opens {p.name}'s own password page so you can export them")
-                btn.clicked.connect(lambda _=False, prof=p, r=row: self.add_browser_passwords(prof, r))
+                btn = QPushButton("Move passwords too")
+                btn.clicked.connect(lambda _=False, prof=p, r=row: self.move_browser_passwords(prof, r))
+                row._pw_btn = btn
                 row.side.addWidget(btn)
             self.browser_rows.append((row, p))
             self.browser_box.addWidget(row)
@@ -667,37 +668,59 @@ class Wizard(Shell):
     def _browser_detail(self, p) -> str:
         bits = [plural(p.bookmarks, "bookmark"), f"{p.history:,} history"]
         if p.family == "firefox":
-            bits.append(plural(p.passwords, "saved password"))
+            bits.append(plural(p.passwords, "saved password") + " \u2014 all move automatically")
         elif p.password_csv:
-            bits.append("\u2714 passwords file added")
+            bits.append("\u2714 passwords ready to move")
         else:
-            bits.append("passwords: click Add passwords")
+            bits.append("bookmarks and history move automatically")
         return "  \u00b7  ".join(bits)
 
-    def add_browser_passwords(self, p, row):
-        opened = open_password_export(p)
-        steps = (f"<b>1.</b> In {p.name}, click <b>Export passwords</b> (or the \u22ee menu "
-                 "next to Saved passwords, then Export).<br>"
-                 "<b>2.</b> Confirm with your Windows PIN or password and save the file.<br>"
-                 "<b>3.</b> Come back here and click <b>Pick the file</b>.")
-        if not opened:
-            steps = f"Open {p.name} and go to its Passwords settings.<br>" + steps
-        box = QMessageBox(self)
-        box.setWindowTitle(f"Export your {p.name} passwords")
-        box.setTextFormat(Qt.TextFormat.RichText)
-        box.setText(steps + "<br><br>The file is locked inside your bundle with your password, "
-                    "and Landfall reminds you to delete the copy you saved.")
-        pick = box.addButton("Pick the file", QMessageBox.ButtonRole.AcceptRole)
-        box.addButton("Cancel", QMessageBox.ButtonRole.RejectRole)
-        box.exec()
-        if box.clickedButton() is not pick:
-            return
-        path, _ = QFileDialog.getOpenFileName(self, f"Pick your {p.name} passwords file",
-                                              str(Path.home() / "Downloads"),
-                                              "Passwords file (*.csv)")
-        if path:
-            p.password_csv = Path(path)
+    def move_browser_passwords(self, p, row):
+        """A clean step-by-step helper. Landfall opens the right page and says exactly what to
+        click; the user never has to figure anything out."""
+        self._pw_pick_path = None
+
+        def open_page():
+            open_password_export(p)
+            return None
+
+        def pick_file():
+            path, _ = QFileDialog.getOpenFileName(
+                self, f"Choose the file you just saved from {p.name}",
+                str(Path.home() / "Downloads"), "Passwords file (*.csv)")
+            if path:
+                self._pw_pick_path = Path(path)
+                return "advance"
+            return None
+
+        menu = "\u22ee" if p.browser != "edge" else "\u2026"
+        steps = [
+            {"title": f"Move your {p.name} passwords",
+             "body": f"{p.name} keeps your saved passwords locked so only it can read them. "
+                     "In three short steps, Landfall will help you unlock a copy and bring it "
+                     "along. It stays locked inside your bundle with your password.<br><br>"
+                     "Prefer to skip it? Click <b>Skip this</b> and you'll just sign in to your "
+                     "sites again on Linux. Click <b>Next</b> to move them."},
+            {"title": f"Open {p.name}'s password page",
+             "body": f"Click the button below. {p.name} opens on its saved-passwords page.<br><br>"
+                     f"There, find <b>Export passwords</b> (next to <b>Saved passwords</b>, "
+                     f"behind the <b>{menu}</b> button). Click it, and confirm with your Windows "
+                     "PIN or password when it asks. Save the file somewhere easy, like your "
+                     "Downloads folder.<br><br>Then come back here and click <b>Next</b>.",
+             "action": (f"Open {p.name}", open_page)},
+            {"title": "Choose the file you saved",
+             "body": "Last step: click the button below and pick the passwords file you just "
+                     "saved.<br><br>Landfall locks it inside your bundle right away, and on "
+                     "Linux it puts the passwords into your new browser for you.",
+             "action": ("Choose the file", pick_file)},
+        ]
+        result = StepDialog(f"Move your {p.name} passwords", steps, self,
+                            accent_last="Done").run()
+        if result == "done" and self._pw_pick_path:
+            p.password_csv = self._pw_pick_path
             row.detail.setText(self._browser_detail(p))
+            row._pw_btn.setText("\u2714 Passwords added")
+            row._pw_btn.setEnabled(False)
 
     def selected_browsers(self):
         return [p for row, p in self.browser_rows if row.box.isChecked()]

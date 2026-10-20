@@ -53,6 +53,7 @@ CHROMIUM_TARGETS = {
 FLATPAK_TO_BROWSER = {"org.mozilla.firefox": "firefox", "org.chromium.Chromium": "chromium",
                       "com.google.Chrome": "chrome", "com.brave.Browser": "brave",
                       "com.vivaldi.Vivaldi": "vivaldi"}
+# Firefox shows an easy Import button on about:logins; Chrome-family on their password page.
 IMPORT_PAGES = {"firefox": "about:logins", "chromium": "chrome://password-manager/settings",
                 "chrome": "chrome://password-manager/settings",
                 "brave": "brave://password-manager/settings", "vivaldi": "vivaldi://settings/passwords"}

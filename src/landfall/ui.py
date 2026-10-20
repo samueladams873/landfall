@@ -786,3 +786,106 @@ class TipCard(QFrame):
     def next_tip(self):
         self.i += 1
         self.show_tip()
+
+
+class StepDialog(QWidget):
+    """A small, friendly step-by-step helper. Shows one step at a time with Back/Next, a
+    picture area, and a clear action button on the step that needs one. Used for the
+    'move your Chrome passwords' walk-through on Windows."""
+    from PySide6.QtCore import Signal as _Signal
+
+    def __init__(self, title, steps, parent=None, accent_last="Finish"):
+        from PySide6.QtWidgets import QDialog
+        super().__init__()
+        self.steps = steps
+        self.i = 0
+        self.result_value = None
+        self.dialog = QDialog(parent)
+        self.dialog.setObjectName("Root")
+        self.dialog.setWindowTitle(title)
+        self.dialog.setMinimumWidth(560)
+        self.accent_last = accent_last
+        box = QVBoxLayout(self.dialog)
+        box.setContentsMargins(0, 0, 0, 0)
+        box.setSpacing(0)
+        banner = QFrame()
+        banner.setObjectName("Banner")
+        b = QHBoxLayout(banner)
+        b.setContentsMargins(18, 12, 18, 12)
+        b.addWidget(logo(34))
+        b.addSpacing(8)
+        self.banner_title = label(title, "BannerTitle")
+        b.addWidget(self.banner_title, 1)
+        box.addWidget(banner)
+        body = QWidget()
+        body.setObjectName("Content")
+        self.body = QVBoxLayout(body)
+        self.body.setContentsMargins(26, 22, 26, 18)
+        self.dots = label("", "Muted")
+        self.body.addWidget(self.dots)
+        self.step_title = label("", "PageTitle")
+        self.body.addWidget(self.step_title)
+        self.step_body = label("")
+        self.step_body.setTextFormat(Qt.TextFormat.RichText)
+        self.step_body.setWordWrap(True)
+        self.step_body.setOpenExternalLinks(True)
+        self.body.addWidget(self.step_body)
+        self.action_btn = QPushButton("")
+        self.action_btn.setObjectName("Primary")
+        self.action_btn.clicked.connect(self._do_action)
+        self.body.addWidget(self.action_btn, 0, Qt.AlignmentFlag.AlignLeft)
+        self.body.addStretch(1)
+        box.addWidget(body, 1)
+        footer = QFrame()
+        footer.setObjectName("Footer")
+        f = QHBoxLayout(footer)
+        f.setContentsMargins(20, 12, 20, 12)
+        self.skip_btn = QPushButton("Skip this")
+        self.skip_btn.clicked.connect(self._skip)
+        f.addWidget(self.skip_btn)
+        f.addStretch(1)
+        self.back_btn = QPushButton("Back")
+        self.back_btn.clicked.connect(lambda: self._go(self.i - 1))
+        self.next_btn = QPushButton("Next")
+        self.next_btn.setObjectName("Primary")
+        self.next_btn.clicked.connect(self._next)
+        f.addWidget(self.back_btn)
+        f.addSpacing(8)
+        f.addWidget(self.next_btn)
+        box.addWidget(footer)
+        self._go(0)
+
+    def _go(self, i):
+        self.i = max(0, min(i, len(self.steps) - 1))
+        step = self.steps[self.i]
+        self.dots.setText(f"Step {self.i + 1} of {len(self.steps)}")
+        self.step_title.setText(step.get("title", ""))
+        self.step_body.setText(step.get("body", ""))
+        action = step.get("action")
+        self.action_btn.setVisible(bool(action))
+        if action:
+            self.action_btn.setText(action[0])
+            self._action_fn = action[1]
+        self.back_btn.setVisible(self.i > 0)
+        last = self.i == len(self.steps) - 1
+        self.next_btn.setText(self.accent_last if last else "Next")
+
+    def _next(self):
+        if self.i == len(self.steps) - 1:
+            self.result_value = "done"
+            self.dialog.accept()
+        else:
+            self._go(self.i + 1)
+
+    def _do_action(self):
+        result = self._action_fn()
+        if result == "advance":
+            self._next()
+
+    def _skip(self):
+        self.result_value = "skip"
+        self.dialog.reject()
+
+    def run(self):
+        self.dialog.exec()
+        return self.result_value
