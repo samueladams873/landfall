@@ -381,8 +381,15 @@ def import_browser(rec: dict, src: Path, target: Target, home: Path) -> BrowserR
         shutil.copy2(csv, keep)
         keep.chmod(0o600)
         res.passwords, res.password_file = "file", keep
-        res.import_command = target.launch + [IMPORT_PAGES[target.browser]]
+        res.import_command = (target.launch + _new_window_flag(target)
+                              + [IMPORT_PAGES[target.browser]])
     return res
+
+
+def _new_window_flag(target) -> list:
+    # --new-window forces the page even when the browser is already open; Firefox opens
+    # about:logins correctly without it.
+    return [] if target.browser == "firefox" else ["--new-window"]
 
 
 def open_import_page(res: BrowserResult) -> None:

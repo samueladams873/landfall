@@ -26,7 +26,7 @@ CHROMIUM_FILES = ("Bookmarks", "History")
 #  which env var, password-page URL for the export step)
 CHROMIUM_BROWSERS = [
     ("chrome", "Google Chrome", "chrome.exe", r"Google\Chrome\User Data", "LOCALAPPDATA",
-     "chrome://password-manager/settings"),
+     "chrome://password-manager/settings"),   # Export button lives here
     ("edge", "Microsoft Edge", "msedge.exe", r"Microsoft\Edge\User Data", "LOCALAPPDATA",
      "edge://settings/passwords"),
     ("brave", "Brave", "brave.exe", r"BraveSoftware\Brave-Browser\User Data", "LOCALAPPDATA",
@@ -198,6 +198,8 @@ def running_browsers(profiles: list[BrowserProfile]) -> list[str]:
 
 
 def open_password_export(profile: BrowserProfile) -> bool:
+    # --new-window forces navigation even when the browser is already open; without it a
+    # running Chrome just raises its current window and ignores the address.
     """Open the browser's own password page so the user can click Export."""
     if sys.platform != "win32":
         return False
@@ -216,7 +218,8 @@ def open_password_export(profile: BrowserProfile) -> bool:
     for exe in candidates:
         if exe and Path(exe).is_file():
             try:
-                subprocess.Popen([exe, profile.password_url], stdin=subprocess.DEVNULL)
+                subprocess.Popen([exe, "--new-window", profile.password_url],
+                                 stdin=subprocess.DEVNULL)
                 return True
             except OSError:
                 continue
