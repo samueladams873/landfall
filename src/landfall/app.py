@@ -676,9 +676,11 @@ class Wizard(Shell):
         return "  \u00b7  ".join(bits)
 
     def move_browser_passwords(self, p, row):
-        """A clean step-by-step helper. Landfall opens the right page and says exactly what to
-        click; the user never has to figure anything out."""
+        """A clean step-by-step helper that works even if the browser is already open:
+        it asks the user to close it first (a freshly opened browser always lands on the
+        right page), and shows the exact address to paste as a backup."""
         self._pw_pick_path = None
+        from landfall.scan.browsers import is_running
 
         def open_page():
             open_password_export(p)
@@ -693,26 +695,44 @@ class Wizard(Shell):
                 return "advance"
             return None
 
-        # Chrome/Brave: Export is a button on password-manager/settings. Edge: on its
-        # settings/passwords page. Either way it's a button, no hidden menu.
+        def check_closed():
+            if is_running(p.process):
+                box = QMessageBox(self.dialog)
+                box.setWindowTitle(f"{p.name} is still open")
+                box.setText(f"{p.name} still seems to be running. Please close every "
+                            f"{p.name} window, then click the button again.")
+                box.exec()
+                return None
+            return "advance"
+
         if p.browser == "edge":
             find_it = "scroll to <b>Export passwords</b> and click its <b>Export</b> button"
         else:
             find_it = ("scroll to <b>Export passwords</b> and click the <b>Download file</b> "
                        "button next to it")
+        url = p.password_url
 
         steps = [
             {"title": f"Move your {p.name} passwords",
              "body": f"{p.name} keeps your saved passwords locked so only it can read them. "
-                     "In three short steps, Landfall will help you unlock a copy and bring it "
+                     "In a few short steps, Landfall helps you unlock a copy and bring it "
                      "along. It stays locked inside your bundle with your password.<br><br>"
-                     "Prefer to skip it? Click <b>Skip this</b> and you'll just sign in to your "
-                     "sites again on Linux. Click <b>Next</b> to move them."},
+                     "Prefer to skip it? Click <b>Skip this</b> and you'll just sign in to "
+                     "your sites again on Linux. Click <b>Next</b> to move them."},
+            {"title": f"Close {p.name} first",
+             "body": f"Please close <b>{p.name}</b> completely if it's open (close every "
+                     f"{p.name} window).<br><br>This matters: if {p.name} is already running, "
+                     "it ignores Landfall and just shows the window you had open. Closing it "
+                     "first lets the next step open straight to your passwords.<br><br>"
+                     f"Once {p.name} is fully closed, click the button below to check.",
+             "action": ("Check \u2014 is it closed?", check_closed)},
             {"title": f"Open {p.name}'s password page",
-             "body": f"Click the green button below. A new {p.name} window opens on the "
-                     f"passwords page.<br><br>On that page, {find_it}. Confirm with your "
-                     "Windows PIN or password if it asks, and save the file in your "
-                     "<b>Downloads</b> folder.<br><br>Then come back here and click <b>Next</b>.",
+             "body": f"Click the green button below. {p.name} opens straight on its passwords "
+                     f"page.<br><br>On that page, {find_it}. Confirm with your Windows PIN or "
+                     "password if it asks, and save the file in your <b>Downloads</b> folder."
+                     f"<br><br><b>If it opens somewhere else</b> (like the home page), click the "
+                     "address bar at the top, type this and press Enter:<br>"
+                     f"<code>{url}</code><br><br>Then come back here and click <b>Next</b>.",
              "action": (f"Open {p.name}", open_page)},
             {"title": "Choose the file you saved",
              "body": "Last step: click the button below and pick the passwords file you just "

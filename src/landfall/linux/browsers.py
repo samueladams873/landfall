@@ -82,6 +82,7 @@ class BrowserResult:
     passwords: str = ""          # "copied" / "file" / ""
     password_file: Path | None = None
     import_command: list = field(default_factory=list)
+    import_url: str = ""         # the address to paste if the page opens wrong
     problem: str = ""
 
 
@@ -381,8 +382,8 @@ def import_browser(rec: dict, src: Path, target: Target, home: Path) -> BrowserR
         shutil.copy2(csv, keep)
         keep.chmod(0o600)
         res.passwords, res.password_file = "file", keep
-        res.import_command = (target.launch + _new_window_flag(target)
-                              + [IMPORT_PAGES[target.browser]])
+        res.import_url = IMPORT_PAGES[target.browser]
+        res.import_command = (target.launch + _new_window_flag(target) + [res.import_url])
     return res
 
 

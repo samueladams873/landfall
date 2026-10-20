@@ -736,9 +736,10 @@ class Importer(Shell):
                 self.browser_box.addLayout(row)
 
     def import_passwords(self, res):
-        where = ("click the \u22ef menu (top right), then <b>Import from a File</b>"
-                 if res.target == "Firefox"
-                 else "scroll to <b>Import passwords</b> and click <b>Select file</b>")
+        if res.target == "Firefox":
+            find_it = "click the \u22ef menu (top right), then <b>Import from a File</b>"
+        else:
+            find_it = "scroll to <b>Import passwords</b> and click <b>Select file</b>"
 
         def open_browser():
             browsers_mod.open_import_page(res)
@@ -753,12 +754,19 @@ class Importer(Shell):
         steps = [
             {"title": f"Bring your passwords into {res.target}",
              "body": f"Your {res.source} passwords came across. The last step is to load them "
-                     f"into {res.target}. Landfall will open the right page and tell you exactly "
-                     "what to click. It takes about a minute."},
+                     f"into {res.target}. Landfall opens the right page and tells you exactly "
+                     "what to click."},
+            {"title": f"Close {res.target} first",
+             "body": f"If <b>{res.target}</b> is open, please close it completely.<br><br>An "
+                     "already-open browser ignores Landfall and just shows the window you had "
+                     f"up. Closing it first lets the next step open straight to the right page."
+                     f"<br><br>Once {res.target} is closed, click <b>Next</b>."},
             {"title": f"Open {res.target}'s password page",
-             "body": f"Click the button below to open {res.target} on its passwords page.<br><br>"
-                     f"There, {where}. When it asks for a file, choose this one:<br>"
-                     f"<code>{res.password_file}</code><br><br>Your passwords appear in "
+             "body": f"Click the green button below to open {res.target} on its passwords page."
+                     f"<br><br>There, {find_it}. When it asks for a file, choose this one:<br>"
+                     f"<code>{res.password_file}</code><br><br><b>If it opens somewhere else</b>, "
+                     "click the address bar, type this and press Enter:<br>"
+                     f"<code>{res.import_url}</code><br><br>Your passwords appear in "
                      f"{res.target}. Then come back here and click <b>Next</b>.",
              "action": (f"Open {res.target}", open_browser)},
             {"title": "Tidy up",

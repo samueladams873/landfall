@@ -197,6 +197,19 @@ def running_browsers(profiles: list[BrowserProfile]) -> list[str]:
     return names
 
 
+def is_running(process: str) -> bool:
+    if sys.platform != "win32":
+        return False
+    try:
+        out = subprocess.run(["tasklist", "/FO", "CSV", "/NH", "/FI", f"IMAGENAME eq {process}"],
+                             capture_output=True, text=True, timeout=20,
+                             creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
+                             stdin=subprocess.DEVNULL).stdout.lower()
+    except (OSError, subprocess.SubprocessError):
+        return False
+    return process.lower() in out
+
+
 def open_password_export(profile: BrowserProfile) -> bool:
     # --new-window forces navigation even when the browser is already open; without it a
     # running Chrome just raises its current window and ignores the address.
