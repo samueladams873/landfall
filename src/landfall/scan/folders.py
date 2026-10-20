@@ -19,6 +19,9 @@ KNOWN_FOLDERS = [
 ]
 
 SKIP_NAMES = {"desktop.ini", "thumbs.db", ".ds_store"}
+# Windows-only files that do nothing on Linux: shortcuts, programs and installers.
+# Left behind by default (the user can choose to bring them anyway).
+WINDOWS_ONLY = {".lnk", ".exe", ".msi", ".msix", ".appx", ".bat", ".cmd", ".scr", ".pif"}
 # Files that live only in the cloud (OneDrive "online-only"). Reading them would
 # trigger a download, so we count them separately and leave them alone.
 CLOUD_ONLY_ATTRS = 0x00400000 | 0x00040000 | 0x00001000  # RECALL_ON_DATA_ACCESS | RECALL_ON_OPEN | OFFLINE
@@ -36,6 +39,8 @@ class FolderInfo:
     excludes: set = field(default_factory=set)       # paths inside the folder to leave out
     extra: bool = False                              # added by the user, not a standard folder
     only_files: list | None = None                   # a hand-picked list of single files
+    keep_windows_files: bool = False                 # bring .exe/.lnk/... anyway
+    windows_only: int = 0                            # how many were left behind
 
 
 def _known_folder_path(guid: str) -> Path | None:
@@ -77,6 +82,7 @@ def find_folders(home: Path | None = None) -> list[FolderInfo]:
 def measure(folder: FolderInfo, cancelled=lambda: False) -> FolderInfo:
     """Walk a folder, filling in file count, size and the list of files to pack."""
     folder.files = folder.bytes = folder.cloud_only = folder.unreadable = 0
+    folder.windows_only = 0
     folder.file_list = []
     if folder.only_files is not None:
         for path in folder.only_files:
@@ -112,6 +118,10 @@ def measure(folder: FolderInfo, cancelled=lambda: False) -> FolderInfo:
                     stack.append(Path(entry.path))
                     continue
                 if entry.name.lower() in SKIP_NAMES:
+                    continue
+                if (not folder.keep_windows_files
+                        and Path(entry.name).suffix.lower() in WINDOWS_ONLY):
+                    folder.windows_only += 1
                     continue
                 if attrs & CLOUD_ONLY_ATTRS:
                     folder.cloud_only += 1

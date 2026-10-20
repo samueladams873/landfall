@@ -38,6 +38,47 @@ def _selftest(out_path: str) -> int:
     return 0
 
 
+def _already_running() -> bool:
+    """Only one Landfall at a time: a second copy just brings the first to the front."""
+    from PySide6.QtCore import QDir, QLockFile
+    from PySide6.QtNetwork import QLocalSocket
+    global _LOCK
+    _LOCK = QLockFile(QDir.tempPath() + "/landfall-wizard.lock")
+    _LOCK.setStaleLockTime(0)
+    if _LOCK.tryLock(100):
+        return False
+    sock = QLocalSocket()
+    sock.connectToServer("landfall-wizard")
+    if sock.waitForConnected(500):
+        sock.write(b"show")
+        sock.flush()
+    return True
+
+
+def _listen_for_second_copy(app):
+    """Raise our window when someone starts Landfall again."""
+    from PySide6.QtNetwork import QLocalServer
+    QLocalServer.removeServer("landfall-wizard")
+    server = QLocalServer(app)
+    server.listen("landfall-wizard")
+
+    def raise_window():
+        conn = server.nextPendingConnection()
+        if conn:
+            conn.close()
+        for w in app.topLevelWidgets():
+            if w.isVisible():
+                w.showNormal()
+                w.raise_()
+                w.activateWindow()
+
+    server.newConnection.connect(raise_window)
+    app._landfall_server = server
+
+
+_LOCK = None
+
+
 def main() -> int:
     if os.environ.get("LANDFALL_SELFTEST"):
         return _selftest(os.environ["LANDFALL_SELFTEST"])
@@ -51,6 +92,9 @@ def main() -> int:
 
     def make_app(*args, **kwargs):
         app = original(*args, **kwargs)
+        if not os.environ.get("LANDFALL_SNAPSHOT") and _already_running():
+            raise SystemExit(0)          # the first Landfall window was brought forward
+        _listen_for_second_copy(app)
         _snapshot_hook()
         return app
 

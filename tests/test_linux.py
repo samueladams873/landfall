@@ -193,3 +193,28 @@ def test_empty_chosen_folder_is_still_created(made):
     dests["Saved Games"] = home / "From Windows" / "Saved Games"
     restore(bundle, "hunter22", ["Documents", "Saved Games"], dests, manifest, home=home)
     assert (home / "From Windows" / "Saved Games").is_dir()
+
+
+def test_windows_only_files_are_left_behind_unless_asked(tmp_path):
+    desk = tmp_path / "Desktop"
+    desk.mkdir()
+    for n in ("uTorrent.lnk", "Firefox.exe", "setup.msi", "photo.jpg", "notes.txt"):
+        (desk / n).write_text("x")
+    f = measure(FolderInfo("Desktop", desk))
+    assert sorted(rel.name for _, rel, _ in f.file_list) == ["notes.txt", "photo.jpg"]
+    assert f.windows_only == 3
+    keep = FolderInfo("Desktop", desk, keep_windows_files=True)
+    assert measure(keep).files == 5 and keep.windows_only == 0
+
+
+def test_windows_web_shortcut_becomes_a_linux_link(tmp_path):
+    from landfall.linux.restore import windows_url_to_link
+    url = tmp_path / "Bank.url"
+    url.write_text("[InternetShortcut]\r\nURL=https://bank.landfall-test.example/\r\n")
+    link = windows_url_to_link(url)
+    assert link.name == "Bank.desktop" and not url.exists()
+    text = link.read_text()
+    assert "Type=Link" in text and "URL=https://bank.landfall-test.example/" in text
+    odd = tmp_path / "Weird.url"
+    odd.write_text("not a shortcut")
+    assert windows_url_to_link(odd) == odd               # left alone if it can't be read

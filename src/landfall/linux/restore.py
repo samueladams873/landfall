@@ -205,8 +205,32 @@ def restore(bundle: Bundle, password: str, folders: list[str], destinations: dic
                 result.renamed.append(str(dest))
             dest.parent.mkdir(parents=True, exist_ok=True)
             shutil.move(str(src), str(dest))
+            if dest.suffix.lower() == ".url":
+                dest = windows_url_to_link(dest)
             result.restored += 1
         progress(total, total, "")
     finally:
         shutil.rmtree(staging, ignore_errors=True)
     return result
+
+
+def windows_url_to_link(path: Path) -> Path:
+    """A Windows web shortcut (.url) does nothing on Linux. Turn it into a Linux web link
+    (.desktop, Type=Link) with the same name, so double-clicking still opens the site."""
+    import configparser
+    cfg = configparser.ConfigParser(interpolation=None)
+    try:
+        cfg.read_string(path.read_text(encoding="utf-8", errors="replace"))
+        url = cfg.get("InternetShortcut", "URL", fallback="").strip()
+    except (configparser.Error, OSError):
+        return path
+    if not url.startswith(("http://", "https://")):
+        return path
+    link = path.with_suffix(".desktop")
+    if link.exists():
+        return path
+    link.write_text("[Desktop Entry]\nType=Link\n"
+                    f"Name={path.stem}\nURL={url}\nIcon=text-html\n", encoding="utf-8")
+    link.chmod(0o755)
+    path.unlink()
+    return link

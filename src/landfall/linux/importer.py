@@ -443,8 +443,8 @@ class Importer(Shell):
             files, size = stats.get(name, [0, 0])
             dest = self.dest_for(name)
             detail = (f"{plural(files, 'file')}  \u00b7  {human_size(size)}  \u2192  {dest}" if files
-                      else "Empty")
-            row = ChoiceRow(folder_icon(name), name, detail, files > 0, files > 0)
+                      else f"Empty folder  \u2192  {dest}")
+            row = ChoiceRow(folder_icon(name), name, detail, True, True)
             row.box.toggled.connect(lambda _: self.update_what())
             self.folder_rows[name] = row
             self.what_box.addWidget(row)

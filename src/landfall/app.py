@@ -574,6 +574,12 @@ class Wizard(Shell):
             self._add_folder_row(folder)
         if not self.folders:
             self.what_box.addWidget(label("No personal folders were found.", "Muted"))
+        self.leave_windows = QCheckBox("Leave Windows-only files behind: shortcuts (.lnk), "
+                                       "programs and installers (.exe, .msi). They don't run on "
+                                       "Linux.")
+        self.leave_windows.setChecked(True)
+        self.leave_windows.toggled.connect(self._toggle_windows_files)
+        self.what_box.addWidget(self.leave_windows)
         self.what_box.addSpacing(8)
         self.what_box.addWidget(label("Other folders and files", "Section"))
         self.what_box.addWidget(label("Bring anything else too: a folder on another drive, "
@@ -620,6 +626,11 @@ class Wizard(Shell):
         self.folder_rows[folder.name] = row
         (box or self.what_box).addWidget(row)
 
+    def _toggle_windows_files(self, leave: bool):
+        for folder in self.folders:
+            folder.keep_windows_files = not leave
+            self._measure(folder)
+
     def _measure(self, folder):
         self._measuring += 1
         self.measured = False
@@ -639,6 +650,8 @@ class Wizard(Shell):
         text = f"{plural(folder.files, 'file')}  \u00b7  {human_size(folder.bytes)}"
         if folder.excludes:
             text += f"  \u00b7  {plural(len(folder.excludes), 'item')} left out"
+        if folder.windows_only:
+            text += f"  \u00b7  {plural(folder.windows_only, 'Windows-only file')} left behind"
         if folder.cloud_only:
             text += f"  \u00b7  {folder.cloud_only:,} online-only OneDrive files stay in the cloud"
         if folder.extra and not folder.only_files:
@@ -661,6 +674,7 @@ class Wizard(Shell):
             QMessageBox.information(self, "Already added", "That folder is already on the list.")
             return
         folder = extra_folder(path, {f.name for f in self.folders})
+        folder.keep_windows_files = not self.leave_windows.isChecked()
         self.folders.append(folder)
         self._add_folder_row(folder, self.extra_box)
         self._measure(folder)
