@@ -65,6 +65,12 @@ def windows_side():
 
     A.measure = fake_measure
     A.list_drives = lambda: [Drive("E:\\", "SANDISK 128GB", 118e9, 128e9, "exFAT", True)]
+    from landfall.scan.browsers import BrowserProfile
+    ff = BrowserProfile("firefox", "Firefox", "firefox", "default-release", tmp, "firefox.exe",
+                        bookmarks=214, history=8412, passwords=37)
+    edge = BrowserProfile("edge", "Microsoft Edge", "chromium", "Default", tmp, "msedge.exe",
+                          bookmarks=58, history=1290, password_url="edge://settings/passwords")
+    A.find_browsers = lambda: [ff, edge]
     w = A.Wizard()
     w.resize(1120, 720)
     w.show()

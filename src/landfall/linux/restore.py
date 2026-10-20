@@ -234,3 +234,13 @@ def windows_url_to_link(path: Path) -> Path:
     link.chmod(0o755)
     path.unlink()
     return link
+
+
+def extract_private(bundle: Bundle, password: str, prefix: str, dest: Path) -> list[str]:
+    """Unpack Landfall's own data (e.g. landfall/browsers/...) into dest. Returns the names."""
+    with _open(bundle, password) as z:
+        names = [n for n in z.getnames() if n.startswith(prefix)]
+    if names:
+        with _open(bundle, password) as z:
+            z.extract(path=dest, targets=names)
+    return names

@@ -133,7 +133,9 @@ def pack(folders, password: str, drive_root: Path, extra_data: dict | None = Non
                 manifest = {
                     "landfall_version": __version__,
                     "created": datetime.now().isoformat(timespec="seconds"),
-                    "folders": [f.name for f in folders],
+                    # browser data travels in its own private section ("landfall/..."),
+                    # never unpacked as a folder
+                    "folders": [f.name for f in folders if not f.name.startswith("landfall/")],
                     "files": manifest_files,
                     "skipped": skipped,
                     **(extra_data or {}),
@@ -158,3 +160,28 @@ def _hide(path: Path) -> None:
     if sys.platform == "win32":
         import ctypes
         ctypes.windll.kernel32.SetFileAttributesW(str(path), 0x02)  # FILE_ATTRIBUTE_HIDDEN
+
+
+def browser_folders(profiles) -> list:
+    """Turn picked browser profiles into pack-able groups under landfall/browsers/<key>/."""
+    from landfall.scan.folders import FolderInfo, measure
+    out = []
+    for p in profiles:
+        files = list(p.files)
+        if p.password_csv:
+            files.append(p.password_csv)
+        folder = FolderInfo(f"landfall/browsers/{p.key}", p.path, only_files=files)
+        measure(folder)
+        if p.password_csv:                 # always stored under one known name
+            folder.file_list = [
+                (src, rel.with_name("passwords.csv") if src == p.password_csv else rel, size)
+                for src, rel, size in folder.file_list]
+        out.append(folder)
+    return out
+
+
+def browser_records(profiles) -> list[dict]:
+    return [{"key": p.key, "browser": p.browser, "name": p.name, "family": p.family,
+             "profile": p.profile, "bookmarks": p.bookmarks, "history": p.history,
+             "passwords": p.passwords, "files": [f.name for f in p.files],
+             "password_csv": bool(p.password_csv)} for p in profiles]

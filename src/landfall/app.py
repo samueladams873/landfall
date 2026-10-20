@@ -16,12 +16,13 @@ from PySide6.QtWidgets import (QCheckBox, QFileDialog, QGridLayout, QHBoxLayout,
 from landfall.drives import list_drives
 from landfall.mapping import (GROUP_ALT, GROUP_SAME, GROUPS, builtin_apps, by_category,
                               match_all)
-from landfall.pack import PackCancelled, pack, space_needed
+from landfall.pack import PackCancelled, browser_folders, browser_records, pack, space_needed
+from landfall.scan.browsers import find_browsers, open_password_export, running_browsers
 from landfall.report import build_html, option_text
 from landfall.scan.apps import scan_apps
 from landfall.scan.folders import extra_files, extra_folder, find_folders, human_size, measure
 from landfall.scan.hardware import hardware_notes, scan_hardware
-from landfall.ui import (ICON, ICONS, CategoryCard, ChoiceRow, FolderPicker, ScoreRing,
+from landfall.ui import (ICON, ICONS, CategoryCard, ChoiceRow, FolderPicker, ScoreRing, logo_for,
                          StageList,
                          WidthWatcher, HeroPage, Page, Shell, card, folder_icon,
                          label, logo, make_app, picture, run_window, set_role,
@@ -30,7 +31,6 @@ from landfall.ui import (ICON, ICONS, CategoryCard, ChoiceRow, FolderPicker, Sco
 __all__ = ["ICON", "Wizard", "build_window", "main", "label", "logo", "set_role", "start_task"]
 
 COMING_SOON = [
-    "Browser bookmarks, saved passwords and history",
     "Email and contacts",
     "Wi-Fi networks and passwords",
     "Wallpaper and fonts",
@@ -54,6 +54,8 @@ class Wizard(Shell):
         self.result = None
         self._cancel_pack = False
         self.folder_rows: dict[str, ChoiceRow] = {}
+        self.browsers: list = []
+        self.browser_rows: list[tuple] = []
         self.pick_cards: list[CategoryCard] = []
         self.pick_filled = False
         self.back_btn.clicked.connect(self.on_back)
@@ -597,6 +599,16 @@ class Wizard(Shell):
         add_row.addStretch(1)
         self.what_box.addLayout(add_row)
         self.what_box.addSpacing(8)
+        self.what_box.addWidget(label("Your browsers", "Section"))
+        self.what_box.addWidget(label("Bookmarks and history come along automatically. Firefox "
+                                      "passwords too; other browsers lock theirs, so use "
+                                      "\u201cAdd passwords\u201d to export them.", "Muted"))
+        self.browser_box = QVBoxLayout()
+        self.browser_box.setSpacing(8)
+        self.what_box.addLayout(self.browser_box)
+        self.browser_box.addWidget(label("Looking for browsers...", "Muted"))
+        start_task(self, lambda report: find_browsers(), self.show_browsers, self.task_failed)
+        self.what_box.addSpacing(8)
         apps = ChoiceRow(ICONS / "Apps.svg", "Your app list",
                          "So Linux can install the apps you picked", True, False)
         apps.title.setStyleSheet("")
@@ -625,6 +637,70 @@ class Wizard(Shell):
             row.side.addWidget(remove)
         self.folder_rows[folder.name] = row
         (box or self.what_box).addWidget(row)
+
+    # --- browsers -------------------------------------------------------
+    BROWSER_LOGOS = {"firefox": "org.mozilla.firefox", "chrome": "com.google.Chrome",
+                     "brave": "com.brave.Browser", "vivaldi": "com.vivaldi.Vivaldi",
+                     "opera": "com.opera.Opera"}
+
+    def show_browsers(self, profiles):
+        while self.browser_box.count():
+            item = self.browser_box.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
+        self.browsers = profiles
+        self.browser_rows.clear()
+        if not profiles:
+            self.browser_box.addWidget(label("No browser bookmarks or history were found.",
+                                             "Muted"))
+        for p in profiles:
+            icon = logo_for({"flatpak": self.BROWSER_LOGOS.get(p.browser, "")})
+            row = ChoiceRow(icon, p.label, self._browser_detail(p))
+            if p.family == "chromium":
+                btn = QPushButton("Add passwords...")
+                btn.setToolTip(f"Opens {p.name}'s own password page so you can export them")
+                btn.clicked.connect(lambda _=False, prof=p, r=row: self.add_browser_passwords(prof, r))
+                row.side.addWidget(btn)
+            self.browser_rows.append((row, p))
+            self.browser_box.addWidget(row)
+
+    def _browser_detail(self, p) -> str:
+        bits = [plural(p.bookmarks, "bookmark"), f"{p.history:,} history"]
+        if p.family == "firefox":
+            bits.append(plural(p.passwords, "saved password"))
+        elif p.password_csv:
+            bits.append("\u2714 passwords file added")
+        else:
+            bits.append("passwords: click Add passwords")
+        return "  \u00b7  ".join(bits)
+
+    def add_browser_passwords(self, p, row):
+        opened = open_password_export(p)
+        steps = (f"<b>1.</b> In {p.name}, click <b>Export passwords</b> (or the \u22ee menu "
+                 "next to Saved passwords, then Export).<br>"
+                 "<b>2.</b> Confirm with your Windows PIN or password and save the file.<br>"
+                 "<b>3.</b> Come back here and click <b>Pick the file</b>.")
+        if not opened:
+            steps = f"Open {p.name} and go to its Passwords settings.<br>" + steps
+        box = QMessageBox(self)
+        box.setWindowTitle(f"Export your {p.name} passwords")
+        box.setTextFormat(Qt.TextFormat.RichText)
+        box.setText(steps + "<br><br>The file is locked inside your bundle with your password, "
+                    "and Landfall reminds you to delete the copy you saved.")
+        pick = box.addButton("Pick the file", QMessageBox.ButtonRole.AcceptRole)
+        box.addButton("Cancel", QMessageBox.ButtonRole.RejectRole)
+        box.exec()
+        if box.clickedButton() is not pick:
+            return
+        path, _ = QFileDialog.getOpenFileName(self, f"Pick your {p.name} passwords file",
+                                              str(Path.home() / "Downloads"),
+                                              "Passwords file (*.csv)")
+        if path:
+            p.password_csv = Path(path)
+            row.detail.setText(self._browser_detail(p))
+
+    def selected_browsers(self):
+        return [p for row, p in self.browser_rows if row.box.isChecked()]
 
     def _toggle_windows_files(self, leave: bool):
         for folder in self.folders:
@@ -772,11 +848,31 @@ class Wizard(Shell):
 
     # --- step: packing ---------------------------------------------------
     def start_pack(self):
+        browsers = self.selected_browsers()
+        while True:
+            open_now = running_browsers(browsers)
+            if not open_now:
+                break
+            box = QMessageBox(self)
+            box.setWindowTitle("Please close your browsers")
+            box.setText(f"Please close {' and '.join(open_now)} first. Browsers lock their "
+                        "bookmarks while they're open, so Landfall can't copy them yet.")
+            retry = box.addButton("I closed them", QMessageBox.ButtonRole.AcceptRole)
+            skip = box.addButton("Skip browsers", QMessageBox.ButtonRole.DestructiveRole)
+            box.exec()
+            if box.clickedButton() is skip:
+                browsers = []
+                break
+            if box.clickedButton() is not retry:
+                break
+        self._pack_browsers = browsers
         self._cancel_pack = False
         self.stop_btn.setEnabled(True)
         folders, drive, password = self.selected_folders(), self.current_drive(), self.pw1.text()
+        folders = folders + browser_folders(self._pack_browsers)
         extra = {"apps": self._app_records(), "install": self.chosen_apps(),
                  "extra_folders": [f.name for f in folders if f.extra],
+                 "browsers": browser_records(self._pack_browsers),
                  "hardware": self.hw or {}}
         self.pack_status.setText(f"Packing to {drive.title}...")
 

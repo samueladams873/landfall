@@ -26,7 +26,7 @@ or repartitions anything.
 | 📁 | **Your files:** Desktop, Documents, Pictures, Downloads, Music, Videos, plus any folder or file you add, with "Choose..." to pick what's inside | ✅ Working |
 | 🔄 | **"Let's update your PC first":** a full Linux system update, one password, no terminal | ✅ Working |
 | 💡 | **Linux tips along the way** and a quick-start list at the end | ✅ Working |
-| 🌐 | **Browsers:** bookmarks, saved passwords, history, put straight into the browser you picked | 🚧 Next |
+| 🌐 | **Browsers:** bookmarks, history and passwords put straight into the browser you picked (Firefox fully automatic; Chrome, Edge and Brave passwords in one guided step) | ✅ Working |
 | ✉️ | **Email and contacts:** Outlook and Thunderbird mail, Windows and Outlook contacts | Planned |
 | 📶 | **Wi-Fi networks and passwords** | Planned |
 | 🖼️ | **Personal touches:** wallpaper and fonts | Planned |

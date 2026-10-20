@@ -11,11 +11,12 @@ from PySide6.QtWidgets import (QCheckBox, QFileDialog, QGridLayout, QHBoxLayout,
                                QProgressBar, QPushButton, QScrollArea, QVBoxLayout, QWidget)
 
 from landfall.linux import apps as apps_mod
+from landfall.linux import browsers as browsers_mod
 from landfall.linux import system_update
 from landfall.linux.dirs import user_dirs
 from landfall.linux.tips import QUICK_START, TIPS
-from landfall.linux.restore import (RestoreCancelled, WrongPassword, find_bundles,
-                                    read_manifest, restore)
+from landfall.linux.restore import (RestoreCancelled, WrongPassword, extract_private,
+                                    find_bundles, read_manifest, restore)
 from landfall.scan.folders import human_size
 from landfall.sysenv import open_path
 from landfall.ui import (ICONS, ChoiceRow, StageList, TipCard, logo_for, HeroPage, Page, Shell, card, folder_icon, label,
@@ -42,6 +43,7 @@ class Importer(Shell):
         self._checking = False
         self.restore_result = None
         self.app_results: list[tuple[str, bool, str]] = []
+        self.browser_results: list = []
         self.back_btn.clicked.connect(self.on_back)
         self.next_btn.clicked.connect(self.on_next)
         self.update_state = "ready"          # ready / running / done / failed / skipped
@@ -289,6 +291,9 @@ class Importer(Shell):
         self.todo.linkActivated.connect(open_path)
         box2.addWidget(self.todo)
         page.body.addWidget(frame2)
+        self.browser_card, self.browser_box = card()
+        self.browser_card.hide()
+        page.body.addWidget(self.browser_card)
         frame3, box3 = card()
         box3.addWidget(label("Your Linux quick start", "Section"))
         for n, tip in enumerate(QUICK_START, 1):
@@ -517,10 +522,43 @@ class Importer(Shell):
             if c.new:
                 row.side.addWidget(label("New", "PillNew", wrap=False))
             self.what_box.addWidget(row)
+        recs = self.manifest.get("browsers", [])
+        if recs:
+            self.what_box.addSpacing(8)
+            self.what_box.addWidget(label("Your browsers", "Section"))
+            picked = [c.linux_name for c in self.to_install + self.present_apps
+                      if c.flatpak in browsers_mod.FLATPAK_TO_BROWSER]
+            for r in recs:
+                into = self._planned_target(r, picked)
+                bits = [plural(r["bookmarks"], "bookmark")]
+                if r["family"] == "firefox" and into == "Firefox":
+                    bits.append("history")
+                    if r["passwords"]:
+                        bits.append(plural(r["passwords"], "password"))
+                elif r.get("password_csv") or r.get("passwords"):
+                    bits.append("passwords (one click at the end)")
+                row = ChoiceRow(logo_for({"flatpak": {"firefox": "org.mozilla.firefox",
+                                                      "chrome": "com.google.Chrome",
+                                                      "brave": "com.brave.Browser"}
+                                          .get(r["browser"], "")}),
+                                f"{r['name']}  \u2192  {into}", "  \u00b7  ".join(bits),
+                                False, False)
+                row.box.hide()
+                row.title.setStyleSheet("")
+                self.what_box.addWidget(row)
         if self.to_install and not apps_mod.flatpak_available():
             self.what_box.addWidget(label(
                 "Landfall will first set up Flatpak, the app store most Linux PCs use. "
                 "You'll be asked for your computer password once.", "Muted"))
+
+    @staticmethod
+    def _planned_target(rec, picked_names):
+        if rec["family"] == "firefox" and "Firefox" in picked_names:
+            return "Firefox"
+        chromium = [n for n in picked_names if n != "Firefox"]
+        if rec["family"] == "chromium" and chromium:
+            return chromium[0]
+        return picked_names[0] if picked_names else "Firefox"
 
     # --- step: working ----------------------------------------------------
     def start_work(self):
@@ -551,9 +589,42 @@ class Importer(Shell):
                     ok, msg = apps_mod.install_app(a.flatpak)
                     app_results.append((a.linux_name, ok, msg))
                 apps_mod.make_visible()   # show them in the app menu now, no logging out
+            browser_results = []
+            if manifest.get("browsers") and not self._cancel:
+                report(("note", "Moving your bookmarks and passwords..."))
+                browser_results = self._import_browsers(bundle, password, manifest, apps)
+            self.browser_results = browser_results
             return result, app_results
 
         start_task(self, work, self.work_done, self.work_failed, self.work_progress)
+
+    def _import_browsers(self, bundle, password, manifest, apps):
+        import shutil as _sh
+        import tempfile
+        home = Path.home()
+        tmp = Path(tempfile.mkdtemp(prefix=".landfall-browsers-", dir=home))
+        results = []
+        try:
+            extract_private(bundle, password, "landfall/browsers/", tmp)
+            flatpaks, snaps = apps_mod.installed_flatpaks(), apps_mod.installed_snaps()
+            picked = [c.flatpak for c in apps_mod.choices_from_manifest(manifest) if c.flatpak]
+            targets = browsers_mod.choose_targets(picked, home, flatpaks, snaps)
+            for rec in manifest["browsers"]:
+                target = browsers_mod.match_target(rec["family"], rec["browser"], targets)
+                if target is None:
+                    results.append(browsers_mod.BrowserResult(
+                        rec["name"], "", problem="No browser was found on this PC to put "
+                                                 "them in. Install one, then run Landfall again."))
+                    continue
+                try:
+                    results.append(browsers_mod.import_browser(
+                        rec, tmp / "landfall" / "browsers" / rec["key"], target, home))
+                except Exception as err:  # noqa: BLE001 - shown to the user
+                    results.append(browsers_mod.BrowserResult(rec["name"], target.name,
+                                                              problem=str(err)))
+        finally:
+            _sh.rmtree(tmp, ignore_errors=True)
+        return results
 
     def work_progress(self, info):
         kind = info[0]
@@ -624,6 +695,65 @@ class Importer(Shell):
             todo.insert(0, "\u2022 Install updates when you have a moment: open the "
                            "Software app and click Updates.")
         self.todo.setText("<br>".join(todo))
+        self.show_browser_results()
+
+    def show_browser_results(self):
+        while self.browser_box.count():
+            item = self.browser_box.takeAt(0)
+            w = item.widget() if item else None
+            if w:
+                w.deleteLater()
+            elif item and item.layout():
+                lay = item.layout()
+                while lay.count():
+                    x = lay.takeAt(0).widget()
+                    if x:
+                        x.deleteLater()
+        if not self.browser_results:
+            self.browser_card.hide()
+            return
+        self.browser_card.show()
+        self.browser_box.addWidget(label("Your browsers", "Section"))
+        for r in self.browser_results:
+            if r.problem:
+                self.browser_box.addWidget(label(
+                    f"<span style='color:#B4410E'><b>{r.source}:</b> {r.problem}</span>"))
+                continue
+            got = [plural(r.bookmarks, "bookmark")]
+            if r.history:
+                got.append("history")
+            if r.passwords == "copied":
+                got.append("saved passwords")
+            self.browser_box.addWidget(label(f"\u2714 <b>{r.source} \u2192 {r.target}:</b> "
+                                             f"{', '.join(got)} moved in."))
+            if r.passwords == "file":
+                row = QHBoxLayout()
+                row.addWidget(label(f"Passwords from {r.source}: one click left.", "Muted"), 1)
+                imp = QPushButton(f"Import into {r.target}")
+                imp.setObjectName("Primary")
+                imp.clicked.connect(lambda _=False, res=r: self.import_passwords(res))
+                row.addWidget(imp)
+                self.browser_box.addLayout(row)
+
+    def import_passwords(self, res):
+        browsers_mod.open_import_page(res)
+        box = QMessageBox(self)
+        box.setWindowTitle("Import your passwords")
+        box.setTextFormat(Qt.TextFormat.RichText)
+        where = ("click the <b>\u22ef</b> menu, then <b>Import from a File</b>"
+                 if res.target == "Firefox" else "click <b>Select file</b> next to Import passwords")
+        box.setText(f"{res.target} is opening its passwords page.<br><br>"
+                    f"<b>1.</b> There, {where}.<br>"
+                    f"<b>2.</b> Pick this file:<br><code>{res.password_file}</code><br><br>"
+                    "When your passwords show up, come back and delete the file: it holds "
+                    "your passwords in plain text.")
+        delete = box.addButton("Delete the file now", QMessageBox.ButtonRole.DestructiveRole)
+        box.addButton("Not yet", QMessageBox.ButtonRole.RejectRole)
+        box.exec()
+        if box.clickedButton() is delete and res.password_file:
+            res.password_file.unlink(missing_ok=True)
+            res.passwords = ""
+            self.show_browser_results()
 
     def retry_failed(self):
         failed = {n for n, ok, _ in self.app_results if not ok}
