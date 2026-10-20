@@ -1,5 +1,6 @@
 import json
 import sqlite3
+import sys
 
 import pytest
 
@@ -121,7 +122,8 @@ def test_full_trip_into_firefox_and_chromium(windows, tmp_path):
     prefs = (prof / "prefs.js").read_text()
     assert 'browser.places.importBookmarksHTML", true' in prefs
     assert 'browser.toolbars.bookmarks.visibility", "always"' in prefs
-    assert oct(res.password_file.stat().st_mode)[-3:] == "600"
+    if sys.platform != "win32":                      # Linux-only permission: owner can read
+        assert oct(res.password_file.stat().st_mode)[-3:] == "600"
     assert res.import_command == ["true", "about:logins"]
 
     croot = home / ".config/chromium"
