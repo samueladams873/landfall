@@ -746,3 +746,43 @@ class FolderPicker(QWidget):
     def run(self) -> set | None:
         from PySide6.QtWidgets import QDialog
         return self.excluded() if self.dialog.exec() == QDialog.DialogCode.Accepted else None
+
+
+class TipCard(QFrame):
+    """A gentle 'Did you know?' card that shows a new Linux tip every few seconds."""
+
+    def __init__(self, tips, seconds: int = 9):
+        from PySide6.QtCore import QTimer
+        super().__init__()
+        self.setObjectName("TipCard")
+        self.tips, self.i = list(tips), 0
+        row = QHBoxLayout(self)
+        row.setContentsMargins(16, 14, 12, 14)
+        row.setSpacing(12)
+        row.addWidget(picture(ICONS / "tip.svg", 34), 0, Qt.AlignmentFlag.AlignTop)
+        col = QVBoxLayout()
+        col.setSpacing(2)
+        self.kicker = label("Did you know?", "TipKicker", wrap=False)
+        self.title = label("", "Section")
+        self.body = label("", "Muted")
+        col.addWidget(self.kicker)
+        col.addWidget(self.title)
+        col.addWidget(self.body)
+        row.addLayout(col, 1)
+        nxt = QPushButton("Next tip")
+        nxt.setObjectName("Small")
+        nxt.clicked.connect(self.next_tip)
+        row.addWidget(nxt, 0, Qt.AlignmentFlag.AlignTop)
+        self._timer = QTimer(self)
+        self._timer.timeout.connect(self.next_tip)
+        self._timer.start(seconds * 1000)
+        self.show_tip()
+
+    def show_tip(self):
+        title, body = self.tips[self.i % len(self.tips)]
+        self.title.setText(title)
+        self.body.setText(body)
+
+    def next_tip(self):
+        self.i += 1
+        self.show_tip()

@@ -10,7 +10,7 @@ def test_windows_wizard_builds(window_factory):
 
 def test_linux_wizard_builds(window_factory):
     window = window_factory(Importer)
-    assert window.stack.count() == 6
+    assert window.stack.count() == 7
     assert window.next_btn.text() == "Get started"
 
 

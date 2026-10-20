@@ -11,20 +11,23 @@ from PySide6.QtWidgets import (QCheckBox, QFileDialog, QGridLayout, QHBoxLayout,
                                QProgressBar, QPushButton, QScrollArea, QVBoxLayout, QWidget)
 
 from landfall.linux import apps as apps_mod
+from landfall.linux import system_update
 from landfall.linux.dirs import user_dirs
+from landfall.linux.tips import QUICK_START, TIPS
 from landfall.linux.restore import (RestoreCancelled, WrongPassword, find_bundles,
                                     read_manifest, restore)
 from landfall.scan.folders import human_size
 from landfall.sysenv import open_path
-from landfall.ui import (ICONS, ChoiceRow, logo_for, HeroPage, Page, Shell, card, folder_icon, label,
+from landfall.ui import (ICONS, ChoiceRow, StageList, TipCard, logo_for, HeroPage, Page, Shell, card, folder_icon, label,
                          make_app, picture, run_window, set_role, start_task,
                          text_field, plural)
 
-STEPS = ["Welcome", "Find your bundle", "Unlock it", "Review", "Setting up", "All done"]
+STEPS = ["Welcome", "Update your PC", "Find your bundle", "Unlock it", "Review", "Setting up",
+         "All done"]
 
 
 class Importer(Shell):
-    WELCOME, FIND, PASSWORD, WHAT, WORKING, DONE = range(6)
+    WELCOME, UPDATE, FIND, PASSWORD, WHAT, WORKING, DONE = range(7)
 
     def __init__(self):
         super().__init__(STEPS, "Welcome to Linux")
@@ -41,7 +44,10 @@ class Importer(Shell):
         self.app_results: list[tuple[str, bool, str]] = []
         self.back_btn.clicked.connect(self.on_back)
         self.next_btn.clicked.connect(self.on_next)
-        for build in (self._page_welcome, self._page_find, self._page_password,
+        self.update_state = "ready"          # ready / running / done / failed / skipped
+        self.update_plan = system_update.detect()
+        self.restart_later = False
+        for build in (self._page_welcome, self._page_update, self._page_find, self._page_password,
                       self._page_what, self._page_working, self._page_done):
             self.stack.addWidget(build())
         self.go(self.WELCOME)
@@ -72,6 +78,112 @@ class Importer(Shell):
                                   "if you haven't yet.", "Good"))
         page.body.addStretch(1)
         return page
+
+    def _page_update(self):
+        page = Page("Let's update your PC first",
+                    "New Linux PCs usually have updates waiting. Landfall installs them for you, "
+                    "no typing commands. It asks for your password once.")
+        frame, box = card()
+        head = QHBoxLayout()
+        head.addWidget(picture(ICONS / "hardware.svg", 40))
+        head.addSpacing(8)
+        words = QVBoxLayout()
+        words.setSpacing(2)
+        name = self.update_plan.label if self.update_plan else "your Linux"
+        words.addWidget(label(f"Update {name}", "Section"))
+        self.update_status = label("This usually takes 5 to 20 minutes. You can keep the "
+                                   "window open and watch, or step away.", "Muted")
+        words.addWidget(self.update_status)
+        head.addLayout(words, 1)
+        box.addLayout(head)
+        self.update_stages = StageList(["Checking for updates", "Installing updates",
+                                        "Updating your apps", "All up to date"])
+        box.addWidget(self.update_stages)
+        self.update_bar = QProgressBar()
+        self.update_bar.setRange(0, 1000)
+        self.update_bar.setValue(0)
+        box.addWidget(self.update_bar)
+        self.update_item = label("", "Muted", wrap=False)
+        box.addWidget(self.update_item)
+        row = QHBoxLayout()
+        row.addStretch(1)
+        self.skip_update_btn = QPushButton("Skip for now")
+        self.skip_update_btn.clicked.connect(self.skip_update)
+        row.addWidget(self.skip_update_btn)
+        box.addLayout(row)
+        page.body.addWidget(frame)
+        page.body.addWidget(TipCard(TIPS))
+        page.body.addStretch(1)
+        if not self.update_plan:
+            self.update_state = "skipped"
+            self.update_status.setText("Landfall couldn't tell how this Linux installs updates, "
+                                       "so this step is skipped. Use your Software app later.")
+        return page
+
+    def start_update(self):
+        self.update_state = "running"
+        self.update_stages.set_stage(0)
+        self.update_bar.setRange(0, 0)
+        self.skip_update_btn.setEnabled(False)
+        set_role(self.update_status, "Muted")
+        self.update_status.setText("A password window will pop up. Type the password you "
+                                   "use to sign in to this PC.")
+        self.update_buttons()
+        plan = self.update_plan
+        start_task(self, lambda report: system_update.run_update(plan, report),
+                   self.update_finished, self.update_crashed, self.update_progress)
+
+    def update_progress(self, ev):
+        kind = ev[0]
+        if kind == "stage":
+            idx = {"check": 0, "install": 1, "apps": 2, "done": 3}.get(ev[1], 0)
+            self.update_stages.set_stage(idx)
+            if ev[1] == "check":
+                self.update_status.setText("Checking which updates are available...")
+            elif ev[1] == "apps":
+                self.update_bar.setRange(0, 0)
+                self.update_status.setText("Updating your apps from the app store...")
+                self.update_item.setText("")
+        elif kind == "progress":
+            done, total = ev[1], ev[2]
+            if total:
+                self.update_bar.setRange(0, total)
+                self.update_bar.setValue(done)
+                self.update_status.setText(f"Installing updates  \u00b7  {int(100 * done / total)}%")
+            if len(ev) > 3:
+                self.update_item.setText(ev[3])
+        elif kind == "item":
+            self.update_item.setText(ev[1])
+
+    def update_finished(self, result):
+        ok, msg = result
+        self.update_bar.setRange(0, 1000)
+        self.skip_update_btn.setEnabled(True)
+        if ok:
+            self.update_state = "done"
+            self.update_stages.set_stage(4)
+            self.update_bar.setValue(1000)
+            self.update_item.setText("")
+            self.restart_later = system_update.restart_needed()
+            set_role(self.update_status, "Good")
+            self.update_status.setText("\u2714  Your PC is up to date."
+                                       + ("  A restart finishes a few updates; Landfall will "
+                                          "remind you at the end." if self.restart_later else ""))
+            self.skip_update_btn.hide()
+        else:
+            self.update_state = "failed"
+            set_role(self.update_status, "Warn")
+            self.update_status.setText(f"The update didn't finish: {msg}  You can try again, "
+                                       "or skip it and update later from the Software app.")
+            self.skip_update_btn.setText("Skip for now")
+        self.update_buttons()
+
+    def update_crashed(self, err):
+        self.update_finished((False, str(err)))
+
+    def skip_update(self):
+        self.update_state = "skipped"
+        self.go(self.FIND)
 
     def _page_find(self):
         page = Page("Find your bundle", "Pick the one you made on your Windows PC.")
@@ -151,6 +263,7 @@ class Importer(Shell):
         row.addWidget(self.stop_btn)
         box.addLayout(row)
         page.body.addWidget(frame)
+        page.body.addWidget(TipCard(TIPS[3:] + TIPS[:3]))   # start with different tips
         page.body.addStretch(1)
         return page
 
@@ -176,6 +289,11 @@ class Importer(Shell):
         self.todo.linkActivated.connect(open_path)
         box2.addWidget(self.todo)
         page.body.addWidget(frame2)
+        frame3, box3 = card()
+        box3.addWidget(label("Your Linux quick start", "Section"))
+        for n, tip in enumerate(QUICK_START, 1):
+            box3.addWidget(label(f"<b>{n}.</b>&nbsp;&nbsp;{tip}"))
+        page.body.addWidget(frame3)
         row = QHBoxLayout()
         files = QPushButton("Open my files")
         files.clicked.connect(lambda: open_path(str(Path.home())))
@@ -198,12 +316,17 @@ class Importer(Shell):
     def update_buttons(self):
         i = self.stack.currentIndex()
         self.back_btn.setVisible(i not in (self.WELCOME, self.DONE))
-        self.back_btn.setEnabled(i != self.WORKING)
+        self.back_btn.setEnabled(i != self.WORKING
+                                 and not (i == self.UPDATE and self.update_state == "running"))
         self.cancel_btn.setVisible(i != self.DONE)
-        self.next_btn.setText({self.WELCOME: "Get started", self.PASSWORD: "Unlock",
-                               self.WHAT: "Start", self.DONE: "Finish"}.get(i, "Next"))
+        update_label = {"ready": "Update now", "failed": "Try again"}.get(self.update_state,
+                                                                           "Next")
+        self.next_btn.setText({self.WELCOME: "Get started", self.UPDATE: update_label,
+                               self.PASSWORD: "Unlock", self.WHAT: "Start",
+                               self.DONE: "Finish"}.get(i, "Next"))
         self.next_btn.setEnabled({
             self.WELCOME: True,
+            self.UPDATE: self.update_state != "running",
             self.FIND: 0 <= self.bundle_list.currentRow() < len(self.bundles),
             self.PASSWORD: bool(self.pw.text()) and not self._checking,
             self.WHAT: self._space_ok(), self.WORKING: False,
@@ -216,7 +339,12 @@ class Importer(Shell):
         i = self.stack.currentIndex()
         if not self.next_btn.isEnabled():
             return
-        if i == self.FIND:
+        if i == self.UPDATE:
+            if self.update_state in ("ready", "failed"):
+                self.start_update()
+            else:
+                self.go(self.FIND)
+        elif i == self.FIND:
             self.bundle = self.bundles[self.bundle_list.currentRow()]
             self.go(self.PASSWORD)
         elif i == self.PASSWORD:
@@ -230,6 +358,11 @@ class Importer(Shell):
             self.go(i + 1)
 
     def closeEvent(self, event):
+        if self.stack.currentIndex() == self.UPDATE and self.update_state == "running":
+            QMessageBox.information(self, "Updating", "Please wait for the update to finish. "
+                                    "Stopping in the middle can leave things half-installed.")
+            event.ignore()
+            return
         if self.stack.currentIndex() == self.WORKING:
             if QMessageBox.question(self, "Stop?", "Landfall is still working. Stop and close?") \
                     != QMessageBox.StandardButton.Yes:
@@ -484,6 +617,12 @@ class Importer(Shell):
         todo.append("\u2022 Sign in to your browser to bring back bookmarks and passwords "
                     "(automatic moving for these is coming soon).")
         todo.append("\u2022 Keep the USB drive until you've checked everything arrived.")
+        if self.restart_later:
+            todo.insert(0, "\u2022 <b>Restart your PC</b> when you're ready, to finish "
+                           "installing updates.")
+        elif self.update_state == "skipped":
+            todo.insert(0, "\u2022 Install updates when you have a moment: open the "
+                           "Software app and click Updates.")
         self.todo.setText("<br>".join(todo))
 
     def retry_failed(self):

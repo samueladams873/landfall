@@ -52,6 +52,10 @@ QLabel#PillGood {{ color: #1E7E3A; background: #E2F6E8; border-radius: 8px; padd
     font-size: 8.5pt; font-weight: 600; }}
 QLabel#PillGrey {{ color: #4A5568; background: #EDF1F6; border-radius: 8px; padding: 2px 8px;
     font-size: 8.5pt; font-weight: 600; }}
+QFrame#TipCard {{ background: #FFFBEA; border: 1px solid #F3E2A6; border-radius: 12px; }}
+QFrame#TipCard QLabel {{ background: transparent; }}
+QLabel#TipKicker {{ color: #9A6B00; font-size: 9pt; font-weight: 700; }}
+QPushButton#Small {{ min-width: 0; min-height: 28px; padding: 0 12px; font-size: 9.5pt; }}
 QLabel#Hero {{ font-size: 22pt; font-weight: 700; }}
 QLabel#Section {{ font-size: 11.5pt; font-weight: 600; }}
 QLabel#Muted {{ color: {MUTED}; }}
