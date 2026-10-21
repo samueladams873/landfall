@@ -658,7 +658,10 @@ class Wizard(Shell):
             icon = logo_for({"flatpak": self.BROWSER_LOGOS.get(p.browser, "")})
             row = ChoiceRow(icon, p.label, self._browser_detail(p))
             if p.family == "chromium":
-                btn = QPushButton("Move passwords too")
+                btn = QPushButton("Add passwords")
+                btn.setObjectName("Primary")
+                # never let the label clip: size the button to its text plus padding
+                btn.setMinimumWidth(btn.fontMetrics().horizontalAdvance("Add passwords") + 44)
                 btn.clicked.connect(lambda _=False, prof=p, r=row: self.move_browser_passwords(prof, r))
                 row._pw_btn = btn
                 row.side.addWidget(btn)
