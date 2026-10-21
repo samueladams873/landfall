@@ -12,7 +12,7 @@ from PySide6.QtWidgets import (QApplication, QCheckBox, QFrame, QGraphicsDropSha
 from landfall import __version__
 from landfall.theme import DATA, FONT, STYLE
 
-ICON = DATA / "landfall.png"
+ICON = DATA / "penguinport.png"
 ICONS = DATA / "icons"
 
 
@@ -36,7 +36,7 @@ def make_app(argv=None) -> QApplication:
     app.setFont(font)
     app.setStyleSheet(STYLE.replace(f'"{FONT}"', f'"{family}"'))
     app.setWindowIcon(QIcon(str(ICON)))
-    app.setApplicationName("Landfall")
+    app.setApplicationName("PenguinPort")
     app.setDesktopFileName("landfall")
     return app
 
@@ -244,7 +244,7 @@ class Shell(QWidget):
     def __init__(self, steps: list[str], tagline: str):
         super().__init__()
         self.setObjectName("Root")
-        self.setWindowTitle("Landfall")
+        self.setWindowTitle("PenguinPort")
         self.resize(1120, 720)
         self.steps = steps
 
@@ -264,7 +264,7 @@ class Shell(QWidget):
         brand.addSpacing(6)
         words = QVBoxLayout()
         words.setSpacing(0)
-        words.addWidget(label("Landfall", "Brand"))
+        words.addWidget(label("PenguinPort", "Brand"))
         words.addWidget(label(tagline, "BrandSub"))
         brand.addLayout(words, 1)
         s.addLayout(brand)

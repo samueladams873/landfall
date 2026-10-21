@@ -11,7 +11,7 @@ from landfall.scan.hardware import hardware_notes
 _GROUP_HELP = {
     GROUP_SAME: "The same app is available on Linux.",
     GROUP_ALT: "A different free app does the same job on Linux.",
-    GROUP_NONE: "Only runs through Wine, or Landfall doesn't know this app yet.",
+    GROUP_NONE: "Only runs through Wine, or PenguinPort doesn't know this app yet.",
 }
 
 _CSS = """
@@ -63,9 +63,9 @@ def build_html(grouped: dict[str, list[MatchResult]], hw: dict) -> str:
     parts = [
         "<!doctype html><html><head><meta charset='utf-8'>",
         "<meta name='viewport' content='width=device-width,initial-scale=1'>",
-        f"<title>Landfall readiness report</title><style>{_CSS}</style></head><body>",
+        f"<title>PenguinPort readiness report</title><style>{_CSS}</style></head><body>",
         "<h1>Linux readiness report</h1>",
-        f"<p class='muted'>Made by Landfall {escape(__version__)} on "
+        f"<p class='muted'>Made by PenguinPort {escape(__version__)} on "
         f"{datetime.now():%B %d, %Y at %I:%M %p}. Nothing on this PC was changed.</p>",
         f"<p><b>{ready} of {total}</b> of your apps work on Linux or have a Linux alternative.</p>",
     ]
@@ -87,7 +87,7 @@ def build_html(grouped: dict[str, list[MatchResult]], hw: dict) -> str:
             parts.append(f"<tr><td>{escape(r.app['name'])}</td><td>{linux}</td></tr>")
         parts.append("</table>")
     parts.append(f"<h2>Your hardware</h2><table>{_hw_rows(hw)}</table>")
-    parts.append("<p class='muted'>Landfall is free and open source: "
+    parts.append("<p class='muted'>PenguinPort is free and open source: "
                  "<a href='https://github.com/samueladams873/landfall'>github.com/samueladams873/landfall</a></p>")
     parts.append("</body></html>")
     return "\n".join(parts)

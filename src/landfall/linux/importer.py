@@ -32,7 +32,7 @@ class Importer(Shell):
 
     def __init__(self):
         super().__init__(STEPS, "Welcome to Linux")
-        self.setWindowTitle("Landfall Moving Wizard")
+        self.setWindowTitle("PenguinPort \u2014 Move to Linux")
         self.bundles, self.bundle, self.manifest, self.password = [], None, None, ""
         self.dests = user_dirs()
         self.folder_rows: dict[str, ChoiceRow] = {}
@@ -58,7 +58,7 @@ class Importer(Shell):
     def _page_welcome(self):
         page = HeroPage("Welcome to your new PC", "Let's bring your things over from Windows.")
         frame, box = card()
-        box.addWidget(label("Landfall will", "Section"))
+        box.addWidget(label("PenguinPort will", "Section"))
         for icon, title, text in (
                 ("Documents", "Unpack your files", "Documents, pictures and more go into the "
                                                    "matching folders."),
@@ -76,14 +76,14 @@ class Importer(Shell):
             box.addLayout(row)
         page.body.addWidget(frame)
         page.body.addSpacing(6)
-        page.body.addWidget(label("Plug in the USB drive with your Landfall Move folder now, "
+        page.body.addWidget(label("Plug in the USB drive with your PenguinPort Move folder now, "
                                   "if you haven't yet.", "Good"))
         page.body.addStretch(1)
         return page
 
     def _page_update(self):
         page = Page("Let's update your PC first",
-                    "New Linux PCs usually have updates waiting. Landfall installs them for you, "
+                    "New Linux PCs usually have updates waiting. PenguinPort installs them for you, "
                     "no typing commands. It asks for your password once.")
         frame, box = card()
         head = QHBoxLayout()
@@ -118,7 +118,7 @@ class Importer(Shell):
         page.body.addStretch(1)
         if not self.update_plan:
             self.update_state = "skipped"
-            self.update_status.setText("Landfall couldn't tell how this Linux installs updates, "
+            self.update_status.setText("PenguinPort couldn't tell how this Linux installs updates, "
                                        "so this step is skipped. Use your Software app later.")
         return page
 
@@ -169,7 +169,7 @@ class Importer(Shell):
             self.restart_later = system_update.restart_needed()
             set_role(self.update_status, "Good")
             self.update_status.setText("\u2714  Your PC is up to date."
-                                       + ("  A restart finishes a few updates; Landfall will "
+                                       + ("  A restart finishes a few updates; PenguinPort will "
                                           "remind you at the end." if self.restart_later else ""))
             self.skip_update_btn.hide()
         else:
@@ -242,7 +242,7 @@ class Importer(Shell):
 
     def _page_what(self):
         page = Page("Review and start",
-                    "Here's everything Landfall will set up. Click Start and it does the rest.")
+                    "Here's everything PenguinPort will set up. Click Start and it does the rest.")
         self.what_box = self._scroll_box(page)
         self.what_total = label("", "Section")
         page.body.addWidget(self.what_total)
@@ -369,7 +369,7 @@ class Importer(Shell):
             event.ignore()
             return
         if self.stack.currentIndex() == self.WORKING:
-            if QMessageBox.question(self, "Stop?", "Landfall is still working. Stop and close?") \
+            if QMessageBox.question(self, "Stop?", "PenguinPort is still working. Stop and close?") \
                     != QMessageBox.StandardButton.Yes:
                 event.ignore()
                 return
@@ -397,7 +397,7 @@ class Importer(Shell):
         self.update_buttons()
 
     def browse_bundle(self):
-        folder = QFileDialog.getExistingDirectory(self, "Where is your Landfall Move folder?",
+        folder = QFileDialog.getExistingDirectory(self, "Where is your PenguinPort Move folder?",
                                                   str(Path.home()))
         if folder:
             self.refresh_bundles([Path(folder)])
@@ -548,7 +548,7 @@ class Importer(Shell):
                 self.what_box.addWidget(row)
         if self.to_install and not apps_mod.flatpak_available():
             self.what_box.addWidget(label(
-                "Landfall will first set up Flatpak, the app store most Linux PCs use. "
+                "PenguinPort will first set up Flatpak, the app store most Linux PCs use. "
                 "You'll be asked for your computer password once.", "Muted"))
 
     @staticmethod
@@ -614,7 +614,7 @@ class Importer(Shell):
                 if target is None:
                     results.append(browsers_mod.BrowserResult(
                         rec["name"], "", problem="No browser was found on this PC to put "
-                                                 "them in. Install one, then run Landfall again."))
+                                                 "them in. Install one, then run PenguinPort again."))
                     continue
                 try:
                     results.append(browsers_mod.import_browser(
@@ -754,7 +754,7 @@ class Importer(Shell):
         steps = [
             {"title": f"Bring your passwords into {res.target}",
              "body": f"Your {res.source} passwords came across. The last step is to load them "
-                     f"into {res.target}. Landfall opens the right page and tells you exactly "
+                     f"into {res.target}. PenguinPort opens the right page and tells you exactly "
                      "what to click."},
             {"title": f"Close {res.target} windows first",
              "body": f"If you have any <b>{res.target}</b> windows open, close them now.<br><br>"
@@ -769,7 +769,7 @@ class Importer(Shell):
                      f"{res.target}. Then come back here and click <b>Next</b>.",
              "action": (f"Open {res.target}", open_browser)},
             {"title": "Tidy up",
-             "body": "All done. For safety, Landfall will now delete the leftover passwords "
+             "body": "All done. For safety, PenguinPort will now delete the leftover passwords "
                      "file, since it holds your passwords in plain text. Your passwords stay "
                      f"safely inside {res.target}.",
              "action": ("Delete the leftover file", delete_file)},
@@ -800,14 +800,14 @@ class Importer(Shell):
         start_task(self, work, finished, self.task_failed)
 
     def task_failed(self, err):
-        QMessageBox.warning(self, "Something went wrong", f"Landfall hit a problem:\n{err}")
+        QMessageBox.warning(self, "Something went wrong", f"PenguinPort hit a problem:\n{err}")
 
     def work_failed(self, err):
         self.stop_btn.setEnabled(True)
         self.work_bar.setRange(0, 1000)
         if not isinstance(err, RestoreCancelled):
             QMessageBox.warning(self, "Something went wrong",
-                                "Landfall stopped before finishing. Nothing already on this PC "
+                                "PenguinPort stopped before finishing. Nothing already on this PC "
                                 f"was replaced.\n\nDetails: {err}")
         self.go(self.WHAT)
 

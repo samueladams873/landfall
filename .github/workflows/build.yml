@@ -1,4 +1,4 @@
-name: Build Landfall
+name: Build PenguinPort
 
 on:
   push:
@@ -30,13 +30,13 @@ jobs:
           QT_QPA_PLATFORM: offscreen
       - name: Build Linux app
         run: >
-          pyinstaller --noconfirm --onedir --windowed --name landfall
+          pyinstaller --noconfirm --onedir --windowed --name penguinport
           --paths "$PWD/src" --add-data "$PWD/src/landfall/data:landfall/data"
           --distpath build/linux --workpath build/work --specpath build run_landfall.py
       - name: Use the computer's own font libraries
         # Bundled copies from this older build machine can't read newer distros' font
         # settings, which shows every letter as an empty box. Every desktop Linux has these.
-        run: rm -f build/linux/landfall/_internal/libfontconfig.so* build/linux/landfall/_internal/libfreetype.so* build/linux/landfall/_internal/libexpat.so*
+        run: rm -f build/linux/penguinport/_internal/libfontconfig.so* build/linux/penguinport/_internal/libfreetype.so* build/linux/penguinport/_internal/libexpat.so*
       - name: Package .deb and .rpm
         run: |
           curl -sSL -o nfpm.tgz "https://github.com/goreleaser/nfpm/releases/download/v${NFPM_VERSION}/nfpm_${NFPM_VERSION}_Linux_x86_64.tar.gz"
@@ -48,7 +48,7 @@ jobs:
           ls -la linux-out
       - uses: actions/upload-artifact@v5
         with:
-          name: Landfall-linux
+          name: PenguinPort-linux
           path: linux-out/*
 
   windows:
@@ -70,11 +70,11 @@ jobs:
       - name: Get the Linux installers to carry inside the .exe
         uses: actions/download-artifact@v5
         with:
-          name: Landfall-linux
+          name: PenguinPort-linux
           path: src/landfall/data/linux
       - name: Build exe
-        run: pyinstaller --onefile --windowed --name Landfall --paths src --add-data "src/landfall/data:landfall/data" --icon src/landfall/data/landfall.ico run_landfall.py
+        run: pyinstaller --onefile --windowed --name PenguinPort --paths src --add-data "src/landfall/data:landfall/data" --icon src/landfall/data/penguinport.ico run_landfall.py
       - uses: actions/upload-artifact@v5
         with:
-          name: Landfall-windows
-          path: dist/Landfall.exe
+          name: PenguinPort-windows
+          path: dist/PenguinPort.exe

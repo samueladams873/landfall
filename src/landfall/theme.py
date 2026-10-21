@@ -5,15 +5,17 @@ DATA = Path(__file__).parent / "data"
 _ICONS = (DATA / "icons").as_posix()
 FONT = "Inter"
 
-BLUE, BLUE_DARK, GREEN, TEXT, MUTED = "#2F7DF6", "#1450B8", "#2BA84A", "#1B2433", "#5B6B82"
+# PenguinPort palette: harbor blue, deep navy, warm orange accent, penguin-ink text
+BLUE, BLUE_DARK, TEXT, MUTED = "#1E6FB8", "#163A5F", "#182033", "#5B6B82"
+ORANGE, ORANGE_DARK = "#F2A33C", "#D98522"
 
 STYLE = f"""
 * {{ font-family: "{FONT}"; font-size: 10.5pt; color: {TEXT}; }}
-QWidget#Root, QWidget#Content, QScrollArea#PageScroll {{ background: #EEF3FA; }}
+QWidget#Root, QWidget#Content, QScrollArea#PageScroll {{ background: #EDF2F8; }}
 
 /* Left side: brand and the list of steps */
 QFrame#Sidebar {{
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #2A74EC, stop:1 {BLUE_DARK});
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #2379C2, stop:0.6 {BLUE}, stop:1 {BLUE_DARK});
 }}
 QLabel#Brand {{ color: white; font-size: 17pt; font-weight: 700; background: transparent; }}
 QLabel#BrandSub {{ color: #D6E6FF; font-size: 9.5pt; background: transparent; }}
@@ -77,11 +79,11 @@ QPushButton:pressed {{ background: #E6EFFD; }}
 QPushButton:disabled {{ color: #A3AEC0; border-color: #E1E6EE; background: #F7F9FC; }}
 QPushButton#Primary {{
     color: white; font-weight: 600; border: none;
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #3BC062, stop:1 #24963F);
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #F2A33C, stop:1 {ORANGE_DARK});
 }}
 QPushButton#Primary:hover {{ background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-    stop:0 #45CB6C, stop:1 #279E44); }}
-QPushButton#Primary:disabled {{ color: #F0F6F1; background: #A9D9B6; }}
+    stop:0 #F6B056, stop:1 #E08E1F); }}
+QPushButton#Primary:disabled {{ color: #FBF2E4; background: #F3D3A0; }}
 
 /* Lists, trees, inputs, tabs */
 QTreeWidget, QListWidget {{
@@ -118,7 +120,7 @@ QScrollBar::handle:horizontal {{ background: #C3CFE0; border-radius: 4px; min-wi
 QProgressBar {{ border: none; border-radius: 7px; background: #DDE6F3; height: 14px;
     text-align: center; color: transparent; }}
 QProgressBar::chunk {{ border-radius: 7px; background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
-    stop:0 {BLUE}, stop:1 #4FA0FF); }}
+    stop:0 {BLUE}, stop:1 #3B95D6); }}
 
 QCheckBox {{ spacing: 10px; }}
 QCheckBox:disabled {{ color: #9AA6B8; }}

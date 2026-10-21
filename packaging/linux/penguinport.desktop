@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=PenguinPort
+GenericName=Move to Linux
+Comment=Bring your files and apps over from Windows
+Exec=/opt/penguinport/penguinport
+Icon=penguinport
+Terminal=false
+Categories=Utility;System;
+Keywords=windows;migrate;move;transfer;import;linux;
+StartupWMClass=penguinport

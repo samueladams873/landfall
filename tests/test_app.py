@@ -4,7 +4,7 @@ from landfall.linux.importer import Importer
 
 def test_windows_wizard_builds(window_factory):
     window = window_factory(build_window)
-    assert window.windowTitle() == "Landfall Moving Wizard"
+    assert window.windowTitle() == "PenguinPort — Move to Linux"
     assert window.stack.count() == 7
 
 

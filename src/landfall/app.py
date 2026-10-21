@@ -47,7 +47,7 @@ class Wizard(Shell):
 
     def __init__(self):
         super().__init__(STEPS, "Moving Wizard")
-        self.setWindowTitle("Landfall Moving Wizard")
+        self.setWindowTitle("PenguinPort \u2014 Move to Linux")
         self.grouped = self.hw = None
         self.folders = []
         self.measured = False
@@ -68,7 +68,7 @@ class Wizard(Shell):
 
     # --- pages ------------------------------------------------------------
     def _page_welcome(self):
-        page = HeroPage("Welcome to Landfall",
+        page = HeroPage("Welcome to PenguinPort",
                         "Move from Windows to Linux without losing a thing.")
         frame, box = card()
         box.addWidget(label("Here's what happens next", "Section"))
@@ -91,7 +91,7 @@ class Wizard(Shell):
             box.addLayout(row)
         page.body.addWidget(frame)
         page.body.addSpacing(6)
-        page.body.addWidget(label("\u2714  Landfall only reads from this PC. It never changes, "
+        page.body.addWidget(label("\u2714  PenguinPort only reads from this PC. It never changes, "
                                   "deletes or moves anything here.", "Good"))
         page.body.addStretch(1)
         return page
@@ -247,7 +247,7 @@ class Wizard(Shell):
                 self.pick_box.addWidget(label("Built into Windows", "Section"))
                 self.pick_box.addWidget(label(
                     "Every Windows PC has these. Most Linux PCs come with their own versions, "
-                    "and Landfall only installs what's missing.", "Muted"))
+                    "and PenguinPort only installs what's missing.", "Muted"))
             card_ = CategoryCard(cat)
             card_.changed.connect(self.update_pick_total)
             self.pick_cards.append(card_)
@@ -324,7 +324,7 @@ class Wizard(Shell):
         frame2, box2 = card()
         box2.addWidget(label("Choose a password", "Section"))
         box2.addWidget(label("You'll type it once more on your Linux PC. Write it down: if it's "
-                             "lost, nobody can open your files, not even Landfall.", "Muted"))
+                             "lost, nobody can open your files, not even PenguinPort.", "Muted"))
         grid = QGridLayout()
         grid.setHorizontalSpacing(12)
         grid.setVerticalSpacing(10)
@@ -377,15 +377,15 @@ class Wizard(Shell):
         frame2, box2 = card()
         box2.addWidget(label("On your new Linux PC", "Section"))
         for n, line in enumerate((
-                "Plug in the USB drive and open the \u201cLandfall Move\u201d folder.",
-                "Double-click the Landfall installer for your Linux, then click Install.",
-                "Open Landfall from your app menu and type your password."), 1):
+                "Plug in the USB drive and open the \u201cPenguinPort Move\u201d folder.",
+                "Double-click the PenguinPort installer for your Linux, then click Install.",
+                "Open PenguinPort from your app menu and type your password."), 1):
             box2.addWidget(label(f"<b>{n}.</b>&nbsp;&nbsp;{line}"))
         box2.addWidget(label("The \u201cSTART HERE\u201d file on the drive has the same steps.",
                              "Muted"))
         page.body.addWidget(frame2)
         row = QHBoxLayout()
-        open_btn = QPushButton("Open the Landfall Move folder")
+        open_btn = QPushButton("Open the PenguinPort Move folder")
         open_btn.clicked.connect(self.open_result_folder)
         row.addWidget(open_btn)
         row.addStretch(1)
@@ -435,7 +435,7 @@ class Wizard(Shell):
     def closeEvent(self, event):
         if self.stack.currentIndex() == self.PACKING:
             if QMessageBox.question(self, "Stop packing?",
-                                    "Packing isn't finished. Stop and close Landfall?") \
+                                    "Packing isn't finished. Stop and close PenguinPort?") \
                     != QMessageBox.StandardButton.Yes:
                 event.ignore()
                 return
@@ -554,9 +554,9 @@ class Wizard(Shell):
             self.hw_tree.addTopLevelItem(QTreeWidgetItem([name, text or "None found"]))
 
     def save_report(self):
-        default = Path.home() / "Desktop" / "Landfall report.html"
+        default = Path.home() / "Desktop" / "PenguinPort report.html"
         if not default.parent.exists():
-            default = Path.home() / "Landfall report.html"
+            default = Path.home() / "PenguinPort report.html"
         path, _ = QFileDialog.getSaveFileName(self, "Save report", str(default),
                                               "Web page (*.html)")
         if not path:
@@ -704,7 +704,7 @@ class Wizard(Shell):
         steps = [
             {"title": f"Move your {p.name} passwords",
              "body": f"{p.name} keeps your saved passwords locked so only it can read them. "
-                     "In a few short steps, Landfall helps you unlock a copy and bring it "
+                     "In a few short steps, PenguinPort helps you unlock a copy and bring it "
                      "along. It stays locked inside your bundle with your password.<br><br>"
                      "Prefer to skip it? Click <b>Skip this</b> and you'll just sign in to "
                      "your sites again on Linux. Click <b>Next</b> to move them."},
@@ -723,7 +723,7 @@ class Wizard(Shell):
              "action": (f"Open {p.name}", open_page)},
             {"title": "Choose the file you saved",
              "body": "Last step: click the button below and pick the passwords file you just "
-                     "saved.<br><br>Landfall locks it inside your bundle right away, and on "
+                     "saved.<br><br>PenguinPort locks it inside your bundle right away, and on "
                      "Linux it puts the passwords into your new browser for you.",
              "action": ("Choose the file", pick_file)},
         ]
@@ -892,7 +892,7 @@ class Wizard(Shell):
             box = QMessageBox(self)
             box.setWindowTitle("Please close your browsers")
             box.setText(f"Please close {' and '.join(open_now)} first. Browsers lock their "
-                        "bookmarks while they're open, so Landfall can't copy them yet.")
+                        "bookmarks while they're open, so PenguinPort can't copy them yet.")
             retry = box.addButton("I closed them", QMessageBox.ButtonRole.AcceptRole)
             skip = box.addButton("Skip browsers", QMessageBox.ButtonRole.DestructiveRole)
             box.exec()
@@ -965,7 +965,7 @@ class Wizard(Shell):
             os.startfile(self.result.folder)  # noqa: S606 - opens Explorer on our own folder
 
     def task_failed(self, err):
-        QMessageBox.warning(self, "Something went wrong", f"Landfall hit a problem:\n{err}")
+        QMessageBox.warning(self, "Something went wrong", f"PenguinPort hit a problem:\n{err}")
 
 
 def build_window() -> QWidget:

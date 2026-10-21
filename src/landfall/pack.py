@@ -1,7 +1,7 @@
 """Pack the chosen folders into one password-locked bundle (7z, AES-256).
 
 The bundle is split into 3.9 GB parts so it fits USB drives formatted FAT32.
-Anyone can open it with free 7-Zip, or with Landfall on Linux.
+Anyone can open it with free 7-Zip, or with PenguinPort on Linux.
 """
 from __future__ import annotations
 
@@ -18,9 +18,9 @@ import py7zr
 from landfall import __version__
 
 PART_SIZE = 3900 * 1024 * 1024
-BUNDLE_NAME = "Landfall-bundle.7z"
-INFO_NAME = "Landfall-info.7z"  # small locked file: list of contents, for a fast password check
-MOVE_FOLDER = "Landfall Move"
+BUNDLE_NAME = "PenguinPort-bundle.7z"
+INFO_NAME = "PenguinPort-info.7z"  # small locked file: list of contents, for a fast password check
+MOVE_FOLDER = "PenguinPort Move"
 DATA_FOLDER = ".landfall-data"  # hidden: users never need to open it; Landfall reads it
 FILTERS = [{"id": py7zr.FILTER_COPY}, {"id": py7zr.FILTER_CRYPTO_AES256_SHA256}]
 OVERHEAD = 1.01  # archive headers and padding
@@ -28,18 +28,18 @@ EXTRA = 50 * 1024 * 1024
 
 # Linux installers carried inside the Windows app, copied next to the bundle.
 LINUX_DIR = Path(__file__).parent / "data" / "linux"
-INSTALLER_NAMES = {".deb": "Landfall for Ubuntu and Mint.deb", ".rpm": "Landfall for Fedora.rpm"}
+INSTALLER_NAMES = {".deb": "PenguinPort for Ubuntu and Mint.deb", ".rpm": "PenguinPort for Fedora.rpm"}
 
-README = """START HERE - made by Landfall {version}, a free tool for moving from Windows to Linux.
+README = """START HERE - made by PenguinPort {version}, a free tool for moving from Windows to Linux.
 
 ON YOUR NEW LINUX PC
-  1. Double-click the Landfall installer for your Linux:
-       Ubuntu, Linux Mint, Zorin OS, Pop!_OS, elementary:  "Landfall for Ubuntu and Mint.deb"
-       Fedora:                                              "Landfall for Fedora.rpm"
+  1. Double-click the PenguinPort installer for your Linux:
+       Ubuntu, Linux Mint, Zorin OS, Pop!_OS, elementary:  "PenguinPort for Ubuntu and Mint.deb"
+       Fedora:                                              "PenguinPort for Fedora.rpm"
   2. Click Install and type your computer password.
-  3. Open Landfall from your app menu and type your bundle password.
+  3. Open PenguinPort from your app menu and type your bundle password.
 
-  You don't need to open or unzip anything yourself. Landfall finds your locked files on
+  You don't need to open or unzip anything yourself. PenguinPort finds your locked files on
   this drive and unpacks them for you.
 
 PLEASE KEEP THIS WHOLE FOLDER TOGETHER

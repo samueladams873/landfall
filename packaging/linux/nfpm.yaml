@@ -1,4 +1,4 @@
-name: landfall
+name: penguinport
 arch: amd64
 platform: linux
 version: ${LANDFALL_VERSION}
@@ -9,7 +9,7 @@ description: |
   Landfall Moving Wizard. Unpacks the bundle you made on Windows: puts your
   files in the right folders and installs the Linux versions of your apps.
 vendor: Landfall
-homepage: https://github.com/samueladams873/landfall
+homepage: https://github.com/samueladams873/penguinport
 license: GPL-3.0-or-later
 overrides:
   deb:
@@ -30,13 +30,13 @@ overrides:
     recommends:
       - flatpak
 contents:
-  - src: ./build/linux/landfall/
-    dst: /opt/landfall/
+  - src: ./build/linux/penguinport/
+    dst: /opt/penguinport/
     type: tree
-  - src: /opt/landfall/landfall
-    dst: /usr/bin/landfall
+  - src: /opt/penguinport/penguinport
+    dst: /usr/bin/penguinport
     type: symlink
-  - src: ./packaging/linux/landfall.desktop
-    dst: /usr/share/applications/landfall.desktop
-  - src: ./src/landfall/data/landfall.png
-    dst: /usr/share/icons/hicolor/512x512/apps/landfall.png
+  - src: ./packaging/linux/penguinport.desktop
+    dst: /usr/share/applications/penguinport.desktop
+  - src: ./src/landfall/data/penguinport.png
+    dst: /usr/share/icons/hicolor/512x512/apps/penguinport.png

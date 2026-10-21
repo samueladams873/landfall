@@ -88,7 +88,7 @@ def test_never_overwrites_an_earlier_bundle(home):
     first = pack(measured(home), "pw1234", home).folder
     assert choose_output_folder(home) != first
     second = pack(measured(home), "pw1234", home).folder
-    assert second.name == "Landfall Move (2)"
+    assert second.name == "PenguinPort Move (2)"
 
 
 def test_space_and_sizes():
@@ -103,8 +103,8 @@ def test_copies_linux_installers(home, monkeypatch, tmp_path):
     (fake / "landfall-9.9.x86_64.rpm").write_bytes(b"rpm")
     monkeypatch.setattr(pack_mod, "LINUX_DIR", fake)
     result = pack(measured(home), "pw1234", home)
-    assert (result.folder / "Landfall for Ubuntu and Mint.deb").read_bytes() == b"deb"
-    assert (result.folder / "Landfall for Fedora.rpm").read_bytes() == b"rpm"
+    assert (result.folder / "PenguinPort for Ubuntu and Mint.deb").read_bytes() == b"deb"
+    assert (result.folder / "PenguinPort for Fedora.rpm").read_bytes() == b"rpm"
     assert space_needed(0) >= 6
 
 
@@ -115,5 +115,5 @@ def test_user_only_sees_installers_and_start_here(home, monkeypatch, tmp_path):
     monkeypatch.setattr(pack_mod, "LINUX_DIR", fake)
     result = pack(measured(home), "pw1234", home)
     visible = sorted(p.name for p in result.folder.iterdir() if not p.name.startswith("."))
-    assert visible == ["Landfall for Ubuntu and Mint.deb", "START HERE.txt"]
-    assert (result.folder / DATA_FOLDER / "Landfall-info.7z").is_file()
+    assert visible == ["PenguinPort for Ubuntu and Mint.deb", "START HERE.txt"]
+    assert (result.folder / DATA_FOLDER / "PenguinPort-info.7z").is_file()

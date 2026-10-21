@@ -18,7 +18,7 @@ TIPS = [
     ("Settings", "Wi-Fi, screen size, printers and sound are all in the Settings app."),
     ("No antivirus needed", "Apps come from trusted app stores, so most Linux users never "
                             "install antivirus."),
-    ("Your Windows PC is untouched", "Landfall only copied your things. Everything is still "
+    ("Your Windows PC is untouched", "PenguinPort only copied your things. Everything is still "
                                      "on your old PC and on the USB drive."),
 ]
 
