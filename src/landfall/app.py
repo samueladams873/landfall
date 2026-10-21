@@ -680,7 +680,6 @@ class Wizard(Shell):
         it asks the user to close it first (a freshly opened browser always lands on the
         right page), and shows the exact address to paste as a backup."""
         self._pw_pick_path = None
-        from landfall.scan.browsers import is_running
 
         def open_page():
             open_password_export(p)
@@ -694,16 +693,6 @@ class Wizard(Shell):
                 self._pw_pick_path = Path(path)
                 return "advance"
             return None
-
-        def check_closed():
-            if is_running(p.process):
-                box = QMessageBox(self.dialog)
-                box.setWindowTitle(f"{p.name} is still open")
-                box.setText(f"{p.name} still seems to be running. Please close every "
-                            f"{p.name} window, then click the button again.")
-                box.exec()
-                return None
-            return "advance"
 
         if p.browser == "edge":
             find_it = "scroll to <b>Export passwords</b> and click its <b>Export</b> button"
@@ -719,13 +708,11 @@ class Wizard(Shell):
                      "along. It stays locked inside your bundle with your password.<br><br>"
                      "Prefer to skip it? Click <b>Skip this</b> and you'll just sign in to "
                      "your sites again on Linux. Click <b>Next</b> to move them."},
-            {"title": f"Close {p.name} first",
-             "body": f"Please close <b>{p.name}</b> completely if it's open (close every "
-                     f"{p.name} window).<br><br>This matters: if {p.name} is already running, "
-                     "it ignores Landfall and just shows the window you had open. Closing it "
-                     "first lets the next step open straight to your passwords.<br><br>"
-                     f"Once {p.name} is fully closed, click the button below to check.",
-             "action": ("Check \u2014 is it closed?", check_closed)},
+            {"title": f"Close {p.name} windows first",
+             "body": f"If you have any <b>{p.name}</b> windows open, close them now.<br><br>"
+                     f"That way the next step can open {p.name} straight to your passwords. "
+                     "(You don't need to hunt in Task Manager \u2014 just close the windows "
+                     "you can see.)<br><br>Then click <b>Next</b>.",},
             {"title": f"Open {p.name}'s password page",
              "body": f"Click the green button below. {p.name} opens straight on its passwords "
                      f"page.<br><br>On that page, {find_it}. Confirm with your Windows PIN or "

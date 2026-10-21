@@ -756,11 +756,10 @@ class Importer(Shell):
              "body": f"Your {res.source} passwords came across. The last step is to load them "
                      f"into {res.target}. Landfall opens the right page and tells you exactly "
                      "what to click."},
-            {"title": f"Close {res.target} first",
-             "body": f"If <b>{res.target}</b> is open, please close it completely.<br><br>An "
-                     "already-open browser ignores Landfall and just shows the window you had "
-                     f"up. Closing it first lets the next step open straight to the right page."
-                     f"<br><br>Once {res.target} is closed, click <b>Next</b>."},
+            {"title": f"Close {res.target} windows first",
+             "body": f"If you have any <b>{res.target}</b> windows open, close them now.<br><br>"
+                     f"That way the next step can open {res.target} straight to the right page."
+                     "<br><br>Then click <b>Next</b>."},
             {"title": f"Open {res.target}'s password page",
              "body": f"Click the green button below to open {res.target} on its passwords page."
                      f"<br><br>There, {find_it}. When it asks for a file, choose this one:<br>"
