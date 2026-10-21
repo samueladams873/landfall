@@ -676,64 +676,79 @@ class Wizard(Shell):
         return "  \u00b7  ".join(bits)
 
     def move_browser_passwords(self, p, row):
-        """A clean step-by-step helper that works even if the browser is already open:
-        it asks the user to close it first (a freshly opened browser always lands on the
-        right page), and shows the exact address to paste as a backup."""
+        """Open the browser's Export page, then watch the Downloads/Desktop folders and pick
+        up the exported file automatically. The only thing the user does in the browser is
+        click Export and approve the one Windows security prompt that Chrome always forces."""
+        import time
+        from landfall.scan.browsers import watch_for_export
+
         self._pw_pick_path = None
+        self._pw_watching = False
 
-        def open_page():
-            open_password_export(p)
-            return None
+        exported_line = (
+            "On that page, scroll to <b>Export passwords</b> and click "
+            + ("its <b>Export</b> button" if p.browser == "edge"
+               else "the <b>Download file</b> button next to it")
+            + ". Windows will ask for your PIN or password \u2014 that's normal, just confirm it.")
 
-        def pick_file():
-            path, _ = QFileDialog.getOpenFileName(
-                self, f"Choose the file you just saved from {p.name}",
-                str(Path.home() / "Downloads"), "Passwords file (*.csv)")
-            if path:
-                self._pw_pick_path = Path(path)
-                return "advance"
-            return None
+        def open_and_watch():
+            if not open_password_export(p):
+                QMessageBox.warning(self.dialog, "Couldn't open " + p.name,
+                                    f"PenguinPort couldn't open {p.name}. Please open it yourself, "
+                                    f"go to its passwords page, and export your passwords.")
+            # start watching for the exported CSV in the background
+            self._pw_watching = True
+            folders = [Path.home() / "Downloads", Path.home() / "Desktop", Path.home()]
+            since = time.time()
 
-        if p.browser == "edge":
-            find_it = "scroll to <b>Export passwords</b> and click its <b>Export</b> button"
-        else:
-            find_it = ("scroll to <b>Export passwords</b> and click the <b>Download file</b> "
-                       "button next to it")
-        url = p.password_url
+            def work(report):
+                return watch_for_export(folders, since, lambda: not self._pw_watching)
+
+            start_task(self, work, self._pw_found, self._pw_watch_failed)
+            return "advance"
 
         steps = [
-            {"title": f"Move your {p.name} passwords",
-             "body": f"{p.name} keeps your saved passwords locked so only it can read them. "
-                     "In a few short steps, PenguinPort helps you unlock a copy and bring it "
-                     "along. It stays locked inside your bundle with your password.<br><br>"
-                     "Prefer to skip it? Click <b>Skip this</b> and you'll just sign in to "
-                     "your sites again on Linux. Click <b>Next</b> to move them."},
-            {"title": f"Close {p.name} windows first",
-             "body": f"If you have any <b>{p.name}</b> windows open, close them now.<br><br>"
-                     f"That way the next step can open {p.name} straight to your passwords. "
-                     "(You don't need to hunt in Task Manager \u2014 just close the windows "
-                     "you can see.)<br><br>Then click <b>Next</b>.",},
-            {"title": f"Open {p.name}'s password page",
-             "body": f"Click the green button below. {p.name} opens straight on its passwords "
-                     f"page.<br><br>On that page, {find_it}. Confirm with your Windows PIN or "
-                     "password if it asks, and save the file in your <b>Downloads</b> folder."
-                     f"<br><br><b>If it opens somewhere else</b> (like the home page), click the "
-                     "address bar at the top, type this and press Enter:<br>"
-                     f"<code>{url}</code><br><br>Then come back here and click <b>Next</b>.",
-             "action": (f"Open {p.name}", open_page)},
-            {"title": "Choose the file you saved",
-             "body": "Last step: click the button below and pick the passwords file you just "
-                     "saved.<br><br>PenguinPort locks it inside your bundle right away, and on "
-                     "Linux it puts the passwords into your new browser for you.",
-             "action": ("Choose the file", pick_file)},
+            {"title": f"Bring your {p.name} passwords",
+             "body": f"{p.name} locks your saved passwords so only it can read them. The only "
+                     "safe way to copy them is {0}'s own <b>Export</b> button \u2014 so "
+                     "PenguinPort will open the right page, and grab the file for you the moment "
+                     "you export it.<br><br>Prefer to skip it? Click <b>Skip this</b> and you'll "
+                     "just sign in to your sites again on Linux.".format(p.name)},
+            {"title": "Export, and PenguinPort does the rest",
+             "body": f"Click the orange button below. {p.name} opens on its passwords page."
+                     f"<br><br>{exported_line}<br><br>Save it in your <b>Downloads</b> folder "
+                     "(the usual place). You don't need to come back and find it \u2014 "
+                     "PenguinPort watches for it and picks it up on its own.",
+             "action": (f"Open {p.name} and export", open_and_watch)},
+            {"title": "Grabbing your passwords\u2026",
+             "body": "Waiting for your exported file to appear\u2026<br><br>Go ahead and click "
+                     f"<b>Export</b> in {p.name} if you haven't yet. As soon as the file lands, "
+                     "PenguinPort picks it up and moves to the next step by itself.<br><br>"
+                     "(If nothing happens, you can click <b>Skip this</b> and move passwords "
+                     "later.)",
+             "wait": True},
         ]
-        result = StepDialog(f"Move your {p.name} passwords", steps, self,
-                            accent_last="Done").run()
-        if result == "done" and self._pw_pick_path:
+        self._pw_dialog = StepDialog(f"{p.name} passwords", steps, self, accent_last="Done")
+        result = self._pw_dialog.run()
+        self._pw_watching = False
+        if result in ("done",) and self._pw_pick_path:
             p.password_csv = self._pw_pick_path
             row.detail.setText(self._browser_detail(p))
             row._pw_btn.setText("\u2714 Added")
             row._pw_btn.setEnabled(False)
+
+    def _pw_found(self, path):
+        self._pw_watching = False
+        if path:
+            self._pw_pick_path = Path(path)
+            # jump straight to done
+            d = getattr(self, "_pw_dialog", None)
+            if d is not None:
+                d.result_value = "done"
+                d.dialog.accept()
+
+    def _pw_watch_failed(self, err):
+        self._pw_watching = False
 
     def selected_browsers(self):
         return [p for row, p in self.browser_rows if row.box.isChecked()]

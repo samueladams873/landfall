@@ -210,14 +210,10 @@ def is_running(process: str) -> bool:
     return process.lower() in out
 
 
-def open_password_export(profile: BrowserProfile) -> bool:
-    # --new-window forces navigation even when the browser is already open; without it a
-    # running Chrome just raises its current window and ignores the address.
-    """Open the browser's own password page so the user can click Export."""
-    if sys.platform != "win32":
-        return False
+def _browser_exe(profile: BrowserProfile) -> str | None:
     exe = shutil.which(profile.process)
-    candidates = [exe] if exe else []
+    if exe and Path(exe).is_file():
+        return exe
     for var in ("PROGRAMFILES", "PROGRAMFILES(X86)", "LOCALAPPDATA"):
         base = os.environ.get(var)
         if not base:
@@ -226,14 +222,64 @@ def open_password_export(profile: BrowserProfile) -> bool:
                     r"Microsoft\Edge\Application\msedge.exe",
                     r"BraveSoftware\Brave-Browser\Application\brave.exe",
                     r"Vivaldi\Application\vivaldi.exe", r"Programs\Opera\opera.exe"):
-            if rel.lower().endswith(profile.process):
-                candidates.append(str(Path(base) / rel))
-    for exe in candidates:
-        if exe and Path(exe).is_file():
+            if rel.lower().endswith(profile.process.lower()):
+                cand = Path(base) / rel
+                if cand.is_file():
+                    return str(cand)
+    return None
+
+
+def open_password_export(profile: BrowserProfile) -> bool:
+    """Open the browser straight on its password page so the user can click Export.
+
+    Uses --app=<url>, which opens a dedicated window on that exact page even when the
+    browser is already running (a plain URL argument gets ignored by an already-open
+    Chrome; --app does not). The app window has no tabs or address bar, so the user sees
+    only the password page and the Export button."""
+    if sys.platform != "win32":
+        return False
+    exe = _browser_exe(profile)
+    if not exe:
+        return False
+    try:
+        subprocess.Popen([exe, f"--app={profile.password_url}"], stdin=subprocess.DEVNULL)
+        return True
+    except OSError:
+        return False
+
+
+def watch_for_export(folders, since: float, stop) -> Path | None:
+    """Wait for a freshly exported passwords CSV to appear. Returns its path, or None if
+    the user cancels (stop() becomes true). Looks in the given folders (Downloads, Desktop)
+    for a .csv newer than `since` whose header looks like a browser password export."""
+    import time
+    seen_sizes: dict = {}
+    while not stop():
+        for folder in folders:
             try:
-                subprocess.Popen([exe, "--new-window", profile.password_url],
-                                 stdin=subprocess.DEVNULL)
-                return True
+                for f in Path(folder).glob("*.csv"):
+                    try:
+                        st = f.stat()
+                    except OSError:
+                        continue
+                    if st.st_mtime < since - 2:
+                        continue
+                    # wait until the file stops growing (download finished)
+                    if seen_sizes.get(f) != st.st_size:
+                        seen_sizes[f] = st.st_size
+                        continue
+                    if _looks_like_passwords(f):
+                        return f
             except OSError:
                 continue
-    return False
+        time.sleep(0.6)
+    return None
+
+
+def _looks_like_passwords(path: Path) -> bool:
+    try:
+        head = path.read_text(encoding="utf-8", errors="replace")[:200].lower()
+    except OSError:
+        return False
+    # Chrome/Edge/Brave all export a header with url, username and password columns
+    return "password" in head and ("url" in head or "origin" in head) and "username" in head

@@ -869,8 +869,11 @@ class StepDialog(QWidget):
         if action:
             self.action_btn.setText(action[0])
             self._action_fn = action[1]
-        self.back_btn.setVisible(self.i > 0)
+        # a "wait" step hides Next/Back and shows it's working; it advances on its own
+        waiting = step.get("wait", False)
+        self.back_btn.setVisible(self.i > 0 and not waiting)
         last = self.i == len(self.steps) - 1
+        self.next_btn.setVisible(not waiting)
         self.next_btn.setText(self.accent_last if last else "Next")
 
     def _next(self):

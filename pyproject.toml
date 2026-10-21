@@ -1,6 +1,6 @@
 [project]
 name = "landfall"
-version = "0.11.0"
+version = "0.11.1"
 description = "A safe, open-source Windows to Linux migration assistant"
 readme = "README.md"
 license = "GPL-3.0-or-later"

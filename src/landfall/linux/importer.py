@@ -761,7 +761,7 @@ class Importer(Shell):
                      f"That way the next step can open {res.target} straight to the right page."
                      "<br><br>Then click <b>Next</b>."},
             {"title": f"Open {res.target}'s password page",
-             "body": f"Click the green button below to open {res.target} on its passwords page."
+             "body": f"Click the orange button below to open {res.target} on its passwords page."
                      f"<br><br>There, {find_it}. When it asks for a file, choose this one:<br>"
                      f"<code>{res.password_file}</code><br><br><b>If it opens somewhere else</b>, "
                      "click the address bar, type this and press Enter:<br>"

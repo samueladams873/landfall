@@ -168,3 +168,61 @@ def test_targets_follow_the_users_pick(tmp_path):
     assert lb.match_target("firefox", "firefox", both).browser == "firefox"
     fallback = lb.choose_targets([], home, set(), {"firefox"})
     assert [t.browser for t in fallback] == ["firefox"] and fallback[0].how == "snap"
+
+
+def test_watch_picks_up_an_exported_passwords_csv(tmp_path):
+    import threading, time
+    from landfall.scan.browsers import watch_for_export
+    dl = tmp_path / "Downloads"
+    dl.mkdir()
+    # a random unrelated csv should be ignored
+    (dl / "shopping.csv").write_text("item,qty\napples,3\n")
+    since = time.time()
+    result = {}
+    stop = {"v": False}
+
+    def run():
+        result["path"] = watch_for_export([dl], since, lambda: stop["v"])
+
+    t = threading.Thread(target=run)
+    t.start()
+    time.sleep(1)
+    # now the browser "exports" a passwords file
+    pw = dl / "Chrome Passwords.csv"
+    pw.write_text("name,url,username,password\nBank,https://bank.example,me,secret123\n")
+    t.join(timeout=8)
+    assert result.get("path") == pw
+
+
+def test_watch_stops_when_cancelled(tmp_path):
+    import threading, time
+    from landfall.scan.browsers import watch_for_export
+    dl = tmp_path / "Downloads"
+    dl.mkdir()
+    since = time.time()
+    result = {"done": False}
+    stop = {"v": False}
+
+    def run():
+        watch_for_export([dl], since, lambda: stop["v"])
+        result["done"] = True
+
+    t = threading.Thread(target=run)
+    t.start()
+    time.sleep(0.5)
+    stop["v"] = True          # user cancelled
+    t.join(timeout=5)
+    assert result["done"] is True
+
+
+def test_export_header_detection():
+    from landfall.scan.browsers import _looks_like_passwords
+    import tempfile, os
+    def check(content):
+        fd, path = tempfile.mkstemp(suffix=".csv")
+        os.write(fd, content.encode()); os.close(fd)
+        from pathlib import Path
+        r = _looks_like_passwords(Path(path)); os.unlink(path); return r
+    assert check("name,url,username,password\nx,y,z,w\n") is True
+    assert check("origin,username,password\na,b,c\n") is True
+    assert check("item,price,qty\na,1,2\n") is False       # not passwords
