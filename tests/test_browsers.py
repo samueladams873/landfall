@@ -226,3 +226,32 @@ def test_export_header_detection():
     assert check("name,url,username,password\nx,y,z,w\n") is True
     assert check("origin,username,password\na,b,c\n") is True
     assert check("item,price,qty\na,1,2\n") is False       # not passwords
+
+
+def test_browser_files_pack_without_closing_the_browser(tmp_path):
+    """browser_folders must stage copies so packing works while the browser is still open."""
+    from landfall.pack import browser_folders
+    from landfall.scan.browsers import BrowserProfile
+    prof_dir = tmp_path / "profile"
+    prof_dir.mkdir()
+    (prof_dir / "Bookmarks").write_text('{"roots":{}}')
+    (prof_dir / "History").write_bytes(b"SQLite format 3\x00fake")
+    p = BrowserProfile("chrome", "Google Chrome", "chromium", "Default", prof_dir, "chrome.exe")
+    p.files = [prof_dir / "Bookmarks", prof_dir / "History"]
+    staging = tmp_path / "staging"
+    folders = browser_folders([p], staging=staging)
+    assert len(folders) == 1
+    # the packed files are the STAGED copies, not the originals (so a lock on the original is moot)
+    staged_paths = [src for src, rel, size in folders[0].file_list]
+    assert all(str(staging) in str(sp) for sp in staged_paths)
+    assert (staging / p.key / "Bookmarks").exists()
+    assert (staging / p.key / "History").exists()
+
+
+def test_copy_shared_handles_a_normal_file(tmp_path):
+    from landfall.pack import _copy_shared
+    src = tmp_path / "Bookmarks"
+    src.write_text("hello")
+    dest = tmp_path / "copy"
+    assert _copy_shared(src, dest) is True
+    assert dest.read_text() == "hello"

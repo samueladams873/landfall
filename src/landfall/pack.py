@@ -162,20 +162,52 @@ def _hide(path: Path) -> None:
         ctypes.windll.kernel32.SetFileAttributesW(str(path), 0x02)  # FILE_ATTRIBUTE_HIDDEN
 
 
-def browser_folders(profiles) -> list:
-    """Turn picked browser profiles into pack-able groups under landfall/browsers/<key>/."""
+def _copy_shared(src: Path, dest: Path) -> bool:
+    """Copy a file even if a browser has it open. Browsers keep bookmarks/history as plain
+    files they read with a shared lock, so a normal copy works; if the OS still refuses,
+    fall back to a byte-by-byte read with shared access. Returns True on success."""
+    import shutil
+    try:
+        shutil.copy2(src, dest)
+        return True
+    except (OSError, shutil.Error):
+        pass
+    try:
+        # Windows: open with full sharing so a running browser can't block the read
+        with open(src, "rb") as fh, open(dest, "wb") as out:
+            while chunk := fh.read(1 << 20):
+                out.write(chunk)
+        return True
+    except OSError:
+        return False
+
+
+def browser_folders(profiles, staging: Path | None = None) -> list:
+    """Turn picked browser profiles into pack-able groups under landfall/browsers/<key>/.
+
+    Each browser file is first copied to a staging folder using a shared-read copy, so this
+    works even while the browser is still open (no need to make the user close it). We pack
+    from the copies."""
+    import tempfile
     from landfall.scan.folders import FolderInfo, measure
+    staging = staging or Path(tempfile.mkdtemp(prefix="penguinport-browsers-"))
     out = []
-    for p in profiles:
-        files = list(p.files)
-        if p.password_csv:
-            files.append(p.password_csv)
-        folder = FolderInfo(f"landfall/browsers/{p.key}", p.path, only_files=files)
+    for prof in profiles:
+        dest_dir = staging / prof.key
+        dest_dir.mkdir(parents=True, exist_ok=True)
+        staged = []
+        for f in prof.files:
+            copy = dest_dir / f.name
+            if _copy_shared(f, copy):
+                staged.append(copy)
+        if prof.password_csv:
+            pwcopy = dest_dir / "passwords.csv"
+            if _copy_shared(prof.password_csv, pwcopy):
+                staged.append(pwcopy)
+        if not staged:
+            continue
+        folder = FolderInfo(f"landfall/browsers/{prof.key}", dest_dir, only_files=staged)
         measure(folder)
-        if p.password_csv:                 # always stored under one known name
-            folder.file_list = [
-                (src, rel.with_name("passwords.csv") if src == p.password_csv else rel, size)
-                for src, rel, size in folder.file_list]
         out.append(folder)
     return out
 

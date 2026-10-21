@@ -17,7 +17,7 @@ from landfall.drives import list_drives
 from landfall.mapping import (GROUP_ALT, GROUP_SAME, GROUPS, builtin_apps, by_category,
                               match_all)
 from landfall.pack import PackCancelled, browser_folders, browser_records, pack, space_needed
-from landfall.scan.browsers import find_browsers, open_password_export, running_browsers
+from landfall.scan.browsers import find_browsers, open_password_export
 from landfall.report import build_html, option_text
 from landfall.scan.apps import scan_apps
 from landfall.scan.folders import extra_files, extra_folder, find_folders, human_size, measure
@@ -908,28 +908,15 @@ class Wizard(Shell):
 
     # --- step: packing ---------------------------------------------------
     def start_pack(self):
-        browsers = self.selected_browsers()
-        while True:
-            open_now = running_browsers(browsers)
-            if not open_now:
-                break
-            box = QMessageBox(self)
-            box.setWindowTitle("Please close your browsers")
-            box.setText(f"Please close {' and '.join(open_now)} first. Browsers lock their "
-                        "bookmarks while they're open, so PenguinPort can't copy them yet.")
-            retry = box.addButton("I closed them", QMessageBox.ButtonRole.AcceptRole)
-            skip = box.addButton("Skip browsers", QMessageBox.ButtonRole.DestructiveRole)
-            box.exec()
-            if box.clickedButton() is skip:
-                browsers = []
-                break
-            if box.clickedButton() is not retry:
-                break
-        self._pack_browsers = browsers
+        # No need to close browsers: PenguinPort copies their bookmark/history files with a
+        # shared read, which works even while the browser is open.
+        self._pack_browsers = self.selected_browsers()
         self._cancel_pack = False
         self.stop_btn.setEnabled(True)
         folders, drive, password = self.selected_folders(), self.current_drive(), self.pw1.text()
-        folders = folders + browser_folders(self._pack_browsers)
+        import tempfile
+        self._browser_staging = Path(tempfile.mkdtemp(prefix="penguinport-browsers-"))
+        folders = folders + browser_folders(self._pack_browsers, staging=self._browser_staging)
         extra = {"apps": self._app_records(), "install": self.chosen_apps(),
                  "extra_folders": [f.name for f in folders if f.extra],
                  "browsers": browser_records(self._pack_browsers),
@@ -966,7 +953,15 @@ class Wizard(Shell):
         self.stop_btn.setEnabled(False)
         self.pack_status.setText("Stopping and cleaning up...")
 
+    def _clean_browser_staging(self):
+        staging = getattr(self, "_browser_staging", None)
+        if staging:
+            import shutil
+            shutil.rmtree(staging, ignore_errors=True)
+            self._browser_staging = None
+
     def pack_done(self, result):
+        self._clean_browser_staging()
         self.result = result
         text = (f"<b>{plural(result.files, 'file')}</b> ({human_size(result.bytes)}) packed and locked "
                 f"with your password in:<br><b>{result.folder}</b>")
@@ -977,6 +972,7 @@ class Wizard(Shell):
         self.go(self.DONE)
 
     def pack_failed(self, err):
+        self._clean_browser_staging()
         self.stop_btn.setEnabled(True)
         if not isinstance(err, PackCancelled):
             QMessageBox.warning(self, "Packing stopped",
