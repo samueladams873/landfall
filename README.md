@@ -1,22 +1,31 @@
-# Landfall
+<p align="center">
+  <img src="docs/banner.png" alt="PenguinPort — move from Windows to Linux without losing a thing" width="600">
+</p>
+
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-GPLv3-blue.svg" alt="License: GPLv3"></a>
+  <img src="https://img.shields.io/badge/platform-Windows%20%E2%86%92%20Linux-1E6FB8.svg" alt="Windows to Linux">
+  <img src="https://img.shields.io/badge/no%20terminal-ever-F2A33C.svg" alt="No terminal, ever">
+</p>
+
+# PenguinPort
 
 **Move from Windows to Linux without losing anything, and without ever opening a terminal.**
 
-Landfall is a free, open-source moving helper for people leaving Windows 10. Run it on your
+PenguinPort is a free, open-source moving helper for people leaving Windows 10. Run it on your
 Windows PC, plug in a USB drive, and it packs up your files, browser data, email, contacts,
 Wi-Fi networks and more into one password-locked bundle. Plug that drive into your new Linux
-PC, double-click Landfall, and everything lands where it belongs, with your apps installed.
+PC, double-click PenguinPort, and everything lands where it belongs, with your apps installed.
 
 It works with any Linux distro, and it only ever *reads* your Windows drive. It never changes
 or repartitions anything.
 
-> **Status: early development (v0.9).** Landfall can already check a Windows PC, let you pick
-> Linux apps side by side, pack your files into a locked bundle, update the new Linux PC, and
-> unpack everything with your apps installed. The rest of the list below is being built now.
+> **Status: early development.** PenguinPort can already check a Windows PC, let you pick
+> Linux apps side by side, pack your files into a locked bundle, move your browser bookmarks,
+> history and passwords, update the new Linux PC, and unpack everything with your apps
+> installed. The rest of the list below is being built now.
 
-![Pick your Linux apps](docs/screenshots/win-3-pick-apps.png)
-
-## What Landfall will move
+## What PenguinPort will move
 
 | | What | Status |
 |---|---|---|
@@ -64,20 +73,20 @@ or repartitions anything.
 
 ## On the Linux side
 
-- Double-click the Landfall installer on the USB drive (.deb for Ubuntu and Mint, .rpm for
-  Fedora), click **Install**, then open Landfall from your app menu. No terminal, ever.
-- Landfall first offers to update the whole system for you (one password, no terminal).
+- Double-click the PenguinPort installer on the USB drive (.deb for Ubuntu and Mint, .rpm for
+  Fedora), click **Install**, then open PenguinPort from your app menu. No terminal, ever.
+- PenguinPort first offers to update the whole system for you (one password, no terminal).
 - Enter the bundle password you chose on Windows.
-- Landfall puts your files in the matching folders, installs your apps, loads your bookmarks
+- PenguinPort puts your files in the matching folders, installs your apps, loads your bookmarks
   and contacts, connects your Wi-Fi and sets your wallpaper.
 - You finish with a short "what's left to do" checklist.
 
 ## Safety first
 
-- **Read-only on Windows:** Landfall never modifies, deletes or repartitions anything.
+- **Read-only on Windows:** PenguinPort never modifies, deletes or repartitions anything.
 - **Encrypted:** passwords, browser data and email only travel inside an AES-256 bundle you
   can open with free 7-Zip.
-- **No internet needed, no tracking:** Landfall has no network code and sends nothing anywhere.
+- **No internet needed, no tracking:** PenguinPort has no network code and sends nothing anywhere.
 - **No surprises:** see the bundle size before packing, check the USB has room, resume if
   unplugged, and verify every file arrived intact.
 
