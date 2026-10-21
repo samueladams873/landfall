@@ -679,27 +679,26 @@ class Wizard(Shell):
         return "  \u00b7  ".join(bits)
 
     def move_browser_passwords(self, p, row):
-        """Open the browser's Export page, then watch the Downloads/Desktop folders and pick
-        up the exported file automatically. The only thing the user does in the browser is
-        click Export and approve the one Windows security prompt that Chrome always forces."""
+        """Bulletproof password export: PenguinPort copies the exact passwords-page address to
+        the clipboard, the user pastes it into the browser they already have open (pasting
+        always works, unlike launching, which a running Chrome ignores), clicks Export, and
+        PenguinPort auto-detects the downloaded CSV from their Downloads folder."""
         import time
         from landfall.scan.browsers import watch_for_export
 
         self._pw_pick_path = None
         self._pw_watching = False
+        url = p.password_url
 
-        exported_line = (
-            "On that page, scroll to <b>Export passwords</b> and click "
-            + ("its <b>Export</b> button" if p.browser == "edge"
-               else "the <b>Download file</b> button next to it")
-            + ". Windows will ask for your PIN or password \u2014 that's normal, just confirm it.")
-
-        def open_and_watch():
-            if not open_password_export(p):
-                QMessageBox.warning(self.dialog, "Couldn't open " + p.name,
-                                    f"PenguinPort couldn't open {p.name}. Please open it yourself, "
-                                    f"go to its passwords page, and export your passwords.")
-            # start watching for the exported CSV in the background
+        def copy_and_watch():
+            # put the address on the clipboard so the user only has to paste
+            try:
+                from PySide6.QtWidgets import QApplication
+                QApplication.clipboard().setText(url)
+            except Exception:
+                pass
+            # also try to open the browser to the page (works if it's not already running)
+            open_password_export(p)
             self._pw_watching = True
             folders = [Path.home() / "Downloads", Path.home() / "Desktop", Path.home()]
             since = time.time()
@@ -710,31 +709,38 @@ class Wizard(Shell):
             start_task(self, work, self._pw_found, self._pw_watch_failed)
             return "advance"
 
+        export_btn = ("its <b>Export</b> button" if p.browser == "edge"
+                      else "the <b>Download file</b> button next to <b>Export passwords</b>")
+
         steps = [
             {"title": f"Bring your {p.name} passwords",
-             "body": f"{p.name} locks your saved passwords so only it can read them. The only "
-                     "safe way to copy them is {0}'s own <b>Export</b> button \u2014 so "
-                     "PenguinPort will open the right page, and grab the file for you the moment "
-                     "you export it.<br><br>Prefer to skip it? Click <b>Skip this</b> and you'll "
-                     "just sign in to your sites again on Linux.".format(p.name)},
-            {"title": "Export, and PenguinPort does the rest",
-             "body": f"Click the orange button below. {p.name} opens on its passwords page."
-                     f"<br><br>{exported_line}<br><br>Save it in your <b>Downloads</b> folder "
-                     "(the usual place). You don't need to come back and find it \u2014 "
-                     "PenguinPort watches for it and picks it up on its own.",
-             "action": (f"Open {p.name} and export", open_and_watch)},
+             "body": f"{p.name} locks your saved passwords so only it can read them. The one safe "
+                     f"way to copy them is {p.name}'s own <b>Export</b> button. PenguinPort makes "
+                     "this easy: it copies the exact page address for you, you paste it, click "
+                     "Export, and PenguinPort grabs the file on its own.<br><br>Prefer to skip "
+                     "it? Click <b>Skip this</b> and you'll just sign in to your sites again on "
+                     "Linux."},
+            {"title": "Copy the address, then paste it",
+             "body": f"Click the orange button \u2014 it copies the {p.name} passwords-page "
+                     f"address and opens {p.name} for you.<br><br>Then, in {p.name}:<br>"
+                     "<b>1.</b> Click the address bar at the top (or press <b>Ctrl+L</b>).<br>"
+                     "<b>2.</b> Paste with <b>Ctrl+V</b>, then press <b>Enter</b>.<br>"
+                     f"<b>3.</b> On that page, click {export_btn}, and confirm with your Windows "
+                     "PIN or password. Save it in your <b>Downloads</b> folder.<br><br>"
+                     "That's it \u2014 PenguinPort watches for the file and takes it from there.",
+             "action": (f"Copy address and open {p.name}", copy_and_watch)},
             {"title": "Grabbing your passwords\u2026",
-             "body": "Waiting for your exported file to appear\u2026<br><br>Go ahead and click "
-                     f"<b>Export</b> in {p.name} if you haven't yet. As soon as the file lands, "
-                     "PenguinPort picks it up and moves to the next step by itself.<br><br>"
-                     "(If nothing happens, you can click <b>Skip this</b> and move passwords "
-                     "later.)",
+             "body": f"Waiting for your exported file\u2026<br><br>In {p.name}: click the address "
+                     f"bar, paste (<b>Ctrl+V</b>), press <b>Enter</b>, then click Export. The "
+                     "address is already copied, ready to paste.<br><br>As soon as the file "
+                     "lands in Downloads, PenguinPort picks it up automatically.<br><br>"
+                     "(Nothing happening? You can <b>Skip this</b> and move passwords later.)",
              "wait": True},
         ]
         self._pw_dialog = StepDialog(f"{p.name} passwords", steps, self, accent_last="Done")
         result = self._pw_dialog.run()
         self._pw_watching = False
-        if result in ("done",) and self._pw_pick_path:
+        if result == "done" and self._pw_pick_path:
             p.password_csv = self._pw_pick_path
             row.detail.setText(self._browser_detail(p))
             row._pw_btn.setText("\u2714 Added")

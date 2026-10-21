@@ -741,9 +741,15 @@ class Importer(Shell):
         else:
             find_it = "scroll to <b>Import passwords</b> and click <b>Select file</b>"
 
-        def open_browser():
+        def copy_and_open():
+            # copy the address so the user can paste it (a running browser ignores a launched URL)
+            try:
+                from PySide6.QtWidgets import QApplication
+                QApplication.clipboard().setText(res.import_url)
+            except Exception:
+                pass
             browsers_mod.open_import_page(res)
-            return None
+            return "advance"
 
         def delete_file():
             if res.password_file:
@@ -754,20 +760,18 @@ class Importer(Shell):
         steps = [
             {"title": f"Bring your passwords into {res.target}",
              "body": f"Your {res.source} passwords came across. The last step is to load them "
-                     f"into {res.target}. PenguinPort opens the right page and tells you exactly "
-                     "what to click."},
-            {"title": f"Close {res.target} windows first",
-             "body": f"If you have any <b>{res.target}</b> windows open, close them now.<br><br>"
-                     f"That way the next step can open {res.target} straight to the right page."
-                     "<br><br>Then click <b>Next</b>."},
+                     f"into {res.target}. PenguinPort copies the right address for you \u2014 "
+                     "you paste it, pick the file, and you're done."},
             {"title": f"Open {res.target}'s password page",
-             "body": f"Click the orange button below to open {res.target} on its passwords page."
-                     f"<br><br>There, {find_it}. When it asks for a file, choose this one:<br>"
-                     f"<code>{res.password_file}</code><br><br><b>If it opens somewhere else</b>, "
-                     "click the address bar, type this and press Enter:<br>"
-                     f"<code>{res.import_url}</code><br><br>Your passwords appear in "
+             "body": f"Click the orange button \u2014 it copies the {res.target} passwords-page "
+                     f"address and opens {res.target}.<br><br>In {res.target}:<br>"
+                     "<b>1.</b> Click the address bar (or press <b>Ctrl+L</b>), paste with "
+                     "<b>Ctrl+V</b>, and press <b>Enter</b>.<br>"
+                     f"<b>2.</b> {find_it[0].upper() + find_it[1:]}.<br>"
+                     "<b>3.</b> When it asks for a file, choose this one:<br>"
+                     f"<code>{res.password_file}</code><br><br>Your passwords appear in "
                      f"{res.target}. Then come back here and click <b>Next</b>.",
-             "action": (f"Open {res.target}", open_browser)},
+             "action": (f"Copy address and open {res.target}", copy_and_open)},
             {"title": "Tidy up",
              "body": "All done. For safety, PenguinPort will now delete the leftover passwords "
                      "file, since it holds your passwords in plain text. Your passwords stay "
