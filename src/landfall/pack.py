@@ -45,7 +45,7 @@ ON YOUR NEW LINUX PC
 PLEASE KEEP THIS WHOLE FOLDER TOGETHER
   Your files are stored, locked with your password, in a hidden folder inside it.
 
-Learn more: https://github.com/samueladams873/landfall
+Learn more: https://github.com/voidwhereprohibited/penguinport
 """
 
 

@@ -88,6 +88,6 @@ def build_html(grouped: dict[str, list[MatchResult]], hw: dict) -> str:
         parts.append("</table>")
     parts.append(f"<h2>Your hardware</h2><table>{_hw_rows(hw)}</table>")
     parts.append("<p class='muted'>PenguinPort is free and open source: "
-                 "<a href='https://github.com/samueladams873/landfall'>github.com/samueladams873/landfall</a></p>")
+                 "<a href='https://github.com/voidwhereprohibited/penguinport'>github.com/voidwhereprohibited/penguinport</a></p>")
     parts.append("</body></html>")
     return "\n".join(parts)

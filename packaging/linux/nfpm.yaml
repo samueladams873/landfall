@@ -4,12 +4,12 @@ platform: linux
 version: ${LANDFALL_VERSION}
 section: utils
 priority: optional
-maintainer: Landfall project <samueladams873@users.noreply.github.com>
+maintainer: Landfall project <voidwhereprohibited@users.noreply.github.com>
 description: |
   Landfall Moving Wizard. Unpacks the bundle you made on Windows: puts your
   files in the right folders and installs the Linux versions of your apps.
 vendor: Landfall
-homepage: https://github.com/samueladams873/penguinport
+homepage: https://github.com/voidwhereprohibited/penguinport
 license: GPL-3.0-or-later
 overrides:
   deb:

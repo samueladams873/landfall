@@ -26,7 +26,7 @@ non-technical Windows switcher, it probably doesn't belong.**
 ## Setting up for development
 
 ```
-git clone https://github.com/samueladams873/penguinport.git
+git clone https://github.com/voidwhereprohibited/penguinport.git
 cd penguinport
 python -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
