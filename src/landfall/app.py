@@ -8,7 +8,7 @@ import webbrowser
 from pathlib import Path
 
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import (QCheckBox, QFileDialog, QGridLayout, QHBoxLayout, QLabel,
+from PySide6.QtWidgets import (QCheckBox, QFileDialog, QFrame, QGridLayout, QHBoxLayout, QLabel,
                                QLineEdit, QListWidget, QListWidgetItem, QMessageBox,
                                QProgressBar, QPushButton, QScrollArea, QStackedWidget, QTabWidget,
                                QTreeWidget, QTreeWidgetItem, QVBoxLayout, QWidget)
@@ -168,15 +168,31 @@ class Wizard(Shell):
         rv.addLayout(top)
         self.notes_card, self.notes_box = card()
         rv.addWidget(self.notes_card)
+        # a friendly visual list of the apps found on this PC
+        self.found_card, self.found_box = card()
+        self.found_box.addWidget(label("Apps we found on this PC", "Section"))
+        self.found_sub = label("Each one has a Linux version or a free alternative waiting.",
+                               "Muted")
+        self.found_box.addWidget(self.found_sub)
+        self.found_grid = QGridLayout()
+        self.found_grid.setSpacing(10)
+        self.found_grid.setContentsMargins(0, 6, 0, 0)
+        self.found_box.addLayout(self.found_grid)
+        rv.addWidget(self.found_card)
         rv.addStretch(1)
+        # quiet text links for anyone who wants the technical detail
         row = QHBoxLayout()
-        details = QPushButton("See the full list")
+        row.addStretch(1)
+        details = QPushButton("See full details")
+        details.setObjectName("Link")
+        details.setCursor(Qt.CursorShape.PointingHandCursor)
         details.clicked.connect(lambda: self.check_views.setCurrentIndex(2))
         row.addWidget(details)
         self.save_report_btn = QPushButton("Save a report")
+        self.save_report_btn.setObjectName("Link")
+        self.save_report_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self.save_report_btn.clicked.connect(self.save_report)
         row.addWidget(self.save_report_btn)
-        row.addStretch(1)
         rv.addLayout(row)
         self.check_views.addWidget(res)
 
@@ -475,6 +491,63 @@ class Wizard(Shell):
         else:
             self.scan_item.setText(value)
 
+    def _fill_found_grid(self):
+        """Show the real apps found on this PC as little icon tiles, so people see what's
+        coming over. Uses each program's own Windows icon."""
+        from landfall.ui import windows_icon
+        # clear any previous tiles
+        while self.found_grid.count():
+            it = self.found_grid.takeAt(0)
+            w = it.widget()
+            if w:
+                w.deleteLater()
+        # gather the real (non-built-in) apps found, de-duplicated by name
+        seen = set()
+        apps = []
+        for group in GROUPS:
+            for r in self.grouped[group]:
+                if r.app.get("builtin"):
+                    continue
+                name = r.app.get("name", "")
+                key = name.lower()
+                if key in seen or not name:
+                    continue
+                seen.add(key)
+                apps.append(r.app)
+        if not apps:
+            self.found_card.hide()
+            return
+        self.found_card.show()
+        cols = 4
+        shown = apps[:12]                       # keep it tidy; details view has the rest
+        for i, app in enumerate(shown):
+            tile = QFrame()
+            tile.setObjectName("FoundTile")
+            tl = QVBoxLayout(tile)
+            tl.setContentsMargins(8, 10, 8, 10)
+            tl.setSpacing(6)
+            tl.addWidget(windows_icon(app, 36), 0, Qt.AlignmentFlag.AlignHCenter)
+            nm = self._short_app_name(app.get("name", ""))
+            cap = label(nm, "FoundName")
+            cap.setAlignment(Qt.AlignmentFlag.AlignHCenter)
+            cap.setWordWrap(True)
+            tl.addWidget(cap)
+            self.found_grid.addWidget(tile, i // cols, i % cols)
+        extra = len(apps) - len(shown)
+        if extra > 0:
+            more = label(f"+ {extra} more", "Muted")
+            more.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            self.found_grid.addWidget(more, len(shown) // cols + 1, 0, 1, cols)
+
+    @staticmethod
+    def _short_app_name(name: str) -> str:
+        # trim the long installer names to something human: "Mozilla Firefox (x64 en-US)" -> "Mozilla Firefox"
+        import re
+        name = re.sub(r"\s*\(.*?\)\s*", " ", name)           # drop parenthetical bits
+        name = re.sub(r"\s+(version|v?\d+[\d.]*)\b.*", "", name, flags=re.I)
+        name = name.split(" - ")[0]
+        return name.strip() or name
+
     def show_check(self, result):
         self.grouped, self.hw = result
         self.stages.set_stage(4)
@@ -482,6 +555,7 @@ class Wizard(Shell):
         total = sum(len(mine(g)) for g in GROUPS)          # built-ins don't count: every
         ready = len(mine(GROUP_SAME)) + len(mine(GROUP_ALT))  # Windows PC has them
         self.ring.set_score(ready, total)
+        self._fill_found_grid()
         if total == 0:
             self.apps_headline.setText("No apps to worry about")
             self.apps_sub.setText("Your files are what matter most, and they're coming with you.")

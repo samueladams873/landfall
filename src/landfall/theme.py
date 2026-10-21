@@ -68,6 +68,14 @@ QLabel#Pill {{ color: #1450B8; background: #E3EEFF; border-radius: 9px; padding:
 QLabel#PillNew {{ color: #8A4B00; background: #FFF0CC; border-radius: 9px; padding: 2px 9px;
     font-size: 9pt; font-weight: 600; }}
 
+QFrame#FoundTile {{ background: #F7FAFE; border: 1px solid #E3E9F3; border-radius: 10px; }}
+QFrame#FoundTile:hover {{ border-color: #A9C8FB; background: #FFFFFF; }}
+QFrame#FoundTile QLabel {{ background: transparent; border: none; }}
+QLabel#FoundName {{ font-size: 9pt; color: #2A3545; }}
+QPushButton#Link {{ min-width: 0; min-height: 0; border: none; background: transparent;
+    color: {MUTED}; font-size: 9.5pt; font-weight: 500; padding: 4px 8px; text-decoration: underline; }}
+QPushButton#Link:hover {{ color: {BLUE}; background: transparent; border: none; }}
+
 /* Footer and buttons */
 QFrame#Footer {{ background: white; border-top: 1px solid #DCE4F0; }}
 QPushButton {{
